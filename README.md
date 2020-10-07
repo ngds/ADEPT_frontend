@@ -19,7 +19,7 @@ We breakup the description of functionality into a list of specific [forms](#for
 4. Linking ADEPT accounts to a CyVerse Account*
 5. An RStudio implementation*
 
-## Pages
+## Forms
 
 ### User Registration Form
 Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format. Most items on this list are standard or intuitive. The only special case is the disclaimer. We will need some sort of disclaimer that outlines our security protocols, why they exist, and terms of use. We may want to approach UA or UW counsel for help with writing this language. For best coverage, we may want to display this disclaimer in multiple places.
@@ -34,6 +34,21 @@ cyverse text -- Users, CyVerse Account information, see "special considerations 
 purpose text -- basically, what research project(s) they are looking to accomplish
 disclaimer boolean
 ````
+### Dictionary Management Form
+A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
+
+1. Allow the upload of a .txt or csv file
+2. Provide some simple checks to notify users if there is already a similar dictionary in use
+3. Let users edit existing dictionaries
+4. Some sort of status-update tracker
+
+### API Key (Test Set) Request Form
+I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
+
+### Application Submission Form
+TBD
+
+## Pages
 
 ### Main-Search Page
 We are currently envisioning the that the main search page will follow the basic structure of https://data.geothermaldata.org/ with xDD articles metadata represented as cards. This is the information that is returned from https://xdddev.chtc.io/api/v1/articles. 
@@ -44,21 +59,13 @@ A few special considerations for ADEPT compared to the data.geothermaldata (NGDS
 3. We might want to change/enhance the "save" button from NGDS so that it literally stores the docid to the user's project?
 4. Because the metadata from xDD is authoratative there is no need for the metadata editing functions of NGDS.
 
-### Card Introspection
+### Card Introspection Page
 If a user wants to look further into an article's metadata they can click on the card. The metadata to be displayed here is relatively straightforward and also would come from the https://xdddev.chtc.io/api/v1/articles route.
 
 We may also want to let users peruse the results of the https://xdddev.chtc.io/api/v1/snippets route and which keywords in a dictionary are found in that document (currently can be gotten through the /terms route - e.g., https://xdd.wisc.edu/api/terms?docid=54b43243e138239d868490ba&show_terms=true, but better methods are supposedly coming). Both of these options present some interesting UI design challenges because they would require users to add additional input such as the term they want to search for snippets or the dictionary of terms they want to have counted/indexed.
 
-### Dictionary Management Form
-A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
-
-1. Allow the upload of a .txt or csv file
-2. Provide some simple checks to notify users if there is already a similar dictionary in use
-3. Let users edit existing dictionaries
-4. Some sort of status-update tracker
-
-### Application Submission Form
-TBD
+### Account Information Page
+A page where users can see the dictionaries they've submitted, the API Key's they've been granted, and the status of any other requests.
 
 ### API Documentation Pages
 TBD
