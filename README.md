@@ -12,6 +12,7 @@ We breakup the description of functionality into a list of specific [forms](#for
 3. Thorough API documentation, xDD Application Template instructions, and examples of applications
 4. Registration forms for both users, applications, and dictionaries
 5. Application run-time status views
+6. Containerized in case it needs to be transferred to UW hosting
 
 ### Optional or Uncertain
 1. External links to UW services like COSMOS
@@ -71,16 +72,12 @@ A page where users can see the dictionaries they've submitted, the API Key's the
 TBD
 
 ## CyVerse
-We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API https://learning.cyverse.org/projects/data_store_guide/en/latest/step2.html.
-
-The read capability may be useful for us as well if we want BYOD documents to be uploaded through CyVerse in some way and *then* posted to UW.
+We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API https://learning.cyverse.org/projects/data_store_guide/en/latest/step2.html. The read capability may be useful for us as well if we want BYOD documents to be uploaded through CyVerse in some way and *then* posted to UW.
 
 ## Special Considerations
 
 ### Who will host?
-Ideally the AZGS will host ADEPT for the time-being, but it should be containerizable/ transferable so that it can be turned over to the UW team if:
-1. They want to go in a different direction in the future.
-2. AZGS is no longer able to support it.
+Ideally the AZGS will host ADEPT for the time-being, but it should be containerizable/ transferable so that it can be turned over to the UW team if they want to go in a different direction in the future or if AZGS is no longer able to support it.
 
 ### CyVerse Account Problem
 An unresolved consideration is how ADEPT user registration will interact with CyVesre (if at all). On one hand, it would be excellent if we could leverage CyVerse OAuth capabilities (which do not exist yet, but I was told could be added) so that users have a single set of login credentials for both ADEPT and CyVerse. If that is not feasible, we can have users manually link their CyVerse accounts. This latter approach may be better anyway because it would allow us to maintain more control over users. The exact pros and cons of this will need to be worked out in detail with the CyVerse team in attendance.
