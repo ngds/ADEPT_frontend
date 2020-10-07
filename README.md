@@ -2,7 +2,7 @@
 This is a new design specification for the ADEPT front-end environment (web-page and forms).
 
 ## Required Functionality
-We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
+We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), [CyVerse](#cyverse) interactions, and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
 
 ### Broad-Strokes Requirements
 
@@ -56,7 +56,7 @@ We are currently envisioning the that the main search page will follow the basic
 A few special considerations for ADEPT compared to the data.geothermaldata (NGDS) template that we will be using are:
 1. There is, as of yet, no reliable geolocation metadata for articles so the map utilities will not be needed at this time.
 2. Users will probably want to search using more complex logic than just by term - i.e., using more of the /articles parameters. Currently the NGDS search page only provides one search field, so there will need to be a more complex search form.
-3. We might want to change/enhance the "save" button from NGDS so that it literally stores the docid to the user's project?
+3. We might want to change/enhance the "save" button from NGDS so that it literally stores the docid to the user's project? 
 4. Because the metadata from xDD is authoratative there is no need for the metadata editing functions of NGDS.
 
 ### Card Introspection Page
@@ -70,6 +70,9 @@ A page where users can see the dictionaries they've submitted, the API Key's the
 ### API Documentation Pages
 TBD
 
+## CyVerse
+We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API https://learning.cyverse.org/projects/data_store_guide/en/latest/step2.html. 
+
 ## Special Considerations
 
 ### Who will host?
@@ -82,3 +85,6 @@ An unresolved consideration is how ADEPT user registration will interact with Cy
 
 ### COSMOS vs. ADEPT
 ADEPT is really meant to be about the app creation and queue pipeline moreso than the enhanced search functionalities of COSMOS. However, there is defintiely going to be some overalp. We should get a clearer specification document for COSMOS as well and look at the intersect/redundancy of features between the two.
+
+## Additional Links
+https://github.com/cyverse/terrain-notebook
