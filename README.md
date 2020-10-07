@@ -32,16 +32,31 @@ institution text
 email text
 password text -- SHA1 of course
 cyverse text -- Users, CyVerse Account information, see "special considerations section" for more information.
+orcid text -- Maybe we use orcid as the login?
 purpose text -- basically, what research project(s) they are looking to accomplish
 disclaimer boolean
 ````
+
+We envision five capabilities for user accounts.
+
+1. Browse
+2. Test Set Request
+3. Dictionary Request
+4. BYOD (document upload) request
+5. Application Request
+
 ### Dictionary Management Form
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
 
-1. Allow the upload of a .txt or csv file
+1. Allow the upload of a csv file
 2. Provide some simple checks to notify users if there is already a similar dictionary in use
 3. Let users edit existing dictionaries
 4. Some sort of status-update tracker
+
+https://xdd.wisc.edu/api/dictionaries?all -- To see a list of existing dictionaries
+https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To see a list of terms in a dictionary
+
+There will have to be some communication between xDD and ADEPT to update key statuses. This may require a rework of the authentication system.
 
 ### API Key (Test Set) Request Form
 I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
@@ -59,11 +74,15 @@ A few special considerations for ADEPT compared to the data.geothermaldata (NGDS
 2. Users will probably want to search using more complex logic than just by term - i.e., using more of the /articles parameters. Currently the NGDS search page only provides one search field, so there will need to be a more complex search form.
 3. We might want to change/enhance the "save" button from NGDS so that it literally stores the docid to the user's project? 
 4. Because the metadata from xDD is authoratative there is no need for the metadata editing functions of NGDS.
+5. Can the articles route support typeahead? It cannot currently.
+6. Add support for facets (publishers, dictionaries, datasets, and journals) in xdd API. The /publishers route is already operational.
 
 ### Card Introspection Page
 If a user wants to look further into an article's metadata they can click on the card. The metadata to be displayed here is relatively straightforward and also would come from the https://xdddev.chtc.io/api/v1/articles route.
 
 We may also want to let users peruse the results of the https://xdddev.chtc.io/api/v1/snippets route and which keywords in a dictionary are found in that document (currently can be gotten through the /terms route - e.g., https://xdd.wisc.edu/api/terms?docid=54b43243e138239d868490ba&show_terms=true, but better methods are supposedly coming). Both of these options present some interesting UI design challenges because they would require users to add additional input such as the term they want to search for snippets or the dictionary of terms they want to have counted/indexed.
+
+We could have a dropdown menu of dictionaries and use the dictionary terms in that article, and have those "terms" populate the "keywords"
 
 ### Account Information Page
 A page where users can see the dictionaries they've submitted, the API Key's they've been granted, and the status of any other requests.
