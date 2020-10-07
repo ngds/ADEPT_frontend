@@ -71,7 +71,9 @@ A page where users can see the dictionaries they've submitted, the API Key's the
 TBD
 
 ## CyVerse
-We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API https://learning.cyverse.org/projects/data_store_guide/en/latest/step2.html. 
+We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API https://learning.cyverse.org/projects/data_store_guide/en/latest/step2.html.
+
+The read capability may be useful for us as well if we want BYOD documents to be uploaded through CyVerse in some way and *then* posted to UW.
 
 ## Special Considerations
 
