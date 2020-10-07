@@ -86,4 +86,5 @@ An unresolved consideration is how ADEPT user registration will interact with Cy
 ADEPT is really meant to be about the app creation and queue pipeline moreso than the enhanced search functionalities of COSMOS. However, there is defintiely going to be some overalp. We should get a clearer specification document for COSMOS as well and look at the intersect/redundancy of features between the two.
 
 ## Additional Links
-https://github.com/cyverse/terrain-notebook
+Tutotiral How to queue applications on CyVerse https://github.com/cyverse/terrain-notebook
+A preliminary front-end made by the xdd team https://xdddev.chtc.io/results.html
