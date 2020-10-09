@@ -61,6 +61,12 @@ There will have to be some communication between xDD and ADEPT to update key sta
 ### API Key (Test Set) Request Form
 I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
 
+Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it.
+
+1. Just save it to their ADEPT web app account (default)
+2. Write the key to their CyVerse Data Store as a YAML or some other common config file format
+3. Have all the data downloaded and stored in their CyVerse Data Store.
+
 ### Application Submission Form
 TBD
 
