@@ -2,7 +2,7 @@
   "name": "Adept",
   "version": "1.0.0",
   "description": "Adept User Interface",
-  "main": "adept-app.js",
+  "main": "adept-app-ssl.js",
   "repository": "",
   "license": "MIT",
   "dependencies": {
@@ -15,7 +15,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node adept-app.js",
+    "start": "node adept-app-ssl.js",
     "poststart": "echo $NODE_PATH"
   },
   "keywords": [
