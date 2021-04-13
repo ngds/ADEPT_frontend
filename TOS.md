@@ -14,10 +14,10 @@ These Terms of Service (hereafter TOS) define the responsibilities of Automated 
 Both ADEPT and xDD are managed by the University of Wisconsin-Madison.
 
 ## Valid Users
-ADEPT is meant to support the design and development of machine-learning software applications for automated knowledge base construction by non-profit researchers. USE OF THESE RESOURCES BY FOR-PROFIT INSTITUTIONS IS NOT PERMITTED WITHOUT OBTAINING ADDITIONAL PERMISSIONS BEYOND THE SCOPE OF THIS AUP AND INQUIRIES FOR COMMERRCIAL USE MUST BE DIRECTED TO contact@geodeepdive.org. 
+ADEPT is meant to support the design and development of machine-learning software applications for automated knowledge base construction by non-profit researchers. USE OF THESE RESOURCES BY FOR-PROFIT INSTITUTIONS IS NOT PERMITTED WITHOUT OBTAINING ADDITIONAL PERMISSIONS BEYOND THE SCOPE OF THESE TOS AND INQUIRIES FOR COMMERRCIAL USE MUST BE DIRECTED TO contact@geodeepdive.org. 
 
 ## Compliance
-USERS are responsible for complying with this AUP and for violations thereof attributable to them. ADEPT reserves the right to monitor and investigate usage and content at its sole discretion to identify possible violations of this AUP, and/or to protect ADEPT resources and its user community. ADEPT EXPRESSLY DISCLAIMS ANY LIABILITY FOR THE CONTENT AND DATA TRANSMITTED THROUGH OR INTERMEDIATELY, TEMPORARILY, OR PERMANENTLY STORED ON ANY SERVER OR VIRTUAL MACHINE AND FOR THE ACTIONS OR OMISSIONS OF USERS.
+USERS are responsible for complying with this TOS and for violations thereof attributable to them. ADEPT reserves the right to monitor and investigate usage and content at its sole discretion to identify possible violations of these TOS, and/or to protect ADEPT resources and its user community. ADEPT EXPRESSLY DISCLAIMS ANY LIABILITY FOR THE CONTENT AND DATA TRANSMITTED THROUGH OR INTERMEDIATELY, TEMPORARILY, OR PERMANENTLY STORED ON ANY SERVER OR VIRTUAL MACHINE AND FOR THE ACTIONS OR OMISSIONS OF USERS.
 
 ### User Security Obligation
 USERS must use reasonable care to ensure the security of their account, uploads, images, virtual machine (VM), etc. A User is solely responsible for any intrusions into or security breaches of their accounts, except as otherwise covered by a specifically designated security administration or firewall security service package. ADEPT reserves the right to discontinue any submitted software applications, without notice, on its resources as a result of a security compromise.
@@ -25,7 +25,7 @@ USERS must use reasonable care to ensure the security of their account, uploads,
 ### Prohibited Content
 USERS shall not post, transmit, or store data or content on or through software applications submitted to ADEPT servers which, in ADEPT's sole determination, constitutes a violation of any federal, state, local, or international law, regulation, ordinance, court order or other legal process. Prohibited content includes, without limitation, content or code that:
 
-+ Facilitates any violation of this AUP
++ Facilitates any violation of these TOS
 + Includes 'harvested' addresses or information
 + Includes phishing websites or spamvertising sites
 + Includes material believed by ADEPT to constitute pornography, pirated software, hackers' programs or archives, Warez sites, IRC bots, MP3 files, spyware of any sort, Spam software of any sort, etc.
@@ -48,7 +48,7 @@ USERS are prohibited from engaging in any activities that ADEPT determines, in i
 + Engaging in activities, whether lawful or unlawful, that ADEPT determines to be harmful to its Users, User community, operations, reputation, community goodwill, or community relations
 + Running applications or services to mine cryptocurrency and/or that use block-chain technology for personal gain. Exceptions must be requested in advance and will be approved at ADEPT's discretion.
 
-## Violations of this AUP
+## Violations of TOS
 ADEPT reserves the right to deactivate a User's account(s) if any or all portions of this TOS are being violated in any way, in ADEPT's sole and absolute discretion.
 
 ## Indemnification
