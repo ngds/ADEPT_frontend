@@ -23,7 +23,7 @@ We breakup the description of functionality into a list of specific [forms](#for
 ## Forms
 
 ### User Registration Form
-Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format. Most items on this list are standard or intuitive. The only special case is the disclaimer. We will need some sort of disclaimer that outlines our security protocols, why they exist, and terms of use. We may want to approach UA or UW counsel for help with writing this language. For best coverage, we may want to display this disclaimer in multiple places.
+Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format.
 
 
 ````SQL
@@ -37,6 +37,8 @@ disclaimer boolean
 ````
 
 ![image](https://user-images.githubusercontent.com/6250117/114731457-9f187480-9cf6-11eb-80cd-4f262b8bb78a.png)
+
+Typical workflow is that a user fills out the registration form, the account will be inactive, admin will activate, optionally change roles to admin.
 
 ### ADEPT USER Management FUNCTIONS
  
@@ -56,12 +58,12 @@ Admin User Functions
 5. Test Set- Can create  
 
 Application User Functions
-1. test set
-2. dictionary
-3. dataset tools
+1. Testset Tools
+2. Dictionary Tools
+3. Saved sets
 
 
-### Dictionary Management Form
+### Dictionary Tools
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
 
 Dictionaries can be system sourced dictionaries, which can be cached locally, or local, user defined dictionaries
@@ -74,19 +76,35 @@ Dictionaries can be system sourced dictionaries, which can be cached locally, or
 https://xdd.wisc.edu/api/dictionaries?all -- To see a list of existing dictionaries
 https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To see a list of terms in a dictionary
 
-There will have to be some communication between xDD and ADEPT to update key statuses. This may require a rework of the authentication system.
 
 ### API Key (Test Set) Request Form
+
+User must define the test sets and dictioanary associated that can be used in applications. These are XDD defined test sets.
+
+DATE LIMIT OPTION - for static or current test sets
+GENERATE NEW SET from EXISTING with new key
+DELETE TEST SET - with deletion dates
+
 I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
 
 Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it.
 
-1. Just save it to their ADEPT web app account (default)
-2. Write the key to their CyVerse Data Store as a YAML or some other common config file format
-3. Have all the data downloaded and stored in their CyVerse Data Store.
+
+### Saved Sets
+
+User defined collections. These are saved collections that can be used as local sources for test sets. The user builds these dataset collections by:
+
+1. Select new, enter a new collection name and save. 
+2. Return to the search tab, and select the new collection in the “Local Saved Set” list.
+3. Define a search and press save to add it to the collection.
+4. Additional single records can be added to the collection, by clicking on the Save Button that is at the top right of every record. 
+
 
 ### Application Submission Form
-TBD
+
+Definition of the programs, algorithms, code, that can be executed by a user.  
+
+a list of the resources needed for the container( number of cores, if GPU will be involved and memory/storage requirements)
 
 ## Pages
 
