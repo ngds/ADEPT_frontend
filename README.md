@@ -45,25 +45,30 @@ User Types
 2. Application Control(regular user)
 3. Anonymous(doesn't create a log in)
 
+| User Types | Description |
+| --- | --- |
+| Admin | highest permission level |
+| Application Control | regular user access |
+| Anonymous |  
+
 
 Admin User Functions
-1. User Management- add, edit, delete, change role.
+1. User Management- add, edit, delete, and change roles.
 2. Password reset- can reset passwords for users.
 3. Group functions- user can create groups and add users to group 
-4. Automatic approval of users when registered. 
+4. Automatic approval of users when registered.
+5. Test Set- Can create  
 
+Application User Functions
+1. test set
+2. dictionary
+3. dataset tools
 
-
-We envision five capabilities for user accounts.
-
-1. Browse
-2. Test Set Request
-3. Dictionary Request
-4. BYOD (document upload) request
-5. Application Request
 
 ### Dictionary Management Form
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
+
+Dictionaries can be system sourced dictionaries, which can be cached locally, or local, user defined dictionaries
 
 1. Allow the upload of a csv file
 2. Provide some simple checks to notify users if there is already a similar dictionary in use
