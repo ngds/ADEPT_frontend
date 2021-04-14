@@ -29,14 +29,14 @@ Given the unique security requirements of ADEPT, there will need to be some vett
 ````SQL
 given text
 surname text
-institution text
 email text
-password text -- SHA1 of course
-cyverse text -- Users, CyVerse Account information, see "special considerations section" for more information.
-orcid text -- Maybe we use orcid as the login?
+institution text
 purpose text -- basically, what research project(s) they are looking to accomplish
+password text -- SHA1 of course
 disclaimer boolean
 ````
+
+![image](https://user-images.githubusercontent.com/6250117/114731457-9f187480-9cf6-11eb-80cd-4f262b8bb78a.png)
 
 ### ADEPT USER Management FUNCTIONS
  
