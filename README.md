@@ -40,10 +40,6 @@ disclaimer boolean
 
 ### ADEPT USER Management FUNCTIONS
  
-User Types
-1. Admin
-2. Application Control(regular user)
-3. Anonymous(doesn't create a log in)
 
 | User Types | Description |
 | --- | --- |
