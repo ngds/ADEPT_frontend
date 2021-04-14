@@ -25,6 +25,7 @@ We breakup the description of functionality into a list of specific [forms](#for
 ### User Registration Form
 Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format. Most items on this list are standard or intuitive. The only special case is the disclaimer. We will need some sort of disclaimer that outlines our security protocols, why they exist, and terms of use. We may want to approach UA or UW counsel for help with writing this language. For best coverage, we may want to display this disclaimer in multiple places.
 
+
 ````SQL
 given text
 surname text
@@ -36,6 +37,22 @@ orcid text -- Maybe we use orcid as the login?
 purpose text -- basically, what research project(s) they are looking to accomplish
 disclaimer boolean
 ````
+
+### ADEPT USER Management FUNCTIONS
+ 
+User Types
+1. Admin
+2. Application Control(regular user)
+3. Anonymous(doesn't create a log in)
+
+
+Admin User Functions
+1. User Management- add, edit, delete, change role.
+2. Password reset- can reset passwords for users.
+3. Group functions- user can create groups and add users to group 
+4. Automatic approval of users when registered. 
+
+
 
 We envision five capabilities for user accounts.
 
