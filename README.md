@@ -45,22 +45,23 @@ Typical workflow is that a user fills out the registration form, the account wil
 
 | User Types | Description |
 | --- | --- |
-| Admin | highest permission level |
-| Application Control | regular user access |
-| Anonymous |  
+| Admin | Highest permission level |
+| Application Control | Regular user access |
+| Anonymous |  |
 
 
-Admin User Functions
+Admin User Functions:
 1. User Management- add, edit, delete, and change roles.
 2. Password reset- can reset passwords for users.
 3. Group functions- user can create groups and add users to group 
 4. Automatic approval of users when registered.
-5. Test Set- Can create  
+5. Access to Test set Tools, Dictionary Tools, and Saved sets.
 
-Application User Functions
-1. Testset Tools
-2. Dictionary Tools
-3. Saved sets
+Application User Functions:
+1. Access to Test set Tools, Dictionary Tools, and Saved sets.
+
+
+
 
 
 ### Dictionary Tools
@@ -100,11 +101,17 @@ User defined collections. These are saved collections that can be used as local 
 4. Additional single records can be added to the collection, by clicking on the Save Button that is at the top right of every record. 
 
 
+
+
 ### Application Submission Form
 
 Definition of the programs, algorithms, code, that can be executed by a user.  
 
 a list of the resources needed for the container( number of cores, if GPU will be involved and memory/storage requirements)
+
+Application States - Submitted. Approved, Denied, running
+Process States - Submitted, Registered, running, finished, canceled, error
+
 
 ## Pages
 
