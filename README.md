@@ -23,7 +23,7 @@ We breakup the description of functionality into a list of specific [forms](#for
 ## Forms
 
 ### User Registration Form
-Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format.
+Given the unique security requirements of ADEPT, there is some vetting of users. The basic information in the registration form is given below in SQL format.
 
 
 ````SQL
@@ -87,13 +87,11 @@ https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To 
 
 User must define the test sets and dictioanary associated that can be used in applications. These are XDD defined test sets.
 
-DATE LIMIT OPTION - for static or current test sets
-GENERATE NEW SET from EXISTING with new key
-DELETE TEST SET - with deletion dates
+Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it:
 
-I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
-
-Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it.
+* DATE LIMIT OPTION - for static or current test sets
+* GENERATE NEW SET from EXISTING with new key
+* DELETE TEST SET - with deletion dates
 
 
 ### Saved Sets
