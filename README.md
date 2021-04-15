@@ -47,7 +47,7 @@ Typical workflow is that a user fills out the registration form, the account wil
 | --- | --- |
 | Admin | Highest permission level |
 | Application Control | Regular user access |
-| Anonymous |  |
+| Anonymous | View-only access |
 
 
 Admin User Functions:
@@ -56,13 +56,14 @@ Admin User Functions:
 3. Group functions- user can create groups and add users to group 
 4. Automatic approval of users when registered.
 5. Access to Test set Tools, Dictionary Tools, and Saved sets.
+6. Able to browse records
 
 Application User Functions:
 1. Access to Test set Tools, Dictionary Tools, and Saved sets.
+2. Able to browse records
 
-
-
-
+Anonymous Functions:
+1. Able to browse records
 
 ### Dictionary Tools
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
@@ -74,7 +75,11 @@ Dictionaries can be system sourced dictionaries, which can be cached locally, or
 3. Let users edit existing dictionaries
 4. Some sort of status-update tracker
 
+![image](https://user-images.githubusercontent.com/6250117/114928718-c56a0d00-9de7-11eb-81a6-13addd96ce4a.png)
+
+
 https://xdd.wisc.edu/api/dictionaries?all -- To see a list of existing dictionaries
+
 https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To see a list of terms in a dictionary
 
 
