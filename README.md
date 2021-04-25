@@ -2,7 +2,7 @@
 This is a new design specification for the ADEPT front-end environment (web-page and forms).
 
 ## Required Functionality
-We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
+We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), and general [broad-strokes requirements](#broad-strokes-requirements). 
 
 ### Broad-Strokes Requirements
 
