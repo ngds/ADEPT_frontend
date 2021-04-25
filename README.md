@@ -1,8 +1,8 @@
-# Automated Data Extraction PlaTform (ADEPT) Specification 1.0
+# Automated Data Extraction PlaTform (ADEPT) Specification 1.1
 This is a new design specification for the ADEPT front-end environment (web-page and forms).
 
 ## Required Functionality
-We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), [CyVerse](#cyverse) interactions, and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
+We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
 
 ### Broad-Strokes Requirements
 
@@ -12,13 +12,11 @@ We breakup the description of functionality into a list of specific [forms](#for
 3. Thorough API documentation, xDD Application Template instructions, and examples of applications
 4. Registration forms for both users, applications, and dictionaries
 5. Application run-time status views
-6. Containerized in case it needs to be transferred to UW hosting
+6. Containerized for final transfer to xDD servers
 
 ### Optional or Uncertain
 1. External links to UW services like COSMOS
-3. Support for exporting informtion directly into a users CyVerse Account*
-4. Linking ADEPT accounts to a CyVerse Account*
-5. An RStudio implementation*
+2. Upload of custom datasets*
 
 ## Forms
 
@@ -142,20 +140,4 @@ A page where users can see the dictionaries they've submitted, the API Key's the
 ### API Documentation Pages
 TBD
 
-## CyVerse
-We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API (https://de.cyverse.org/terrain/docs/index.html#!/fileio/post_terrain_secured_fileio_upload). The read capability may be useful for us as well if we want BYOD documents to be uploaded through CyVerse in some way and *then* posted to UW.
 
-## Special Considerations
-
-### Who will host?
-Ideally the AZGS will host ADEPT for the time-being, but it should be containerizable/ transferable so that it can be turned over to the UW team if they want to go in a different direction in the future or if AZGS is no longer able to support it.
-
-### CyVerse Account Problem
-An unresolved consideration is how ADEPT user registration will interact with CyVesre (if at all). On one hand, it would be excellent if we could leverage CyVerse OAuth capabilities (which do not exist yet, but I was told could be added) so that users have a single set of login credentials for both ADEPT and CyVerse. If that is not feasible, we can have users manually link their CyVerse accounts. This latter approach may be better anyway because it would allow us to maintain more control over users. The exact pros and cons of this will need to be worked out in detail with the CyVerse team in attendance.
-
-### COSMOS vs. ADEPT
-ADEPT is really meant to be about the app creation and queue pipeline moreso than the enhanced search functionalities of COSMOS. However, there is defintiely going to be some overalp. We should get a clearer specification document for COSMOS as well and look at the intersect/redundancy of features between the two.
-
-## Additional Links
-Tutotiral How to queue applications on CyVerse https://github.com/cyverse/terrain-notebook
-A preliminary front-end made by the xdd team https://xdddev.chtc.io/results.html
