@@ -63,6 +63,20 @@ Application User Functions:
 Anonymous Functions:
 1. Able to browse records
 
+
+### Saved Sets
+
+A user may save the results of one or more metadata searches as a SAVED SET. Saved Sets are created in the saved sets tab, then populated by saving searches and citations on the Search page. The search parameters in a saved set can be also be used to access the xDD API directly to access the same data directly from the source.
+
+ The user builds these dataset collections by:
+
+1. Select new, enter a new collection name and save. 
+2. Return to the search tab, and select the new collection in the “Local Saved Set” list.
+3. Define a search and press save to add it to the collection.
+4. Additional single records can be added to the collection, by clicking on the Save Button that is at the top right of every record. 
+
+
+
 ### Dictionary Tools
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
 
@@ -83,6 +97,10 @@ https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To 
 
 ### API Key (Test Set) Request Form
 
+xDD must control access to its resources to ensure that they are used for legitimate scientific research in bulk text data-mining and that xDD is not used by bad-actors to circumnavigate normal licensing restrictions (i.e., to download PDFs that they would not normally have legal access to for purposes other than text data-mining). xDD fulfils this responsibility by ensuring that its full-text documents do not leave its servers.
+
+An exception to this rule are test-sets that ADEPT users may use for local development of xDD APPLICATIONS. A test-set is a random sample of 200 documents from a SAVED SET that a user may download onto their local machines for development purposes. New test sets can be requested from the SAVED SETS or DICTIONARIES tab. Once approved by the xDD system, users can find a unique API-key and URL to to their requested test-set in the TEST SETS tab.
+
 User must define the test sets and dictioanary associated that can be used in applications. These are XDD defined test sets.
 
 Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it:
@@ -90,17 +108,6 @@ Upon giving the user a key, we can specify whether they want to do 1 of 3 action
 * DATE LIMIT OPTION - for static or current test sets
 * GENERATE NEW SET from EXISTING with new key
 * DELETE TEST SET - with deletion dates
-
-
-### Saved Sets
-
-User defined collections. These are saved collections that can be used as local sources for test sets. The user builds these dataset collections by:
-
-1. Select new, enter a new collection name and save. 
-2. Return to the search tab, and select the new collection in the “Local Saved Set” list.
-3. Define a search and press save to add it to the collection.
-4. Additional single records can be added to the collection, by clicking on the Save Button that is at the top right of every record. 
-
 
 
 
