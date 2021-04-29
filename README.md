@@ -124,6 +124,22 @@ Process States - Submitted, Registered, running, finished, canceled, error
 ## Pages
 
 ### Main-Search Page
+
+![image](https://user-images.githubusercontent.com/6250117/116592650-147a6c80-a8d5-11eb-8282-7ea18907d7f9.png)
+
+User can search terms to the title, author, abstract, or keyword. 
+
+Narrowing a Search
+
+Optional Search Fields - Type in publication, title, DOI, DOCID, and Authors.
+Date Selection - Search for content published during a particular time frame
+Publishers - Search for Publishers
+Journals - Search for journals 
+
+
+
+
+
 We are currently envisioning the that the main search page will follow the basic structure of https://data.geothermaldata.org/ with xDD articles metadata represented as cards. This is the information that is returned from https://xdddev.chtc.io/api/v1/articles. 
 
 A few special considerations for ADEPT compared to the data.geothermaldata (NGDS) template that we will be using are:
