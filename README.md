@@ -125,18 +125,22 @@ Process States - Submitted, Registered, running, finished, canceled, error
 
 ### Main-Search Page
 
-![image](https://user-images.githubusercontent.com/6250117/116592650-147a6c80-a8d5-11eb-8282-7ea18907d7f9.png)
-
 User can search terms to the title, author, abstract, or keyword. 
+
+![image](https://user-images.githubusercontent.com/6250117/116596911-d6cc1280-a8d9-11eb-8c19-a28c48c3844d.png)
+
 
 Narrowing a Search
 
-Optional Search Fields - Type in publication, title, DOI, DOCID, and Authors.
-Date Selection - Search for content published during a particular time frame
-Publishers - Search for Publishers
-Journals - Search for journals 
+![image](https://user-images.githubusercontent.com/6250117/116597192-2579ac80-a8da-11eb-90c5-88024a7281d8.png)
 
 
+* Optional Search Fields - Type in publication, title, DOI, DOCID, and Authors.
+* Date Selection - Search for content published during a particular time frame
+* Publishers - Search for Publishers
+* Journals - Search for journals
+* Datasets -
+* Dictionaries -
 
 
 
