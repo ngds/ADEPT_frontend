@@ -139,8 +139,7 @@ Narrowing a Search
 * Date Selection - Search for content published during a particular time frame
 * Publishers - Search for Publishers
 * Journals - Search for journals
-* Datasets -
-* Dictionaries -
+
 
 
 
