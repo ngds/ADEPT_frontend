@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="https://kit-free.fontawesome.com/releases/latest/css/free.min.css" media="all">
 <link rel="stylesheet" href="/css/ngds.css" />
 <link rel="stylesheet" href="/css/dds.css" />
-<link rel="stylesheet" href="/css/adept.css" />
 <link rel="shortcut icon" href="/img/nico.ico" />
 
 <script src="/js/jquery.min.js"></script>
@@ -20,12 +19,148 @@
 <link href="/css/spin.css" type="text/css" rel="stylesheet" />
 <script src="/js/spin.js"></script>
 
+<style>
+
+    .a:hover {
+        color:rgb(58, 85, 81);
+        font-weight: bold;
+    }
+
+    .shitem[title]:hover:after {
+        content: attr(title);
+        position: absolute;
+    }
+    
+    .ui-datepicker-header {
+        background: #80bbbb;
+	    color: #222222;
+    }
+    .ui-datepicker table {
+        width: 80%;
+        font-size: .7em;
+        border-collapse: collapse;
+        margin: 0 0 .4em;
+    }
+    .ui-datepicker th {
+        padding: .4em .2em;
+        text-align: center;
+        font-weight: bold;
+        border: 0;
+    }
+    .ui-datepicker td {
+        border: 0;
+        padding: 1px;
+    }
+    .ui-datepicker .ui-datepicker-buttonpane {
+	background-image: none;
+	margin: .2em 0 0 0;
+	padding: 0 .2em;
+	border-left: 0;
+	border-right: 0;
+	border-bottom: 0;
+    }
+    .ui-datepicker .ui-datepicker-buttonpane button {
+        font-size: 11px;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        float: right;
+        margin: .2em .2em .4em;
+        cursor: pointer;
+        padding: .2em .6em .3em .6em;
+        width: auto;
+        overflow: visible;
+    }
+    .ui-datepicker select.ui-datepicker-month,
+    .ui-datepicker select.ui-datepicker-year {
+        width: 45%;
+        font-size: 12px;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    }
+    #ui-datepicker-div {
+        width: 260px;
+    }
+
+    .ui-selectmenu-menu-item-header {
+    text-decoration: underline;
+    }
+
+    .ui-selectmenu-menu-item-content {
+    font-style: italic;
+    }
+
+    .hl {
+        background: yellow;
+        font-weight: bold;
+    }
+
+    .jtd {
+        font-size: 12px;
+        font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    }
+
+    .spf {
+        font-size: 16px;
+        font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+        font-style: italic;
+        font-weight: normal;
+        color:rgb(41, 97, 122);
+
+    }
+
+    .ud-hr { margin:2px; 
+        font-size: 18px; 
+        font-family: calibri; 
+        font-weight: bold; 
+        color: rgb(41,97,122);
+    }
+
+    .ud-sh { margin:5px; 
+        font-size: 14px; 
+        font-family: calibri; 
+        font-weight: bold;
+    }
+
+    .ud-tx { margin:5px; 
+        font-size: 14px; 
+        font-family: calibri; 
+        font-weight: normal;
+    }
+
+    .md-label {
+        font-size: 12px;
+    }
+
+    table {
+        border: solid 1px;
+        border-color: rgb(28, 65, 61);
+        background-color:rgb(132, 155, 170);
+    }
+    td {
+        font-size: 12px; 
+        font-family: calibri; 
+        font-weight: normal;
+        margin: 0px;
+        color:rgb(58, 85, 81);
+        background-color:rgb(255, 255, 255);
+    }
+
+    th {
+        font-size: 14px; 
+        font-family: calibri; 
+        font-weight: bold;
+        margin: 0px;
+        background-color:rgb(58, 67, 78);
+        color: rgb(132, 155, 165);
+    }
+
+</style>
 <script>
 
     var sSrchUrl = "";
     var sPage = 0;
     var gSp = 0;
 
+    //var gFeatureGroup;
+    //var gBounds;
     var gExtents=[];
     var gMdRecord=false;
     var gSearchHistory=[];
@@ -137,7 +272,7 @@
 		}
 
         $("#app").on('mouseover',function(){
-           
+            //console.log('1'+ t++);
             $("#SearchHistory").css("display","none");      
         });
 
@@ -146,22 +281,30 @@
         });
 
         $("#cb").on('mouseover',function(){
-          
+            //console.log('2'+ t++);
             $("#SearchHistory").css("display","none");      
         });
-      
+        /*
+        $("#leftSearch").on('mouseover',function(){
+            if ( mous == 1) {
+                $("#SearchHistory").css("display","none");
+                mous = 0;
+            }
+        });
+        */
+
         $("#searchBtn").on('mouseover',function(){
-          
+            //console.log('3'+ t++);
             $("#SearchHistory").css("display","none");      
         });
 
         $("#widget-box").on('mouseover',function(){   
-           
+            //console.log('4'+ t++);   
             $("#SearchHistory").css("display","none");      
         });
 
         $("#search-tool-div").on('mouseover',function(){
-            
+            //console.log('5'+ t++);
             $("#SearchHistory").css("display","none");      
         });
 
@@ -224,7 +367,7 @@
             }
            
             if ( gTApre.length > 2 ) {
-              
+                //console.log(' pre len ' + gTApre.length);
                 if ( e.keyCode > 47 && e.keyCode < 91 ) {
                     $("#sHistoryItems").empty();
                     getTA();
@@ -239,7 +382,7 @@
                 if ( gTAK > 0 ) { gTAK--; }
 
                 $(".sh-item").each(function() {
-                   
+                    //console.log( ' id ' +  $(this).attr("id") );
 
                     if ( $(this).attr("id") == 'sh-'+gTAK ) {
                         $(this).css("font-weight","bold");
@@ -306,9 +449,10 @@
                 });
             } 
 
+
             if (e.keyCode == 13) {
                 gTApre='';
-              
+                //console.log('Search box enter');
                 console.log('6'+ t++);
                 $("#SearchHistory").css("display","none");
                 findRecords(0);   
@@ -322,6 +466,7 @@
             mous = 1;
         }).on('mouseout',function() { 
             if ( mous == 1) {
+                //$("#SearchHistory").css("display","none");
                 mous = 0;  
             }
             
@@ -462,16 +607,18 @@
         
          <div id="leftUserData" class="g-search-pane-left" style="width: 200px; margin:5px; display: none;" > 
             <span class="ud-hr" >User Components</span></br> 
+            <a id="ugbtn" class="res-tag" onclick="userMan(this);" 
+                style="display: none; font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Users</a></br>
+            <a id="grpbtn" class="res-tag" onclick="grpMan(this);" 
+                style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Groups</a></br>
             <a id="scbtn" class="res-tag" onclick="collectionMan(this);" 
                 style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Saved Sets</a></br>
             <a id="dbtn" class="res-tag" onclick="dictionaryMan(this);" 
-                style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Dictionaries</a>
-            </br>
+                style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Dictionaries</a></br>
             <a id="tsbtn" class="res-tag" onclick="testSetMan(this);" 
                 style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Test Sets</a></br>
             <a id="appbtn" class="res-tag" onclick="appMan(this);" 
                 style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Applications</a>  </br>
-            
             <a id="uploadbtn" class="res-tag" onclick="uploadMan(this);" 
                 style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Upload Document</a></br>
             <a id="statusbtn" class="res-tag" onclick="statusMan(this);" 
@@ -479,8 +626,8 @@
             <span class="ud-hr">Interfaces </span></br> 
             <a id="cosmosbtn" class="res-tag" onclick="cosmosMan(this);" 
                 style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">COSMOS</a>  </br>
-            <a id="cosmosbtn" class="res-tag" onclick="cosmosMan(this);" 
-                style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Cyverse</a>  </br>
+            <!--a id="cosmosbtn" class="res-tag" onclick="cosmosMan(this);" 
+                style="font-size: 12px; padding: 5px; width: 100px; background-color: rgb(33, 145, 194);">Cyverse</a>  </br-->
          </div>
 
          <div id="rightUserData" class="g-search-pane-right" style="left: 220px; margin:5px; display: none;">
@@ -488,55 +635,59 @@
             <span id="rud-title" class="dijitTitlePaneTextNode"  style="margin:2px; font-size: 16px;"> / User Data Functions</span>
             <button id="rud-goSearchBtn" class="arrow-button" onclick="bactoSearch(this)">Return to Search</button>
             <span id="rud-page" style="display:none"></span>
-            <div id="rud-results" style="background-color: white; margin:5px;" >
-                <span class="ud-hr">User Components</span>
-                <p class="ud-tx"> <span class="ud-sh">Saved Sets</span> are made up of zero or more saved searches 
-                    (which identify a group of citations) and/or additional identified citation records. Saved Sets
-                    are created in this tab, then populated by saving searches and citations on the Search page.
-                    Saved Sets can be used as the source for the creation of "Test Sets", which are a data product 
-                    identified in the GeoDeepDive system used in ML processing. 
-                    
-                    The <b>Request Test Set</b> button sends the Saved Set data to GeodeepDive for processing. When the 
-                    Test Set is complete, GeoDeepDive system returns the results, which then appears in the Test Set tab.
-                </p></br>         
-                <p class="ud-tx"> 
-                    <span class="ud-sh">Dictionaries</span> are a collection of search terms, and can be either Geodeepdive
-                    identified Dictionaries, or user constructed 
-                    dictionaries. Dictionaries can also be used as the source for the creation of "Test Sets", which
-                    are a data product identified in the GeoDeepDive system used in ML processing.
-                    The <b>Request Test Set</b> button sends the Saved Set data to GeodeepDive for processing. When the 
-                    Test Set is complete, GeoDeepDive system returns the results, which then appears in the Test Set tab.
-                </p></br>               
-                <p class="ud-tx"> 
-                    <span class="ud-sh">Test Sets</span> are data products (usually the full-text of a document) provided by the 
-                    GeoDeepDive System. Test sets can only be requested by authorized users and are identified by GDD API Keys. 
-                    Test sets are made up of text samples from various citations that conform to a specific search criteria 
-                    (a dictionary or saved set). These test documents are meant to aid in application development by giving 
-                    users a broad, random sample of full-text documents that meet their search criteria.</br>
+            <div id="rud-results" style="background-color: white; margin:5px;" ></div>
+            <div id="rud-help" style="background-color: white; margin:5px;" >
+                <span class="ud-hr">ABOUT</span>
+                <p class= "ud-tx">This Automated Data Extraction PlaTform is a set of webtools to facilitate access to the xDD
+                    library of full-text documents (<a href="https://xdd.wisc.edu" target="_blank">https://xdd.wisc.edu</a>). xDD is the largest collection of 
+                    open and controlled-access scientific articles available for bulk text data-mining in the world.</br></br>
 
-                    The <b>Sync with CyVerse</b> button will automatically send the test-set information (the api-key and 
-                    test-set name) to a user’s CyVerse data store. From the CyVerse Data store, the API key can easily be 
-                    used to download the test-sets directly into into CyVerse Applications (such as RStudio or Jupyter Notebooks), 
-                    where the user can experiment with developing a full-text analysis application.
+                    Machine-learning researchers can use ADEPT to:</br></br>
                     
+                    1. SEARCH xDD metadata records</br>
+                    2. Create a SAVED SET of one or more search results</br>
+                    3. Request a TEST SET of 200 random documents from a saved set for local development purposes.</br>
+                    4. Submit APPLICATIONS for high-throughput deployment on the entire xDD library</br>
+                    5. Share saved sets, test-sets, and applications with GROUPS of collaborators</br></p>
+                <span class="ud-hr">SAVED SETS</span>
+                <p class="ud-tx">A user may save the results of one or more metadata 
+                    searches as a SAVED SET. Saved Sets are created in the saved sets tab, then populated by saving searches 
+                    and citations on the Search page. The search parameters in a saved set can be also be used to access the 
+                    xDD API directly to access the same data directly from the source.
                     
-                </p> </br>              
-                <p class="ud-tx">
-                    <span class="ud-sh">Applications</span> are user identified machine learning algorithms</p></br>              
-                <p class="ud-tx">
-                    <span class="ud-sh">Upload Document</span>
-                    provides capability to allow authorized users to upload documents (citations) to the GeoDeepDive system.</p></br>  
-                <p class="ud-tx">
-                    <span class="ud-sh">Status</span>
-                    provides a transaction history and current state of all requests and processes in the Adept, GeoDeepDive,
-                    Cyverse, and COSMOS Systems.</p></br>  
-                <span class="ud-hr">Interfaces</span>
+                </p></br> 
+                <span class="ud-hr">TEST SETS</span>
+                <p class="ud-tx">xDD must control access to its resources to ensure that they are used 
+                    for legitimate scientific research in bulk text data-mining and that xDD is not used by bad-actors to circumnavigate normal 
+                    licensing restrictions (i.e., to download PDFs that they would not normally have legal access to for purposes other 
+                    than text data-mining). xDD fulfils this responsibility by ensuring that its full-text documents do not leave 
+                    its servers.</br></br>
+
+                    An exception to this rule are test-sets that ADEPT users may use for local development of xDD APPLICATIONS. 
+                    A test-set is a random sample of 200 documents from a SAVED SET that a user may download onto their local machines 
+                    for development purposes. New test sets can be requested from the SAVED SETS or DICTIONARIES tab. Once approved by
+                    the xDD system, users can find a unique API-key and URL to to their requested test-set in the TEST SETS tab.
+                    
+                </p></br> 
+                <span class="ud-hr">DICTIONARIES</span>        
                 <p class="ud-tx"> 
-                    <span class="ud-sh">Cyverse</span>establishes connectivity, access, and interfaces to Cyverse system</p></br>  
+                    Dictionaries are a collection of search terms, and can be either xDD identified 
+                    Dictionaries, or user constructed dictionaries. Dictionaries can also be used as the source for the 
+                    creation of TEST SETS, which are a data product identified in the GeoDeepDive system used in ML processing.
+                </p></br>               
+                <span class="ud-hr">APPLICATIONS</span>
                 <p class="ud-tx">
-                    <span class="ud-sh">COSMOS</span>establishes connectivity, access, and interfaces to COSMOS system</p></br>  
+                    ADEPT defines an xDD application as a dockerized set of machine-learning 
+                    scripts for the purpose of bulk text data-mining. xDD administrators need to monitor whether a submitted text 
+                    data-mining application is respectful of its <a onclick="viewTos();">Terms of Service</a>. Users can use the applications tab to submit an 
+                    application for review and approval by an xDD administrator or to request that an already approved application 
+                    be deployed on the xDD high-throughput computing architecture.</p></br> 
+                <span class="ud-hr">GROUPS</span>             
+                <p class="ud-tx">
+                    A user may create a GROUP of collaborators to share items with (i.e., SETS, TEST SETS, and APPLICATIONS). 
+                    Group members have full edit privileges for shared items and may add, edit, or delete items within a group. 
+                    Note that deleting a shared item will delete that item for all users.</p></br>   
             </div>
-           
         </div>
 
 
@@ -557,7 +708,8 @@
                 <a class="tag" type="submit"  onclick="toggleLogin();"  style="margin:2px;">Cancel</a>
                 </br>
                 <a onclick="register();" style="margin:2px; color: #bbbbbb;">Register</a>
-                <a onclick="resetPw();" style="margin:2px; color: #bbbbbb;">Forgot Password ?</a>
+                <a onclick="resetPw();" style="margin:2px; color: #bbbbbb;">Forgot Password ?</a></br>
+                <a onclick="viewTos();" style="margin:2px; color: #bbbbbb; font-size: 10px;">Terms of Service</a>
             </div>
         </div>
 
@@ -565,11 +717,102 @@
             style="position: absolute; top: 75px; left: 300px; margin: 6px; height: 400px; width: 400px; 
                 background-color: #005e95; border-radius: 3px; display: none;">
             <div id="regForm" style="background-color: #ffffff; margin:5px;padding:5px;" ></div>
+            
         </div>
 
+        <div id="tosDiv" style="position: absolute; top: 75px; left: 300px; margin: 6px;  width: 700px; 
+            background-color: #005e95; border-radius: 3px; display: none;">
+            <div id="tosForm" style="background-color: #ffffff; margin:5px;padding:5px; font-size: 10px;" >
+                <b>TERMS OF SERVICE</b></br></br>
 
+<b>Background</b></br>
+These Terms of Service (hereafter TOS) define the responsibilities of Automated Data Extraction Platform (hereafter ADEPT) account holders (hereafter USERS) with respect to proper and acceptable use of its resources. ADEPT is the front-end interface for accessing the xDD corpus of digital documents. xDD was originally supported by the U.S. National Science Foundation EarthCube building block project (NSF ICER 1343760). Additional ogoing critical support is being provided by DARPA ASKE HR00111990013. Additional support is provided by the DOE and USGS. A through-going objective of all of these projects is to build a cyberinfrastructure that is capable of supporting end-to-end text and data mining (TDM) and knowledge base creation/augmentation 
+activities in any domain of science or scholarship. xDD infrastructure includes the following key components:</br>
 
+1. Automated, rate-controlled and authenticated original document fetching</br>
+2. Secure original document storage and bibliographic/source metadata management</br>
+3. Automated pre-processing of documents by multiple software tools; 
+ability to quickly deploy new tools/versions of tools across all documents</br>
+4. API for basic full-text search and discovery capabilities</br>
+5. Ability to pre-index content using external dictionaries</br>
+6. Ability to generate fully documented, bibliographically complete testing and development datasets based on user-supplied terms</br>
+7. Capacity to support the deployment of user-developed TDM applications across full corpus, with on-demand
+ updates as new relevant documents are acquired</br></br>
 
-          
+Both ADEPT and xDD are managed by the University of Wisconsin-Madison.</br></br>
+
+<b>Valid Users</b></br></br>
+ADEPT is meant to support the design and development of machine-learning software applications for automated knowledge
+ base construction by non-profit researchers. USE OF THESE RESOURCES BY FOR-PROFIT INSTITUTIONS IS NOT PERMITTED WITHOUT 
+ OBTAINING ADDITIONAL PERMISSIONS BEYOND THE SCOPE OF THESE TOS AND INQUIRIES FOR COMMERRCIAL USE MUST BE DIRECTED 
+ TO contact@geodeepdive.org. </br></br>
+
+<b>Compliance</b></br>
+USERS are responsible for complying with this TOS and for violations thereof attributable to them. ADEPT reserves 
+the right to monitor and investigate usage and content at its sole discretion to identify possible violations 
+of these TOS, and/or to protect ADEPT resources and its user community. ADEPT EXPRESSLY DISCLAIMS ANY LIABILITY 
+FOR THE CONTENT AND DATA TRANSMITTED THROUGH OR INTERMEDIATELY, TEMPORARILY, OR PERMANENTLY STORED ON ANY SERVER 
+OR VIRTUAL MACHINE AND FOR THE ACTIONS OR OMISSIONS OF USERS.</br></br>
+
+<b>User Security Obligation</b></br>
+USERS must use reasonable care to ensure the security of their account, uploads, images, virtual machine (VM), etc. 
+A User is solely responsible for any intrusions into or security breaches of their accounts, except as otherwise covered 
+by a specifically designated security administration or firewall security service package. ADEPT reserves the right 
+to discontinue any submitted software applications, without notice, on its resources as a result of a security compromise.</br></br>
+
+<b>Prohibited Content</b></br>
+USERS shall not post, transmit, or store data or content on or through software applications submitted to ADEPT servers 
+which, in ADEPT's sole determination, constitutes a violation of any federal, state, local, or international law,
+ regulation, ordinance, court order or other legal process. Prohibited content includes, without limitation, content or code that:</br>
+
++ Facilitates any violation of these TOS</br>
++ Includes 'harvested' addresses or information</br>
++ Includes phishing websites or spamvertising sites</br>
++ Includes material believed by ADEPT to constitute pornography, pirated software, hackers' programs or archives, 
+Warez sites, IRC bots, MP3 files, spyware of any sort, Spam software of any sort, etc.</br>
++ All ADEPT hosting services, virtual or otherwise, may only be used for lawful purposes.</br></br>
+
+<b>Abuse and Unacceptable Uses</b></br>
+USERS are prohibited from engaging in any activities that ADEPT determines, in its sole and absolute discretion, 
+to constitute abuse or unacceptable uses, including but not limited to:</br>
+
++ USERS may not submit any software applications to the ADEPT infrastructure that transmit, distribute, 
+download, copy, cache, host, or store any information, data, material, or work that infringes the intellectual property 
+rights of others or violates any trade secret right of any other person/User.</br>
++ Introducing or executing malicious content or programs into ADEPT servers or virtual machines, such as viruses, worms, 
+Trojan horses, and key loggers</br>
++ Causing or initiating security breaches or disruptions of system communications and/or connectivity, including port scans, 
+flood pings, email bombing, packet spoofing, IP spoofing, and forged routing information</br>
++ Executing any form of system activity that will intercept data not intended for the USERS's account</br>
++ Evading or circumventing USER authentication or security of any host, network, or account, including cracking, brute-force, 
+or dictionary attacks</br>
++ Interfering with or denying service to any USER, host, or network other than the User's host, such as a denial of service 
+attack or distributed denial of service attack</br>
++ Conduct designed to avoid restrictions or limits access to specific services, hosts, or networks, including the forging of
+ packet headers or other identification information</br>
++ Soliciting the performance of any illegal activity, even if the activity is not performed.</br>
++ Using any program, or sending messages of any kind, designed to interfere with or disable a User's terminal session</br>
++ Revealing your account password to others or allowing use of your account by others</br>
++ Using ADEPT's computing resources to actively engage in procuring or transmitting material that is in violation 
+of sexual harassment or hostile workplace laws in the User's local jurisdiction</br>
++ Engaging in activities, whether lawful or unlawful, that ADEPT determines to be harmful to its Users, User community,
+ operations, reputation, community goodwill, or community relations</br>
++ Running applications or services to mine cryptocurrency and/or that use block-chain technology for personal gain. 
+Exceptions must be requested in advance and will be approved at ADEPT's discretion.</br></br>
+
+<b>Violations of TOS</b></br>
+ADEPT reserves the right to deactivate a User's account(s) if any or all portions of this TOS are being violated in any way, 
+in ADEPT's sole and absolute discretion.</br></br>
+
+<b>Indemnification</b></br>
+USER agrees to indemnify and hold harmless ADEPT and its staff, directors, agents, and collaborators from and against any claims, 
+losses, judgments, damages, costs, and expenses incurred by any of the foregoing parties due to or resulting from:</br>
+
++ USER's publication of unacceptable content or materials stored on xDD resources</br>
++ USER's download of prohibitied content or materials stored on xDD resources</br>
++ USER's breach or violation of any covenant contained in this policy, or resulting from their use of ADEPT</br>
+<a onclick="viewTos();" class="tag" style="margin: 5px;">Close</a>
+    </div>
+</div>
             
 </body>

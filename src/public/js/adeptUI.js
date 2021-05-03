@@ -21,6 +21,10 @@
   var gSelCollection = {};
   var gProcLog = [];
   var gApps = [];
+  var gSelApp = {};
+  var gGroups = [];
+  var gOtherGroups=[];
+  var gSelGrp = {};
 
   var gDLType = "";
   var gDict = {};
@@ -54,7 +58,9 @@
   var gkwid=-1;
  
   var gUser = {};
-
+  var gUsers = [];
+  var gSelUser = {};
+  
   function showSeaHis() {
 
     $("#sHistoryItems").empty();
@@ -324,7 +330,8 @@
     if ( o.text == 'Save' ) {
       if ( kmu(gKey) ) {
         if ( gSelCollection.col_id ) {
-          var mdv = gSRA[o.id];
+          var oid = o.id.substr(3);
+          var mdv = gSRA[oid];
           var doi = mdv.identifier[0].id;
           var id = mdv._gddid;
           var zx = saveRecordToCollection(id);
@@ -344,8 +351,6 @@
     }
 
     
-
-  
   }
 
   function getTA() {
@@ -445,6 +450,14 @@ function savedData(o) {
 
   $("#leftUserData").show();
   $("#rightUserData").show();
+  $("#rud-help").show();
+  $("#rud-results").empty();
+  
+  if ( gUser.role_id == 1 ) {
+    $("#ugbtn").show();
+  } else {
+    $("#ugbtn").hide();
+  }
 
 }
 
@@ -1003,7 +1016,7 @@ function preview(o) {
 var getSnippets = function(doi) {
 
   var z = [];
-  var sUrl = gdUrl+'/snippets?term='+gSE.term+'&doi='+doi;
+  var sUrl = gdUrl+'/snippets?term='+gSE.term+'&doi='+doi+'&fragment_limit=10';
 
   var jqxhr = $.get(sUrl, function() {
     var ssu = 'success snippet'; 
@@ -1716,10 +1729,14 @@ function logmein(o, cb) {
       var dres = JSON.parse(data);
     }
   
-    if ( dres.authtoken == dres.kv ) {
+    if ( dres.authtoken == 'undefined' || dres.authtoken == 'Not authorized') {
+      var pt = false;
+    } else { pt = true; }
+
+    if ( pt == true && dres.authtoken == dres.kv ) {
         gKey = {};
         gKey[dres.authtoken] = dres.kv;
-        gKey.agentRole = dres.role_id;
+        gKey.agentRole = dres.agentrole;
         $("#laname").text(un).css("font-size","12px")
             .css("font-family","Arial, Lucida Grande, sans-serif");
         $("#loginBtn").text("Logout");
@@ -1729,17 +1746,25 @@ function logmein(o, cb) {
         $("#saveSetGrp").show();
         $("#saveSearchBtn").show();
         gUser.id = dres.user_id;
-        gUser.role_id = dres.role_id;
+        gUser.role_id = dres.agentrole;
+        if ( gUser.role_id == 1 ) {
+          $("#ugBtn").show();
+        } else {
+          $("#ugBtn").hide();
+        }
         getCollections('login');
         cb();
         return;
     } else {
+      $("#loginBtn").text("Not Authorized");
+        $("#loginDiv").hide();
+        $("#myDataTab").hide();
         gKey = {"x":"z","agentRole":"99"};
         cb();
+        alert('Invalid login');
     }
   });
   
-
 }
 
 function loginSelCol(o) {
@@ -1762,7 +1787,7 @@ function loginSelCol(o) {
 
     }
   } else {
-    var so = $('<option value="default">Default</option>').css("font-family", "calibri");
+    var so = $('<option value="default" selected>Default</option>').css("font-family", "calibri");
     $("#selSavedSets").append(so);
   }
 }
@@ -1964,6 +1989,7 @@ var register = function(o) {
           .css("font-family","calibri")
           .css("font-size","11px");
 
+    var tosBtn = $('<a id="tosBtn" class="tag" onclick="viewTos();" style="margin:2px; ">Terms of Service</a>')
     var regBtn = $('<a id="regBtn" class="tag" type="submit" onclick="submitReg();" style="margin:4px;">Register</a>');
     var cancelBtn = $('<a id="cancelBtn" class="tag" type="submit" onclick="cancelReg();" style="margin:4px;">Cancel</a>');
 
@@ -1974,7 +2000,9 @@ var register = function(o) {
                     .css("font-family","calibri")
                     .css("margin-bottom", "8px")
                     .css("text-align", "center");
-    bsp.append(regBtn)
+
+    bsp.append(tosBtn);                
+    bsp.append(regBtn);
     bsp.append(cancelBtn);
 
     rf.append(h);
@@ -2108,31 +2136,43 @@ var toggleLogin = function(o, cb) {
       gKey = { "a" : "b" };
       $("#laname").text("");
       $(o).text("Login");
-     $("#Cex").css("display","none");
-     $("#myDataTab").hide();
-     $("#saveSetGrp").hide();
-     $("#saveSearchBtn").hide();
+
+      $("#Cex").css("display","none");
+      $("#myDataTab").hide();
+      $("#saveSetGrp").hide();
+      $("#saveSearchBtn").hide();
+
+      $("#leftUserData").hide();
+      $("#rightUserData").hide();
+      $("#rud-results").empty();
+      $("#rud-help").show();
+      $("#leftSearch").show();
+      $("#cb").show();
       cb();
   } else {
+    
     if ( $("#loginDiv").css("display") == "none") { 
       $("#loginDiv").css("display","block");
     
     } else {
       $("#loginDiv").css("display","none");
-  
     }
   
   }
 
 }
 
+var viewTos = function(o) {
+  //$("#loginDiv").hide();
+  $("#tosDiv").toggle();
+}
 
 // My Data Functions
 
 var dictionaryMan = function(o) {
 
   $("#rud-results").empty();
-
+  $("#rud-help").hide();
   var dmdiv = $('<div id="dmdiv"></div>') 
             .css('width','600px')
             .css('float','left')
@@ -2473,9 +2513,266 @@ var createNewDict = function(o) {
   });
 }
 
+var userMan = function(o) {
+
+  $("#rud-results").empty();
+  $("#rud-help").hide();
+  
+  var umdiv = $('<div id="umdiv"></div>');
+  var umTx = $('<h3>Manager Users</h3>');
+
+  var uhdrdiv = $('<div id="uhdr-div"></div>')
+        .css('width','800px')
+        .css('height','60px')
+        .css('display','block');
+  
+  var unBtn = $('<a id="unBtn" class="res-tag" type="submit" onclick="usReset(this);">Reset Password</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','100px');
+
+  var usBtn = $('<a id="unBtn" class="res-tag" type="submit" onclick="uChgStatus(this);">Status</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var urBtn = $('<a id="unBtn" class="res-tag" type="submit" onclick="uChgRole(this);">Role</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var rp = $('<input id="pwreset" type="text" size="30" value="">');
+       
+  uhdrdiv.append(unBtn);
+  uhdrdiv.append(usBtn);
+  uhdrdiv.append(urBtn);
+  uhdrdiv.append('</br>');
+  uhdrdiv.append(rp);
+
+  rp.hide();
+  var utdiv = $('<div id="utab-div"></div>')
+        .css('width','800px')
+        .css('display','block');
+
+  umdiv.append(umTx);
+  umdiv.append(uhdrdiv);
+  umdiv.append(utdiv);
+  $("#rud-results").append(umdiv);
+  umTemplate();
+
+}
+
+
+var umTemplate = function() {
+
+  var umT = $('<table id="umtab"></table>');
+  var umth = $('<tr><th style="text-align:left">User</th><th style="text-align:left">Email</th><th>Status</th><th>Created</th><th>Role</th></tr>');
+  umT.append(umth);
+  $("#utab-div").append(umT);
+
+  var pUrl ='/adept/getUsers?t='+ kmu(gKey) +'&u='+gUser.id;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success users'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        gUsers = dres.success.data;
+        showUsers();
+
+  });
+
+}
+
+var showUsers = function() {
+
+  for (k in gUsers) {
+    var u =  gUsers[k].user_id;
+    var f =  gUsers[k].first_name;
+    var l =  gUsers[k].last_name;
+    var e =  gUsers[k].email;
+    var r =  gUsers[k].role_id;
+    var o =  gUsers[k].org_name;
+    var c =  gUsers[k].created;
+    var s =  gUsers[k].state;
+    
+    if ( r == 1 ) {
+      var rn = 'admin';
+    } else {
+      var rn = 'application';
+    }
+
+    var tr = $('<tr></tr>');
+
+    var userx = $('<a class="tsx-dm" id="'+k+'" onclick="selectUser(this);" >' + f + ' ' + l + '</a>')
+        .css("font-size", "12px")
+        .css("color", "#222222")
+        .css("cursor", "pointer")
+        .css("font-weight", "bold");
+
+    var t1 = $('<td id="ut1-'+k+'" class="jtd"></td>')
+            .css("width","140px");
+    t1.append(userx);
+
+    var t2 = $('<td id="ut2-'+k+'" class="jtd">'+ e +'</td>')
+          .css("width","220px");
+
+    var t3 =  $('<td id="ut3-'+k+'" class="jtd">' + s + '</td>')
+          .css("width","80px");
+
+    var t4 =  $('<td id="ut4-'+k+'" class="jtd">'+ c +'</td>')
+          .css("width","160px");
+
+    var t5 =  $('<td id="ut5-'+k+'" class="jtd">' + rn + '</td>')
+          .css("width","160px");
+
+    tr.append(t1);
+    tr.append(t2);
+    tr.append(t3);
+    tr.append(t4);
+    tr.append(t5);
+  
+    $("#umtab").append(tr);
+
+  }
+}
+
+var selectUser = function(o) {
+
+  var sid = o.id;
+  gSelUser = gUsers[sid];
+
+  for (k in gUsers) {
+    $("#ut1-"+k).css("background-color","white");
+    $("#ut2-"+k).css("background-color","white");
+    $("#ut3-"+k).css("background-color","white");
+    $("#ut4-"+k).css("background-color","white");
+    $("#ut5-"+k).css("background-color","white");
+  }
+
+  // if clicks on selected user deselect
+  if ( gSelUser.user_id !== sid ) {
+    $("#ut1-"+sid).css("background-color","yellow");
+    $("#ut2-"+sid).css("background-color","yellow");
+    $("#ut3-"+sid).css("background-color","yellow");
+    $("#ut4-"+sid).css("background-color","yellow");
+    $("#ut5-"+sid).css("background-color","yellow");
+  } else {
+    gSelUser = {};
+  }
+
+
+  //for (k in gUsers) {
+  //   if ( gUsers[k].user_id == sid) {
+  //    gSelUser = gUsers[k];
+  //   }
+  //}
+
+  //console.log(JSON.stringify(gSelUser));
+
+}
+
+var uChgStatus = function(o) {
+
+  for (k in gUsers) {
+     if ( gUsers[k].user_id == gSelUser.user_id) {
+        var nk = k;
+     }
+  }
+
+  if ( typeof(gSelUser.user_id) !== 'undefined' ) {
+    if (  gSelUser.state == 'active' ) {
+      var nuState = 'inactive';
+    } else {
+      var nuState = 'active';
+    }
+    $("#ut3-"+nk).text(nuState);
+    gSelUser.state = nuState;
+
+    updateUser(gSelUser.user_id,'state',nuState);
+  } else {
+    alert('Select a user');
+  }
+}
+
+
+var uChgRole = function(o) {
+
+  for (k in gUsers) {
+    if ( gUsers[k].user_id == gSelUser.user_id) {
+       var nk = k;
+    }
+ }
+
+  if ( typeof(gSelUser.role_id) !== 'undefined' ) {
+    if (  gSelUser.role_id == 1 ) {
+      var nuRole = 2;
+      $("#ut5-"+nk).text('application');
+    } else {
+      var nuRole = 1;
+      $("#ut5-"+nk).text('admin');
+    }
+    gSelUser.role_id = nuRole;
+    updateUser(gSelUser.user_id,'role_id',nuRole);
+  } else {
+    alert('Select a user');
+  }
+}
+
+var usReset = function(o) {
+
+  if ( typeof(gSelUser.role_id) !== 'undefined' ) {
+    if ( $("#pwreset").is(':hidden') ) {
+      $("#pwreset").show();
+      o.text = 'Save Password';
+    } else {
+      var pzx = $("#pwreset").val();
+      if ( pzx.length > 8 ) {
+        updateUser(gSelUser.user_id, 'password', pzx );
+        $("#pwreset").hide();
+        o.text = 'Reset Password';
+      } else {
+        alert('Invalid password');
+      }
+    }
+  } else {
+    alert('Select a user');
+  }
+
+}
+
+
+var updateUser = function(u,p,v) {
+
+  var pUrl ='/adept/updateUser?t='+ kmu(gKey) +'&u='+u+'&p='+p+'&v='+v;
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success user update'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+          console.log('user succesfully changed')
+        }
+  });
+
+}
+
 var testSetMan = function(o) {
 
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var tsdiv = $('<div id="tsdiv"></div>');
   var tsTx = $('<h3>Test Set Manager</h3>');
@@ -2543,7 +2840,7 @@ var getTestSets = function() {
 
         if ( dres.success.data ) {
           gTestSets = dres.success.data;
-          if ( gTestSets.length ) {
+          if ( gTestSets.length  ) {
             showTestSetList();
           } else {
             // empty it out
@@ -2608,6 +2905,7 @@ var tsCyverseSync = function(o) {
 var appMan = function(o) {
 
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var aphdr = $('<div id="app-hdr-div"></div>');
   var apdiv = $('<div id="app-man-div"></div>');
@@ -2631,16 +2929,34 @@ var appMan = function(o) {
         .css('margin','5px')
         .css('width','80px');
 
+  var gaBtn = $('<a id="gaBtn" class="res-tag" type="submit" onclick="addAppToGroup();" >Add to Group</a>')
+        .css('display','none')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var sQ = $('<select id="selGrp"></select>')
+        .css("font-family","calibri")
+        .css("font-weight","bold")
+        .css("border-style","solid 1px")
+        .css('display', 'none')
+        .css("margin","4px 4px");
+
   aphdr.append(apTx);
   aphdr.append(naBtn);
   aphdr.append(eaBtn);
   aphdr.append(raBtn);
+  aphdr.append(gaBtn);
+  aphdr.append(sQ);
+
 
   $("#rud-results").append(aphdr);
   $("#rud-results").append(apdiv);
   getApps();
 
 }
+
 
 var getApps = function(o) {
 
@@ -2668,25 +2984,457 @@ var getApps = function(o) {
   });
 }
 
+var selectApp = function(o) {
+
+  var old_id = gSelApp.ua_id;
+  var aid = o.id;
+  gSelApp = gApps[aid];
+  $("#app-div-detail").remove();
+
+  for (k in gApps) {
+    $("#ar-"+k).hide();
+    $("#gaBtn").hide();
+    $("#ab-"+k).css("background-color","white");
+    $("#a-"+k).css("background-color","white");
+    $("#b-"+k).css("background-color","white");
+    $("#c-"+k).css("background-color","white");
+    $("#d-"+k).css("background-color","white");
+    $("#e-"+k).css("background-color","white");
+    $("#f-"+k).css("background-color","white");
+    $("#m-"+k).css("background-color","white");
+
+  }
+
+  // if clicks on selected user deselect
+  if ( gSelApp.ua_id !== old_id ) {
+    $("#ar-"+aid).show();
+    $("#ab-"+aid).css("background-color","yellow");
+    $("#a-"+aid).css("background-color","yellow");
+    $("#b-"+aid).css("background-color","yellow");
+    $("#c-"+aid).css("background-color","yellow");
+    $("#d-"+aid).css("background-color","yellow");
+    $("#e-"+aid).css("background-color","yellow");
+    $("#f-"+aid).css("background-color","yellow");
+    $("#m-"+aid).css("background-color","yellow");
+    $("#gaBtn").show();
+  
+    showAppDetails();
+
+  } else {
+    gSelApp = {};
+    for (k in gApps) {
+      $("#ar-"+k).show();
+    }
+    $("#app-tab-detail").remove();
+  }
+}
+
+var addAppToGroup = function(o) {
+
+  var u =  gUser.id;
+  var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+u+'&type=owner';
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+
+    $("#selGrp").html('');
+
+    for (k in dres.success.data ) {
+      var o = $('<option value="'+ dres.success.data[k].group_id +'" >'+dres.success.data[k].group_name+'</option>'); 
+      $("#selGrp").append(o);
+    }
+    $("#selGrp").show();
+
+    $("#gaBtn").text("Save");
+    $("#gaBtn").attr("onclick","saveObjToGroup('application')");
+    
+  });
+}
+
+var showAppDetails = function() {
+
+  var sad = $('<div id="app-div-detail"></div>');
+
+  $("#app-man-div").append(sad);
+  sad.append('</br>Test Sets & Dictionaries');
+  var nrBtn = $('<a id="nrBtn" class="res-tag" type="submit" onclick="addDataset();" >Add</a>')
+              .css('font-size','12px')
+              .css('background-color','rgb(33,145,194)')
+              .css('margin','5px')
+              .css('width','80px');
+  sad.append(nrBtn);
+
+  var pt = $('<table id="app-tab-detail"></table>');
+ 
+  for (k in gSelApp.test_set ) {
+    var i =  gSelApp.test_set[k].res_id;
+    var n =  gSelApp.test_set[k].ts_name;
+    var t =  gSelApp.test_set[k].ts_url;
+    var d = new Date(gSelApp.test_set[k].created);
+    var tr = $('<tr id="as-'+k+'"></tr>');
+
+    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
+        + "-" + ('0' + d.getDate()).slice(-2);
+
+    var appX = $('<a class="tsx-dm" id="at-'+k+'" onclick="selectRes(this);" ><i class="fa fa-trash"></i></a>')
+      .css("font-size", "10px")
+      .css("color", "#196fa6")
+      .css("cursor", "pointer")
+      .css("font-weight", "bold");
+
+    var ta = $('<td id="sax-'+k+'"></td>');
+    ta.append(appX);
+
+    var tb = $('<td id="sb-'+k+'">'+n+'</td>');
+    var tc = $('<td id="sc-'+k+'">test set</td>');
+    var td = $('<td id="sd-'+k+'">'+d+'</td>');
+    var te = $('<td id="se-'+k+'">'+t+'</td>');
+   
+    tr.append(ta);
+    tr.append(tb);
+    tr.append(tc);
+    tr.append(td);
+    tr.append(te);
+    pt.append(tr);
+
+  }
+
+  for (k in gSelApp.dict ) {
+    var i =  gSelApp.dict[k].res_id;
+    var n =  gSelApp.dict[k].dict_name;
+    var t =  gSelApp.dict[k].dict_source;
+    var d = new Date(gSelApp.dict[k].last_updated);
+    var tr = $('<tr id="ad-'+k+'"></tr>');
+
+    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
+        + "-" + ('0' + d.getDate()).slice(-2);
+
+    var appz = $('<a class="tsx-dm" id="bx-'+k+'" onclick="selectRes(this);" ><i class="fa fa-trash"></i></a>')
+      .css("font-size", "10px")
+      .css("color", "#196fa6")
+      .css("cursor", "pointer")
+      .css("font-weight", "bold");
+
+    var tf = $('<td id="sf-'+k+'"></td>');
+    
+    tf.append(appz);
+
+    var tb = $('<td id="sg-'+k+'">'+n+'</td>');
+    var tc = $('<td id="sh-'+k+'">dictionary</td>');
+    var td = $('<td id="si-'+k+'">'+d+'</td>');
+    var te = $('<td id="sj-'+k+'">'+t+'</td>');
+   
+    tr.append(tf);
+    tr.append(tb);
+    tr.append(tc);
+    tr.append(td);
+    tr.append(te);
+    pt.append(tr);
+  }
+  
+  sad.append(pt);
+  sad.append('</br>');  
+  
+  // process history
+  sad.append('</br>Process History</br>');
+  var nxBtn = $('<a id="nxBtn" class="res-tag" type="submit" onclick="runApplication();" >Execute</a>')
+          .css('font-size','12px')
+          .css('background-color','rgb(33,145,194)')
+          .css('margin','5px')
+          .css('width','80px');
+  var xn = $('<input class="form-control" size="40" placeholder="Exec Notes" id="xni">');
+  var nxcBtn = $('<a id="nxcBtn" class="res-tag" type="submit" onclick="haltApplication();" >Halt</a>')
+          .css('font-size','12px')
+          .css('background-color','rgb(33,145,194)')
+          .css('margin','5px')
+          .css('width','80px');
+  
+  sad.append(nxBtn);
+  sad.append(xn);
+  sad.append('</br>'); 
+  //sad.append(nxcBtn);
+  //sad.append('</br>');  
+
+  var px = $('<table id="app-tab-process"></table>');
+  var tr = $('<tr></tr>')
+  var ta = $('<th></th>');
+  var tb = $('<th width="80px">Created</th>');
+  var tc = $('<th width="80px">Last Run Date</th>');
+  var td = $('<th width="140px">Notes</th>');
+  var te = $('<th width="80px">Status</th>');
+ 
+  tr.append(ta);
+  tr.append(tb);
+  tr.append(tc);
+  tr.append(td);
+  tr.append(te);
+  px.append(tr);
+
+  for (k in gSelApp.proc ) {
+    var i =  gSelApp.proc[k].ax_id;
+    var n =  gSelApp.proc[k].proc_notes;
+    var t =  gSelApp.proc[k].state;
+    var c =  new Date(gSelApp.proc[k].created);
+    var d =  new Date(gSelApp.proc[k].run_date);
+    var tr = $('<tr id="as-'+k+'"></tr>');
+
+    c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+    + "-" + ('0' + c.getDate()).slice(-2);
+
+    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
+        + "-" + ('0' + d.getDate()).slice(-2);
+
+    var procHalt = $('<a class="tsx-dm" id="ps-'+k+'" onclick="stopProc(this);" ><i class="fa fa-hand-paper"></i></a>')
+                  .css("font-size", "11px")
+                  .css("color", "#196fa6")
+                  .css("cursor", "pointer")
+                  .css("margin", "4px 4px")
+                  .css("font-weight", "bold");
+
+    var procGo = $('<a class="tsx-dm" id="pg-'+k+'" onclick="rerunProc(this);" ><i class="fa fa-sync-alt"></i></a>')
+                  .css("font-size", "11px")
+                  .css("color", "#196fa6")
+                  .css("cursor", "pointer")
+                  .css("margin", "4px 4px")
+                  .css("font-weight", "bold");
+
+    var ta = $('<td id="sap-'+k+'"></td>');
+    ta.append(procGo);
+    ta.append(procHalt);
+
+    //ta.append(appx);
+
+    var tb = $('<td id="sb-'+k+'">'+c+'</td>');
+    var tc = $('<td id="sb-'+k+'">'+d+'</td>');
+    var td = $('<td id="sc-'+k+'">'+n+'</td>');
+    var te = $('<td id="sd-'+k+'">'+t+'</td>');
+    
+    tr.append(ta);
+    tr.append(tb);
+    tr.append(tc);
+    tr.append(td);
+    tr.append(te);
+    px.append(tr);
+  }
+  sad.append(px);
+
+}
+
+var newApplication = function(o) {
+
+  var am = $("#app-man-div");
+  $("#apptab").hide();
+  var ad = $('<div id="new-app-div"></div>');
+  am.append(ad);
+
+  var an = $('<input class="form-control" placeholder="Application Name" id="aName">');
+  var adl = $('<input class="form-control" placeholder="Date Limit" id="aDateLim">');
+  var ado = $('<input class="form-control" placeholder="Docker Id" id="aDID">');
+  var sApT = $('<select id="selAppType"></select>')
+              .css("font-family","calibri")
+              .css("border-style","solid 1px")
+              .css("border-color","rgb(132, 155, 165)")
+              .css("margin","4px 4px");
+  var oad = $('<option value="docker" selected>docker</option>');
+  var oap = $('<option value="python" >python</option>');        
+  sApT.append(oad);
+  sApT.append(oap);
+
+  var aco = $('<input class="form-control" placeholder="Cores" id="aCores">');
+  var ame = $('<input class="form-control" placeholder="Memory" id="aMemory">');
+  
+  ad.append('</br>');
+  ad.append(an);
+  ad.append('</br>');
+  ad.append(adl);
+  ad.append('</br>Application Type</br>');
+  ad.append(sApT);
+  ad.append('</br>Application Identifier and Version</br>');
+  ad.append(ado);
+  ad.append('</br>Resources Required to Execute</br>');
+  ad.append(aco);
+  ad.append('</br>');
+  ad.append(ame);
+  ad.append('</br>Add Test Sets');
+
+  var sQ = $('<select id="selTestSets"></select>')
+            .css("font-family","calibri")
+            .css("border-style","solid 1px")
+            .css("border-color","rgb(132, 155, 165)")
+            .css("margin","4px 4px");
+
+  appTestSetSelect(sQ);
+
+  //var oa = $('<option value="lithologies" selected>lithologies</option>');
+  //var os = $('<option value="strat names" >strat names</option>');
+
+  //sQ.append(oa);
+  //sQ.append(os);
+  ad.append(sQ);
+
+  ad.append('</br>Add Dictionaries');
+
+  var sD = $('<select id="selDict"></select>')
+            .css("font-family","calibri")
+            .css("border-style","solid 1px")
+            .css("border-color","rgb(132, 155, 165)")
+            .css("margin","4px 4px");
+  
+  appDictSelect(sD);
+
+  //var doa = $('<option value="lithologies" selected>lithologies</option>');
+  //var dob = $('<option value="strat names" >strat names</option>');
+
+  //sD.append(doa);
+  //sD.append(dob);
+  ad.append(sD);
+
+  var saveBtn = $('<a id="saveAppBtn" class="res-tag" type="submit" onclick="SaveNewApp();" >Save</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var cancelBtn = $('<a id="cancelAppBtn" class="res-tag" type="submit" onclick="cancelNewApp();" >Cancel</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  ad.append('</br>');
+  ad.append(saveBtn);
+  ad.append(cancelBtn);    
+
+}
+
+
+var appTestSetSelect = function(sb) {
+
+  var pUrl ='/adept/getTestSets?t='+ kmu(gKey) +'&u='+gUser.id;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict terms'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+          gTestSets = dres.success.data;
+          if ( gTestSets.length  ) {
+            for( k in gTestSets) {
+              var ox = $('<option value="'+ gTestSets[k].ts_id + '" selected>' + gTestSets[k].ts_name + '</option>');
+              sb.append(ox);
+            }           
+          }
+        }
+  });
+}
+
+
+var appDictSelect = function(sb) {
+
+  pUrl = '/adept/getFilteredDictionaries?t='+ kmu(gKey)+'&u='+gUser.id;
+  gDLType = 'Local Saved';
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict records'; 
+  })
+  .done(function(data) { 
+
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        gDictList = dres.success.data;
+        
+        if ( gDictList.length  ) {
+          for( k in gDictList) {
+            var ox = $('<option value="'+ gDictList[k].dict_id + '" selected>' + gDictList[k].name + '</option>');
+            sb.append(ox);
+          }           
+        }
+    });
+}
+
+var SaveNewApp = function() {
+
+  var an = $("#aName").val();
+  var adl =  $("#aDateLim").val();
+  var adid =  $("#aDID").val();
+  var aco =  $("#aCores").val();
+  var ame =  $("#aMemory").val();
+
+  //var sts =  $("selTestSets").val();
+  //var sts = $('select[name=selTestSets] option').filter(':selected').val()
+  var sts =  $("#selTestSets option:selected").val();
+  //var sd =  $("selDict").val();
+  var sd = $("#selDict option:selected").val();
+
+  pUrl = '/adept/newUserApp?t='+ kmu(gKey)+'&u='+gUser.id+'&n='+an+'&d='+adid+'&c='+aco+'&m='+ame+'&s='+sts+'&i='+sd;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict records'; 
+  })
+  .done(function(data) { 
+
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+
+    $("#apptab").show();
+    $("#apptab").empty();
+    $("#new-app-div").remove();
+    getApps();
+       
+  });
+
+
+}
+
+var cancelNewApp = function() {
+
+  $('#new-app-div').remove();
+  $("#apptab").show();
+
+}
+
 var showAppTemplate = function() {
 
   $("#app-man-div").empty();
   
     var pt = $('<table id="apptab"></table>')
     var tr = $('<tr></tr>')
-    var tab = $('<th width="10px"></th>');
-    var ta = $('<th width="100px">Application</th>');
+    //var tab = $('<th width="10px"></th>');
+    var tm = $('<th></th>');
+    var ta = $('<th width="160px">Application</th>');
     var tb = $('<th width="70px">Type</th>');
     var tc = $('<th width="110px">Source</th>');
-    var td = $('<th width="160px">Timestamp</th>');
-    var te = $('<th width="70px">Status</th>');
+    var td = $('<th width="80px">Cores/Memory</th>');
+    var te = $('<th width="80px">Timestamp</th>');
+    var tf = $('<th width="70px">Status</th>');
 
-    tr.append(tab);
+    //tr.append(tab);
+    tr.append(tm);
     tr.append(ta);
     tr.append(tb);
     tr.append(tc);
     tr.append(td);
     tr.append(te);
+    tr.append(tf);
     pt.append(tr);
   
     for (k in gApps) {
@@ -2694,40 +3442,621 @@ var showAppTemplate = function() {
       var n =  gApps[k].app_name;
       var t =  gApps[k].app_type;
       var l =  gApps[k].source_url;
-      var c =  gApps[k].created;
+      var r =  gApps[k].resources;
+
+      var c =  new Date(gApps[k].created);
+
+      c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+              + "-" + ('0' + c.getDate()).slice(-2);
+
       var s = gApps[k].state;
   
       var ak = gApps[k].app_key;
   
-      var tr = $('<tr></tr>')
-      var tab = $('<td id="ab-'+i+'"><input type="checkbox" id="cb='+i+'"></td>');
-      var ta = $('<td id="a-'+i+'">'+n+'</td>');
-      var tb = $('<td id="b-'+i+'">'+t+'</td>');
-      var tc = $('<td id="c-'+i+'">'+l+'</td>');
-      var td = $('<td id="d-'+i+'">'+c+'</td>');
-      var te = $('<td id="d-'+i+'">'+s+'</td>');
-      tr.append(tab);
+      var tr = $('<tr id="ar-'+k+'"></tr>');
+
+      var appD = $('<a class="tsx-dm" id="appdel-'+k+'" onclick="deleteApp(this);" ><i class="fa fa-trash"></i></a>')
+            .css("font-size", "12px")
+            .css("color", "#196fa6")
+            .css("cursor", "pointer")
+            .css("margin", "4px 4px")
+            .css("font-weight", "bold");
+      var tm = $('<td id="m-'+k+'"></td>');
+      tm.append(appD);
+
+      var appx = $('<a class="tsx-dm" id="'+k+'" onclick="selectApp(this);" >' + n + '</a>')
+            .css("font-size", "12px")
+            .css("color", "#222222")
+            .css("cursor", "pointer")
+            .css("font-weight", "bold");
+
+      //var tab = $('<td id="ab-'+k+'"></td>');
+      var ta = $('<td id="a-'+k+'"></td>');
+      ta.append(appx);
+
+      var tb = $('<td id="b-'+k+'">'+t+'</td>');
+      var tc = $('<td id="c-'+k+'">'+l+'</td>');
+      var td = $('<td id="d-'+k+'">'+r+'</td>');
+      var te = $('<td id="e-'+k+'">'+c+'</td>');
+      var tf = $('<td id="f-'+k+'">'+s+'</td>');
+      //tr.append(tab);
+      tr.append(tm);
       tr.append(ta);
       tr.append(tb);
       tr.append(tc);
       tr.append(td);
       tr.append(te);
+      tr.append(tf);
       pt.append(tr);
   
     }
   
     $("#app-man-div").append(pt);
 
+}
+
+
+var grpMan = function(o) {
+
+  $("#rud-results").empty();
+  $("#rud-help").hide();
+
+  var gphdr = $('<div id="grp-hdr-div"></div>');
+  var gpdiv = $('<div id="grp-man-div"></div>');
+
+  var apTx = $('<h5>Group Manager</h5>');
+  var naBtn = $('<a id="ngBtn" class="res-tag" type="submit" onclick="newGroup();" >New</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+  
+  var egBtn = $('<a id="egBtn" class="res-tag" type="submit" onclick="editGroup();" >Edit</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var rgBtn = $('<a id="rgBtn" class="res-tag" type="submit" onclick="delGroup();" >Remove</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('display', 'none')
+        .css('width','80px');
+
+  var amBtn = $('<a id="amBtn" class="res-tag" type="submit" onclick="addMemberToGroup();" >Add Member</a>')
+        .css('display','none')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var amBox = $('<input class="form-control" id="amBox" placeholder="User email">')
+        .css("display", "none")
+        .css("font-size", "11px");
+
+  var jgBtn = $('<a id="jgBtn" class="res-tag" type="submit" onclick="joinGroup();" >Join</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+  
+  var sG = $('<select id="selxGrp"></select>')
+        .css("font-family","calibri")
+        .css("font-weight","bold")
+        .css("border-style","solid 1px")
+        .css("margin","4px 4px");
+
+  gphdr.append(apTx);
+  gphdr.append(naBtn);
+  //gphdr.append(egBtn);
+  gphdr.append(rgBtn);
+  gphdr.append(amBtn);
+  gphdr.append(amBox);
+  gphdr.append(jgBtn);
+  gphdr.append(sG);
+  $("#rud-results").append(gphdr);
+  $("#rud-results").append(gpdiv);
+  getOtherGroups();
+  getGroups();
 
 }
 
+var getGroups = function(o) {
+
+  var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+gUser.id;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict terms'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+          gGroups = dres.success.data;
+          if ( gGroups.length ) {
+            showGroupTemplate();
+          } else {
+            // empty it out
+          }
+        }
+
+  });
+}
+
+var getOtherGroups = function(o) {
+
+  var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+gUser.id+'&type=other';
+  $("#selxGrp").empty();
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict terms'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+          gOtherGroups = dres.success.data;
+          if ( gOtherGroups.length ) {
+            for (k in gOtherGroups ) {
+              var ot = gOtherGroups[k].group_name + ' - '+ gOtherGroups[k].owner_name;
+              var o = $('<option value="'+ gOtherGroups[k].group_id +'" >'+ot+'</option>'); 
+              $("#selxGrp").append(o);
+            }
+           
+          } else {
+            // empty it out
+          }
+        }
+
+  });
+}
+
+var delGroup = function(o) {
+
+  if ( gSelGrp.gtype == 'member') {
+
+    var pUrl ='/adept/leaveGroup?t='+ kmu(gKey) +'&u='+gUser.id+'&g='+gSelGrp.group_id;
+   
+    var jqxhr = $.get(pUrl, function() {
+      var ssu = 'success leave group'; 
+    })
+    .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        $("#jgBtn").show();
+        $("#selxGrp").show();
+        getOtherGroups();
+        getGroups();
+
+    });
+
+  } else {
+    alert('Are you sure you want to delete this group ?');
+
+  }
+}
+
+var joinGroup = function(o) {
+  var gid = $("#selxGrp").val();
+  if ( typeof(gid) == "undefined") {
+    alert('Select a group to join');
+  } else {
+   
+    var pUrl ='/adept/joinGroup?t='+ kmu(gKey) +'&u='+gUser.id+'&g='+gid;
+   
+    var jqxhr = $.get(pUrl, function() {
+      var ssu = 'success dict terms'; 
+    })
+    .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        getOtherGroups();
+        getGroups();
+
+    });
+
+  }
+ 
+
+}
+
+var showGroupTemplate = function() {
+
+  $("#grp-man-div").empty();
+  $("#rgBtn").hide();
+  var pt = $('<table id="grptab"></table>')
+  var tr = $('<tr></tr>')
+  
+  var ta = $('<th width="100px">Group</th>');
+  var tb = $('<th width="80px">Owner</th>');
+  var tc = $('<th width="60px">Type</th>');
+  var td = $('<th width="60px">Created</th>');
+  var te = $('<th width="50px">Status</th>');
+  var tf = $('<th width="120px">Notes</th>');
+  var tg = $('<th width="140px">Members</th>');
+    
+  tr.append(ta);
+  tr.append(tb);
+  tr.append(tc);
+  tr.append(td);
+  tr.append(te);
+  tr.append(tf);
+  tr.append(tg);
+  pt.append(tr);
+
+  for (k in gGroups) {
+      var i =  gGroups[k].group_id;
+      var n =  gGroups[k].group_name;
+      var o =  gGroups[k].owner_name;
+      var t =  gGroups[k].gtype;
+     
+      var c = new Date(gGroups[k].created);
+      var s = gGroups[k].state;
+      var l =  gGroups[k].notes;
+      var mo = gGroups[k].members;
+
+      c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+            + "-" + ('0' + c.getDate()).slice(-2);
+       
+      if (typeof(mo) == "object" ) {
+        var dx = mo;
+      } else {
+        var dx = JSON.parse(mo);
+      }
+    
+      var tr = $('<tr id="gr-'+k+'"></tr>')
+      //var tab = $('<td id="ab-'+k+'"><input type="checkbox" id="cb='+i+'"></td>');
+      //var tab = $('<td id="ab-'+k+'"></td>');
+      
+      var ta = $('<td id="a-'+k+'"></td>');
+      var appg = $('<a class="tsx-dm" id="grpsel-'+k+'" onclick="selectGrp(this);" >' + n + '</a>')
+            .css("font-size", "12px")
+            .css("color", "#222222")
+            .css("cursor", "pointer")
+            .css("font-weight", "bold");
+      ta.append(appg);
+
+      var tb = $('<td id="b-'+k+'">'+o+'</td>');
+      var tc = $('<td id="c-'+k+'">'+t+'</td>');
+      var td = $('<td id="d-'+k+'">'+c+'</td>');
+      if ( t == 'owner') {
+        var gsc =  $('<a class="tsx-dm" id="gstate-'+k+'" onclick="chgGrpState(this);" >' + s + '</a>')
+              .css("font-size", "12px")
+              .css("color", "#222222")
+              .css("cursor", "pointer")
+              .css("font-weight", "bold");
+        var te = $('<td id="e-'+k+'"></td>');
+        te.append(gsc);
+
+        var gn = $('<input class="form-control" id="gNote-'+k+'">')
+            .css("display", "none")
+            .css("font-size", "11px")
+            .css("color", "#222222")
+            .css("cursor", "pointer")
+            .css("font-weight", "bold");
+
+        var gnc =  $('<a class="tsx-dm" id="gnc-'+k+'" onclick="chgGrpNote(this);" >' + l + '</a>')
+              .css("font-size", "11px")
+              .css("color", "#222222")
+              .css("cursor", "pointer")
+              .css("font-weight", "bold");
+        var tf = $('<td id="f-'+k+'"></td>');
+        tf.append(gnc);
+        tf.append(gn);
+
+        var tg = $('<td id="g-'+k+'"></td>');
+        for ( z in mo ) {
+
+          var gmx = $('<i class="fa fa-trash-alt" id="dgm-'+i+'-'+mo[z].user_id+'" onclick="delGrpMember(this)"></i>')
+              .css("margin","3px;")
+              .css("font-size", "10px;")
+              .css('color','rgb(33,145,194)');
+          tg.append(gmx);
+          tg.append(mo[z].email);
+          tg.append('</br>');
+           
+        }
+        
+      } else {
+        var te = $('<td id="e-'+k+'">'+s+'</td>');
+        var tf = $('<td id="f-'+k+'">'+l+'</td>');
+        var m = '';
+        for (z in mo) {
+          if ( m.length > 1 ) { var sep = '</br>'; } else { var sep = ''; }
+          m = m + sep + mo[z].email;
+        }
+        var tg = $('<td id="g-'+k+'">'+m+'</td>');
+      }
+     
+      //tr.append(tab);
+      tr.append(ta);
+      tr.append(tb);
+      tr.append(tc);
+      tr.append(td);
+      tr.append(te);
+      tr.append(tf);
+      tr.append(tg);
+      pt.append(tr);
+  
+  }
+
+  $("#grp-man-div").append(pt);
+
+}
+
+var chgGrpNote = function(o) {
+
+  var gid = '#gNote-'+o.id.split('-')[1];
+  if ( $(o).text() == 'Save' ) {
+    $(o).text($(gid).val());
+    $(o).removeClass("tag");
+    $(gid).val("");
+    $(gid).hide();
+  } else {
+    $(gid).val($(o).text() );
+    $(o).text("Save");
+    $(o).addClass("tag");
+    $(gid).show();
+  }
+
+}
+
+var chgGrpState = function(o) {
+
+  if ( $(o).text() == 'new') {
+    $(o).text("active");
+  } else if ( $(o).text() == 'active' ) {
+    $(o).text("inactive");
+  } else if ( $(o).text() == 'inactive' ) {
+    $(o).text("active");
+  }
+
+}
+
+var selectGrp = function(o) {
+
+    if ( typeof(gSelGrp) !== 'undefined' && typeof(gSelGrp.group_id) !== 'undefined' ) {
+      var old_id = gSelGrp.group_id;
+    } else {
+      var old_id = -1;
+    }
+    
+    var aid = o.id.split('-')[1];
+    gSelGrp = gGroups[aid];
+    $("#rgBtn").show();
+    $("#jgBtn").hide();
+    $("#selxGrp").hide();
+    if ( gSelGrp.gtype == 'member') {
+      $("#rgBtn").text('Leave Group');
+    } else {
+      $("#rgBtn").text('Remove');
+
+    }
+
+    for (k in gGroups) {
+      $("#gr-"+k).hide();
+      $("#a-"+k).css("background-color","white");
+      $("#b-"+k).css("background-color","white");
+      $("#c-"+k).css("background-color","white");
+      $("#d-"+k).css("background-color","white");
+      $("#e-"+k).css("background-color","white");
+      $("#f-"+k).css("background-color","white");
+      $("#g-"+k).css("background-color","white");
+  
+    }
+  
+   
+    // if clicks on selected user deselect
+    if ( gSelGrp.group_id !== old_id ) {
+      $("#gr-"+aid).show();
+      $("#a-"+aid).css("background-color","yellow");
+      $("#b-"+aid).css("background-color","yellow");
+      $("#c-"+aid).css("background-color","yellow");
+      $("#d-"+aid).css("background-color","yellow");
+      $("#e-"+aid).css("background-color","yellow");
+      $("#f-"+aid).css("background-color","yellow");
+      $("#g-"+aid).css("background-color","yellow");
+      if ( gSelGrp.gtype == 'owner' ) {
+        $("#amBtn").show();
+        $("#amBox").show();
+      }
+      //showGroupDetails();
+
+    } else {
+
+      $("#amBtn").hide();
+      $("#amBox").hide();
+      $("#jgBtn").show();
+      $("#selxGrp").show();
+      gSelGrp = {};
+      for (k in gGroups) {
+        $("#gr-"+k).show();
+      }
+     // $("#app-tab-detail").remove();
+    }
+
+}
+
+var newGroup = function(o) {
+
+  var am = $("#grp-man-div");
+  $("#grptab").hide();
+  var ad = $('<div id="new-grp-div">New Group</div>');
+  am.append(ad);
+
+  var an = $('<input class="form-control" placeholder="Group Name" id="gName">');
+  var adl = $('<input class="form-control" placeholder="Notes" id="gNotes">');
+  
+  var ado = $('<input class="form-control" placeholder="Email user name" id="gMem1">');
+  var ad1 = $('<input class="form-control" placeholder="Email user name" id="gMem2">');
+  var ad2 = $('<input class="form-control" placeholder="Email user name" id="gMem3">');
+  
+  ad.append('</br>');
+  ad.append(an);
+  ad.append('</br>');
+  ad.append(adl);
+  ad.append('</br>Share With</br>');
+  ad.append(ado);
+  ad.append('</br>');
+  ad.append(ad1);
+  ad.append('</br>');
+  ad.append(ad2);
+  ad.append('</br>');
+
+  var saveBtn = $('<a id="saveAppBtn" class="res-tag" type="submit" onclick="saveNewGroup();" >Save</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  var cancelBtn = $('<a id="cancelAppBtn" class="res-tag" type="submit" onclick="cancelNewGroup();" >Cancel</a>')
+        .css('font-size','12px')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+  ad.append('</br>');
+  ad.append(saveBtn);
+  ad.append(cancelBtn);    
+
+}
+
+var saveNewGroup = function(o) {
+  
+  var gn = $("#gName").val();
+  var gs =  $("#gNotes").val();
+  var gm1 =  $("#gMem1").val();
+  var gm2 =  $("#gMem2").val();
+  var gm3 =  $("#gMem3").val();
+
+  var gmem = '';
+  if ( gm1.indexOf("@") > 3 ) {
+    gmem = gm1;
+  }
+
+  if ( gm2.indexOf("@") > 3 ) {
+    if ( gmem.length > 3 ) {
+      gmem = gmem +','+ gm2;
+    } else {
+      gmem = gm2;
+    }
+  }
+
+  if ( gm3.indexOf("@") > 3 ) {
+    if ( gmem.length > 3 ) {
+      gmem = gmem +','+ gm3;
+    } else {
+      gmem = gm3;
+    }
+  }
+
+  pUrl = '/adept/newUserGroup?t='+ kmu(gKey)+'&u='+gUser.id+'&n='+gn+'&d='+gs+'&m='+gmem;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success new group'; 
+  })
+  .done(function(data) { 
+
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+
+    $("#grptab").show();
+    $("#grptab").empty();
+    $("#new-grp-div").remove();
+    getGroups();
+       
+  });
+
+}
+
+var addMemberToGroup = function(o) {
+
+  var nm =  $("#amBox").val();
+  pUrl = '/adept/addMemberToGroup?t='+ kmu(gKey)+'&g='+gSelGrp.group_id+'&m='+nm;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success new group'; 
+  })
+  .done(function(data) { 
+
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    if ( dres.success.data ) {
+      var stat = dres.success.data[0].add_group_member;
+      var sa = stat.split('-');
+      if ( sa[0] == 'Success') {
+        alert('User added to group');
+      } else {
+        alert('User not found ');
+      }
+    }
+    
+    getGroups();
+       
+  });
+  
+
+}
+
+var delGrpMember = function(o) {
+
+  var ga = o.id.split('-');
+  var u = ga[2];
+  var g = ga[1];
+
+  var pUrl ='/adept/leaveGroup?t='+ kmu(gKey) +'&u='+u+'&g='+g;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success new group'; 
+  })
+  .done(function(data) { 
+
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    
+    getGroups();
+       
+  });
+
+}
+
+var cancelNewGroup = function(o) {
+
+  $("#grptab").show();
+  $("#new-grp-div").remove();
+
+}
 
 var collectionMan = function(o) {
 
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var codiv = $('<div id="coldiv"></div>');
-  var coTx = $('<h3>User Sets Data Management</h3>');
+  var coTx = $('<h3>Data Set Management</h3>');
   codiv.append(coTx);
   $("#rud-results").append(codiv);
   colTemplate();
@@ -2754,14 +4083,28 @@ var colTemplate = function(o) {
     .css('margin','5px')
     .css('width','120px');
 
-  var clldiv = $('<div id="colist-div"></div>')
-            .css('width','180px')
-            .css('height','420px')
-            .css("overflow-x","hidden")
-            .css("overflow-y", "scroll")
-            .css('float','left')
-            .css('display','block');
+  var gaBtn = $('<a id="gaBtn" class="res-tag" type="submit" onclick="addColToGroup(this);">Add to Group</a>')
+    .css('font-size','12px')
+    .css('display', 'none')
+    .css('background-color','rgb(33,145,194)')
+    .css('margin','5px')
+    .css('width','80px');
 
+  var sQ = $('<select id="selGrp"></select>')
+    .css("font-family","calibri")
+    .css("font-weight","bold")
+    .css("border-style","solid 1px")
+    .css('display', 'none')
+    .css("margin","4px 4px");
+
+  var clldiv = $('<div id="colist-div"></div>')
+           // .css('width','180px')
+          //  .css('height','420px')
+          //  .css("overflow-x","hidden")
+          //  .css("overflow-y", "scroll")
+          //  .css('float','left')
+            .css('display','block');
+  /*
   var clsdiv = $('<div id="col-search-div"></div>')
             .css('width','520px')
             .css('height','400px')
@@ -2771,10 +4114,12 @@ var colTemplate = function(o) {
             .css("overflow-y", "scroll")
             .css('float','left')
             .css('display','block');
-
+  */
   $("#coldiv").append(cnBtn);
   $("#coldiv").append(dcBtn);
   $("#coldiv").append(rtBtn);
+  $("#coldiv").append(gaBtn);
+  $("#coldiv").append(sQ);
   $("#coldiv").append('</br>');
   $("#coldiv").append(clldiv);
  
@@ -2786,6 +4131,30 @@ var colTemplate = function(o) {
 
 var colrequestTS = function(o) {
   // send to Geo Deep Dive
+  var cn = gSelCollection.col_id;
+
+  var pUrl = '/adept/collectionRegisterTs?t='+kmu(gKey)+'&u='+gUser.id+'&c='+cn;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success add collection'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success ) {
+          //gCollections = dres.success;
+          //if ( gCollections.length ) {
+          getCollections('template');
+        } else {
+            // empty it out
+          
+        }
+
+  });
 
 }
 
@@ -2852,7 +4221,8 @@ var getCollections = function(o) {
           gCollections = dres.success.data;
           if ( gCollections.length ) {
             if ( o == 'template') {
-              showCollectionList();
+              //showCollectionList();
+              showDatasets();
               loginSelCol();
             } else if ( o == 'login' ) {
               loginSelCol();
@@ -2864,6 +4234,90 @@ var getCollections = function(o) {
         }
 
   });
+}
+
+var showDatasets = function() {
+
+  $("#colist-div").empty();
+
+  var pt = $('<table id="coltab"></table>')
+  var tr = $('<tr></tr>')
+  
+  var ta = $('<th width="100px">Dataset</th>');
+  var tb = $('<th width="80px">Owner</th>');
+  var tc = $('<th width="60px">Created</th>');
+  var td = $('<th width="60px">Searches/Count/Saved</th>');
+  var te = $('<th width="120px">Groups</th>');
+  
+  tr.append(ta);
+  tr.append(tb);
+  tr.append(tc);
+  tr.append(td);
+  tr.append(te);
+
+  pt.append(tr);
+
+  for (k in gCollections) {
+      var i =  gCollections[k].col_id;
+      var n =  gCollections[k].col_name;
+      var u =  gCollections[k].user_id;
+      var o =  gCollections[k].owner_name;
+      var s1 = gCollections[k].scnt;
+      var s2 = gCollections[k].srecs;
+      var s3 = gCollections[k].mdcnt;
+      var c = new Date(gCollections[k].created);
+      var g = gCollections[k].jgrp;
+ 
+      c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+            + "-" + ('0' + c.getDate()).slice(-2);
+      
+      if (g) {
+        if (typeof(g) == "object" ) {
+          var grp = g;
+        } else {
+          var grp = JSON.parse(g);
+        }
+      }
+    
+      var tr = $('<tr id="co-'+k+'"></tr>')
+      
+      var ta = $('<td id="a-'+k+'"></td>');
+      var cola = $('<a class="tsx-dm" id="colsel-'+k+'" onclick="selectCol(this);" >' + n + '</a>')
+            .css("font-size", "12px")
+            .css("cursor", "pointer")
+            .css("font-weight", "bold");
+      ta.append(cola);
+
+      var tb = $('<td id="b-'+k+'">'+o+'</td>');
+      var tc = $('<td id="c-'+k+'">'+c+'</td>');
+      var td = $('<td id="d-'+k+'">'+s1+'/'+s2+' '+s3+'</td>');
+      var te = $('<td id="e-'+k+'"></td>');
+      
+      if ( grp ) {
+        for (z in grp) {
+          if ( u == gUser.id ) {
+            var gmx = $('<i class="fa fa-trash-alt" id="ct-'+z+'-'+grp[z].group_id+'" onclick="delGrpCol(this)"></i>')
+              .css("margin","3px;")
+              .css("font-size", "10px;")
+              .css('color','rgb(33,145,194)');
+            te.append(gmx);
+          }
+          te.append(grp[z].group_name);
+          te.append('</br>');
+        }
+      }
+     
+      tr.append(ta);
+      tr.append(tb);
+      tr.append(tc);
+      tr.append(td);
+      tr.append(te);
+      pt.append(tr);
+  
+  }
+
+  $("#colist-div").append(pt);
+
 }
 
 var showCollectionList = function() {
@@ -2913,7 +4367,7 @@ var deleteCollection = function(o) {
     });
 
   } else {
-    alert('You have selected a Collection Set to delete ');
+    alert('You must select a Data Set to delete ');
   }
 
 
@@ -2934,6 +4388,8 @@ var selectCollection = function(o) {
     $(o).css("background-color", "#ffffff");
     $("#col-search-div").empty();
     $("#rtBtn").hide();
+    $("#gaBtn").hide();
+    $("#selGrp").hide();
   } else {
     $(o).css("background-color", "yellow");
     $("#col-search-div").empty();
@@ -2941,6 +4397,8 @@ var selectCollection = function(o) {
     gSelCollection.col_k = parseInt(k);
     gSelCollection.col_name = gCollections[k].col_name;
     $("#rtBtn").show();
+    $("#gaBtn").show();
+   
     if ( gCollections[k].search_set ) {
       $("#col-search-div").append('<b>Searches</b></br>');
       for (z in  gCollections[k].search_set ) {
@@ -2948,7 +4406,12 @@ var selectCollection = function(o) {
         var n = gCollections[k].search_set[z].col_desc;
         var u = gCollections[k].search_set[z].search_url;
         var c = gCollections[k].search_set[z].rec_count;
-        var jst = JSON.parse(u);
+        if (typeof(u) == "object" ) {
+          var jst = u;
+        } else {
+          var jst = JSON.parse(u);
+        }
+        //var jst = JSON.parse(u);
         var pstr = '';
         var mStr = '';
         Object.keys(jst).forEach(key => {
@@ -3030,7 +4493,7 @@ var saveRecordToCollection = function(d) {
 
   var i = gSelCollection.col_id;
 
-  var pUrl ='/adept/newItemInCollection?t='+ kmu(gKey) +'&i='+i+'&d='+d;
+  var pUrl ='/adept/newRecordInCollection?t='+ kmu(gKey) +'&i='+i+'&d='+d;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success collections'; 
@@ -3046,9 +4509,75 @@ var saveRecordToCollection = function(d) {
 
 }
 
+var addColToGroup = function(o) {
+
+  var u =  gUser.id;
+  var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+u+'&type=owner';
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+
+    $("#selGrp").html('');
+
+    for (k in dres.success.data ) {
+      var o = $('<option value="'+ dres.success.data[k].group_id +'" >'+dres.success.data[k].group_name+'</option>'); 
+      $("#selGrp").append(o);
+    }
+    $("#selGrp").show();
+    //dx.append(sQ);
+    //$("#coldiv").append(dx);
+    $("#gaBtn").text("Save");
+    $("#gaBtn").attr("onclick","saveObjToGroup('dataset')");
+    
+  });
+
+}
+
+var saveObjToGroup = function(type) {
+
+  var g = $("#selGrp").val();
+  if ( type == 'dataset') {
+    var i = gSelCollection.col_id;
+  } else if (  type == 'application') {
+    var i = gSelApp.ua_id;
+  } else if (  type == 'testset') {
+    var i = gSel
+  } else if (  type == 'dictionary') {
+    var i = gSelDict.dict_id;
+  } 
+  
+  
+  var pUrl ='/adept/addObjectToGroup?t='+ kmu(gKey) +'&u='+gUser.user_id+'&g='+g+'&type='+type+'&o='+i;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success added objec to collection'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        $("#gaBtn").text("Add To Group");
+        $("#gaBtn").attr("onclick","addColToGroup()");
+        $("#selGrp").hide();
+        //alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
+  });
+
+}
+
 var uploadMan = function(o) {
 
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var updiv = $('<div></div>');
   var upTx = $('<h5>Upload Document</h5>');
@@ -3060,6 +4589,7 @@ var uploadMan = function(o) {
 var statusMan = function(o) {
 
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var sthdr = $('<div id="stat-hdr-div"></div>');
   var stdiv = $('<div id="stat-man-div"></div>');
@@ -3174,6 +4704,7 @@ var cosmosMan = function(o) {
 
 var cosmosTemplate = function() {
   $("#rud-results").empty();
+  $("#rud-help").hide();
 
   var stdiv = $('<div></div>');
   var stTx = $('<h5>COSMOS Links</h5>');
@@ -3239,3 +4770,4 @@ var gotoCosmosLink = function(o) {
   window.open(sUrl);
 
 }
+
