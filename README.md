@@ -1,8 +1,8 @@
-# Automated Data Extraction PlaTform (ADEPT) Specification 1.0
+# Automated Data Extraction PlaTform (ADEPT) Specification 1.1
 This is a new design specification for the ADEPT front-end environment (web-page and forms).
 
 ## Required Functionality
-We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), [CyVerse](#cyverse) interactions, and general [broad-strokes requirements](#broad-strokes-requirements). In addition, some elements are TBD or have some other quirks that are discussed separate in the [special considerations](#special-considerations) section.
+We breakup the description of functionality into a list of specific [forms](#forms), [pages](#pages), and general [broad-strokes requirements](#broad-strokes-requirements). 
 
 ### Broad-Strokes Requirements
 
@@ -12,67 +12,137 @@ We breakup the description of functionality into a list of specific [forms](#for
 3. Thorough API documentation, xDD Application Template instructions, and examples of applications
 4. Registration forms for both users, applications, and dictionaries
 5. Application run-time status views
-6. Containerized in case it needs to be transferred to UW hosting
+6. Containerized for final transfer to xDD servers
 
 ### Optional or Uncertain
 1. External links to UW services like COSMOS
-3. Support for exporting informtion directly into a users CyVerse Account*
-4. Linking ADEPT accounts to a CyVerse Account*
-5. An RStudio implementation*
+2. Upload of custom datasets*
 
 ## Forms
 
 ### User Registration Form
-Given the unique security requirements of ADEPT, there will need to be some vetting of users. The basic information we expect to be included in a registration form is given below in SQL format. Most items on this list are standard or intuitive. The only special case is the disclaimer. We will need some sort of disclaimer that outlines our security protocols, why they exist, and terms of use. We may want to approach UA or UW counsel for help with writing this language. For best coverage, we may want to display this disclaimer in multiple places.
+Given the unique security requirements of ADEPT, there is some vetting of users. The basic information in the registration form is given below in SQL format.
+
 
 ````SQL
 given text
 surname text
-institution text
 email text
-password text -- SHA1 of course
-cyverse text -- Users, CyVerse Account information, see "special considerations section" for more information.
-orcid text -- Maybe we use orcid as the login?
+institution text
 purpose text -- basically, what research project(s) they are looking to accomplish
+password text -- SHA1 of course
 disclaimer boolean
 ````
 
-We envision five capabilities for user accounts.
+![image](https://user-images.githubusercontent.com/6250117/114731457-9f187480-9cf6-11eb-80cd-4f262b8bb78a.png)
 
-1. Browse
-2. Test Set Request
-3. Dictionary Request
-4. BYOD (document upload) request
-5. Application Request
+Typical workflow is that a user fills out the registration form, the account will be inactive, admin will activate, optionally change roles to admin.
 
-### Dictionary Management Form
+### ADEPT USER Management FUNCTIONS
+ 
+
+| User Types | Description |
+| --- | --- |
+| Admin | Highest permission level |
+| Application Control | Regular user access |
+| Anonymous | View-only access |
+
+
+Admin User Functions:
+1. User Management- add, edit, delete, and change roles.
+2. Password reset- can reset passwords for users.
+3. Group functions- user can create groups and add users to group 
+4. Automatic approval of users when registered.
+5. Access to Test set Tools, Dictionary Tools, and Saved sets.
+6. Able to browse records
+
+Application User Functions:
+1. Access to Test set Tools, Dictionary Tools, and Saved sets.
+2. Able to browse records
+
+Anonymous Functions:
+1. Able to browse records
+
+
+### Saved Sets
+
+A user may save the results of one or more metadata searches as a SAVED SET. Saved Sets are created in the saved sets tab, then populated by saving searches and citations on the Search page. The search parameters in a saved set can be also be used to access the xDD API directly to access the same data directly from the source.
+
+ The user builds these dataset collections by:
+
+1. Select new, enter a new collection name and save. 
+2. Return to the search tab, and select the new collection in the “Local Saved Set” list.
+3. Define a search and press save to add it to the collection.
+4. Additional single records can be added to the collection, by clicking on the Save Button that is at the top right of every record. 
+
+
+
+### Dictionary Tools
 A list of terms that a user would like to have indexed by elastic search. While the basic submission is straightforward there are a few ways that might make it more user-friendly.
+
+Dictionaries can be system sourced dictionaries, which can be cached locally, or local, user defined dictionaries
 
 1. Allow the upload of a csv file
 2. Provide some simple checks to notify users if there is already a similar dictionary in use
 3. Let users edit existing dictionaries
 4. Some sort of status-update tracker
 
+![image](https://user-images.githubusercontent.com/6250117/114928718-c56a0d00-9de7-11eb-81a6-13addd96ce4a.png)
+
+
 https://xdd.wisc.edu/api/dictionaries?all -- To see a list of existing dictionaries
+
 https://xdd.wisc.edu/api/dictionaries?dictionary=covid-19&show_terms=true -- To see a list of terms in a dictionary
 
-There will have to be some communication between xDD and ADEPT to update key statuses. This may require a rework of the authentication system.
 
 ### API Key (Test Set) Request Form
-I think that this can be completely automated. Users just specify a dictioanary and they will receive a key and a random sample of 1-200 documents for their project. For security and performance reasons we can cap users at 10 API keys at a time, but I think it would make development a lot less painful if people could just quickly generate test sets.
 
-Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it.
+xDD must control access to its resources to ensure that they are used for legitimate scientific research in bulk text data-mining and that xDD is not used by bad-actors to circumnavigate normal licensing restrictions (i.e., to download PDFs that they would not normally have legal access to for purposes other than text data-mining). xDD fulfils this responsibility by ensuring that its full-text documents do not leave its servers.
 
-1. Just save it to their ADEPT web app account (default)
-2. Write the key to their CyVerse Data Store as a YAML or some other common config file format
-3. Have all the data downloaded and stored in their CyVerse Data Store.
+An exception to this rule are test-sets that ADEPT users may use for local development of xDD APPLICATIONS. A test-set is a random sample of 200 documents from a SAVED SET that a user may download onto their local machines for development purposes. New test sets can be requested from the SAVED SETS or DICTIONARIES tab. Once approved by the xDD system, users can find a unique API-key and URL to to their requested test-set in the TEST SETS tab.
+
+User must define the test sets and dictioanary associated that can be used in applications. These are XDD defined test sets.
+
+Upon giving the user a key, we can specify whether they want to do 1 of 3 actions with it:
+
+* DATE LIMIT OPTION - for static or current test sets
+* GENERATE NEW SET from EXISTING with new key
+* DELETE TEST SET - with deletion dates
+
+
 
 ### Application Submission Form
-TBD
+
+Definition of the programs, algorithms, code, that can be executed by a user.  
+
+a list of the resources needed for the container( number of cores, if GPU will be involved and memory/storage requirements)
+
+Application States - Submitted. Approved, Denied, running
+Process States - Submitted, Registered, running, finished, canceled, error
+
 
 ## Pages
 
 ### Main-Search Page
+
+User can search terms to the title, author, abstract, or keyword. 
+
+![image](https://user-images.githubusercontent.com/6250117/116596911-d6cc1280-a8d9-11eb-8c19-a28c48c3844d.png)
+
+
+Narrowing a Search
+
+![image](https://user-images.githubusercontent.com/6250117/116597192-2579ac80-a8da-11eb-90c5-88024a7281d8.png)
+
+
+* Optional Search Fields - Type in publication, title, DOI, DOCID, and Authors.
+* Date Selection - Search for content published during a particular time frame
+* Publishers - Search for Publishers
+* Journals - Search for journals
+
+
+
+
 We are currently envisioning the that the main search page will follow the basic structure of https://data.geothermaldata.org/ with xDD articles metadata represented as cards. This is the information that is returned from https://xdddev.chtc.io/api/v1/articles. 
 
 A few special considerations for ADEPT compared to the data.geothermaldata (NGDS) template that we will be using are:
@@ -96,20 +166,4 @@ A page where users can see the dictionaries they've submitted, the API Key's the
 ### API Documentation Pages
 TBD
 
-## CyVerse
-We want to let users interact with their test-set data easily using pre-made RStudio and Jupyter Notebooks (a separate aspect of ADEPT from the front-end). We can automatically write/read/edit data in their CyVerse users directory using the CyVerse API (https://de.cyverse.org/terrain/docs/index.html#!/fileio/post_terrain_secured_fileio_upload). The read capability may be useful for us as well if we want BYOD documents to be uploaded through CyVerse in some way and *then* posted to UW.
 
-## Special Considerations
-
-### Who will host?
-Ideally the AZGS will host ADEPT for the time-being, but it should be containerizable/ transferable so that it can be turned over to the UW team if they want to go in a different direction in the future or if AZGS is no longer able to support it.
-
-### CyVerse Account Problem
-An unresolved consideration is how ADEPT user registration will interact with CyVesre (if at all). On one hand, it would be excellent if we could leverage CyVerse OAuth capabilities (which do not exist yet, but I was told could be added) so that users have a single set of login credentials for both ADEPT and CyVerse. If that is not feasible, we can have users manually link their CyVerse accounts. This latter approach may be better anyway because it would allow us to maintain more control over users. The exact pros and cons of this will need to be worked out in detail with the CyVerse team in attendance.
-
-### COSMOS vs. ADEPT
-ADEPT is really meant to be about the app creation and queue pipeline moreso than the enhanced search functionalities of COSMOS. However, there is defintiely going to be some overalp. We should get a clearer specification document for COSMOS as well and look at the intersect/redundancy of features between the two.
-
-## Additional Links
-Tutotiral How to queue applications on CyVerse https://github.com/cyverse/terrain-notebook
-A preliminary front-end made by the xdd team https://xdddev.chtc.io/results.html
