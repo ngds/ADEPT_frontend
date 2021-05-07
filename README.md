@@ -57,7 +57,7 @@ Admin User Functions:
 6. Able to browse records
 
 Application User Functions:
-1. Access to Test set Tools, Dictionary Tools, and Saved sets.
+1. Access to Test set Tools, Dictionary Tools, Group functions, and Saved sets.
 2. Able to browse records
 
 Anonymous Functions:
@@ -119,6 +119,14 @@ a list of the resources needed for the container( number of cores, if GPU will b
 
 Application States - Submitted. Approved, Denied, running
 Process States - Submitted, Registered, running, finished, canceled, error
+
+
+### Groups
+
+* A user may create a GROUP of collaborators to share items with (i.e., SETS, TEST SETS, and APPLICATIONS). 
+* Group members have full edit privileges for shared items and may add, edit, or delete items within a group. 
+
+Note that deleting a shared item will delete that item for all users.
 
 
 ## Pages
