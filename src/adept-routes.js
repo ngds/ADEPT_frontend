@@ -1,20 +1,36 @@
-/* Adept */
+/* Adept Frontend API routes */
 
 var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
-var  Path = process.env.NODE_PATH;
-const pg = require('pg');
-const connectionString = 'postgres://ngdsdb:geonewton@localhost:5432/geothermal';
-const client = new pg.Client(connectionString);
-client.connect();
+var bodyParser = require('body-parser');
+var  Path = '/<WORKING-DIR>';
+
+const  {Pool} = require('pg');
+
+// The ADEPT Database is a postgres database containing user, stored datasets, & applications control
+// used to run Machine Learning apps. 
+  
+const pool = new Pool({
+	user: 'db-username',
+	host: '10.x.x.x',
+	database: 'geothermal',
+	password: 'xxxxx',
+	port: 5432,
+	max: 25
+  });
+  
+pool.on('error', (err, client) => {
+	console.error('Unexpected error on idle client', err)
+	process.exit(-1)
+  })
 
 var request = require('request');
 
-var qbUrl = 'http://127.0.0.1:8082/query?q=';
+// The GeoDeepDive URL is the elastic search engine
 var gdUrl = 'https://xdddev.chtc.io/api/v1';
 
-// Authentication
+// Authentication 
 
 var gAdeptKey = [];
 var gNACL = '5d097fe1065645c8';
@@ -83,37 +99,8 @@ function rd() {
 	return d;
 }
 
-
-async function testpool(q) {
-	// this example uses pg-pool service
-	var sqlStr = 'Select * from mdview2 where version_id=1000';
-
-	console.log('test '+ encodeURI(sqlStr) );
-	var z = await dbCall(sqlStr);
-    return z;
-	/*
-	var qUrl = qbUrl + encodeURI(sqlStr);
-
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-		qr.get(qUrl)
-		.on ('response',function(response) {         		
-		})
-		.on ('data', function(chunk) {
-			body += chunk;
-		}).on ('end', function() {
-
-			resolve(body);
-		});		 
-	});
-	*/
-}
-
 async function createUser(uo) {
   
-	console.log('a');
-
 	var tdate = Date.now();
 	var pwh = sha512(uo.pw,gNACL);
 	console.log('b');
@@ -134,54 +121,33 @@ async function createUser(uo) {
 				+ ',\'' + uo.uname + '\''
 				+ ',\'inactive\')';
 
-	console.log(' sql ' + sqlStr);
-	var z = await dbCall(sqlStr);
-	return z;
-	/*
-	var qUrl =  qbUrl + encodeURI(sqlStr);
+	try {
+		var z = await dbCall(sqlStr);
+		return z;
+	} catch(e) {
+		return e;
+	}
+	
+ }
 
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-		qr.get(qUrl)
-		.on ('response',function(response) {         		
-		})
-		.on ('data', function(chunk) {
-			body += chunk;
-		}).on ('end', function() {
-			resolve(body);
-		});		 
-	});
-	*/
-  }
-
-async function dbCall(s) {
+async function dbCall(q) {
 	//using pgPool
-	var qUrl =  qbUrl + s; //encodeURI(s);
-	//console.log('qUrl ' + qUrl.length + ' ' + qUrl);
-
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-		//console.log('p');
-		try {
-			qr.get(qUrl)
-			.on ('response',function(response) {         		
-			})
-			.on ('data', function(chunk) {
-				body += chunk;
-			}).on ('end', function() {
-				//console.log('e');
-				resolve(body);
-			}).on ('error', function(err) {
-
-				reject('db call error '+err);
-			});	
-		} catch(e) {
-			reject('db error '+e);
-		}
+	return new Promise(function(resolve, reject) {
+		pool.connect()
+			.then(client => {
+				return client
+				.query(q)
+				.then(res => {
+					client.release();
+					resolve(res);
+				})
+				.catch(err => {
+					client.release()
+					console.log(err.stack)
+					reject(err);
+				})
+			});
 	});
-
 }
 
 async function fetchAuth(u,p,s ) {
@@ -189,100 +155,24 @@ async function fetchAuth(u,p,s ) {
 	var sqlStr = 'select user_id, first_name, last_name, user_name, apikey, role_id, password '
 				+ ' from adept.users where email = \'' 
 				+ u + '\' and password = \'' + p + '\' and state = \'active\' order by 1'; 
-	//console.log(' sql ' + sqlStr);
+
 	try {
 		var z = await dbCall(sqlStr);
-		//console.log('z '+JSON.stringify(z) );
+		
 		return z;
 	} catch(e) {
 		return e;
 	}
 	
-
-	/*
-    var qUrl = qbUrl + encodeURI(sqlStr);
-
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-		qr.get(qUrl)
-		.on ('response',function(response) {         		
-		})
-		.on ('data', function(chunk) {
-			body += chunk;
-		}).on ('end', function() {
-			resolve(body);
-		});		 
-	});
-	*/
 }
 
 async function getDict(type) {
 	
-	console.log('here');
-
 	var s = 'select dict_id, dict_name as name, base_class as base_classification, dict_source as source, '
 			+'case_sensitive, last_updated from adept.dictionaries where filter_flag = \'true\'';
-	//console.log(s);
-	var z = await dbCall(s);
-	//console.log('returns '+JSON.stringify(z));
-	if (typeof(z) == "object" ) {
-		var b = z;
-	} else {
-		var b = JSON.parse(z);
-	}
-	var dx = {};
-	dx.success = {};
-	
-	if ( b.rows ) {
-		dx.success.data =  b.rows;
-		return dx;
-	} else {
-		return b;
-	}
 
-	/*
-	var qUrl = qbUrl + encodeURI(s);
-    console.log(qUrl );
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-		qr.get(qUrl)
-		.on ('response',function(response) {       
-
-		})
-		.on ('data', function(chunk) {
-			body += chunk;
-		}).on ('end', function() {
-			if (typeof(body) == "object" ) {
-				console.log('typeo');
-				var b = body;
-			} else {
-				var b = JSON.parse(body);
-			}
-			console.log('dict ret');
-			var dx = {};
-			dx.success = {};
-			
-			if ( b.rows ) {
-
-				dx.success.data =  b.rows;
-				resolve(dx);
-			} else {
-				resolve(b);
-			}
-		});		 
-	});
-	*/
-
-}
-
-async function getLocalDict(u) {
-
-	var s = 'select * from adept.user_dictionaries where user_id ='+u;
-	try {
+  try {
 		var z = await dbCall(s);
-		//console.log('z '+JSON.stringify(z) );
 		if (typeof(z) == "object" ) {
 			var b = z;
 		} else {
@@ -297,7 +187,34 @@ async function getLocalDict(u) {
 		} else {
 			return b;
 		}
-		//return z;
+	
+	} catch(e) {
+		return e;
+	}
+
+}
+
+async function getLocalDict(u) {
+
+	var s = 'select * from adept.user_dictionaries where user_id ='+u;
+	try {
+		var z = await dbCall(s);
+		
+		if (typeof(z) == "object" ) {
+			var b = z;
+		} else {
+			var b = JSON.parse(z);
+		}
+		var dx = {};
+		dx.success = {};
+		
+		if ( b.rows ) {
+			dx.success.data =  b.rows;
+			return dx;
+		} else {
+			return b;
+		}
+		
 	} catch(e) {
 		return e;
 	}
@@ -329,9 +246,8 @@ async function fetchProcessLog(u) {
 
 async function fetchUserApps(u) {
 
-	var s = 'select * from adept.user_applications where user_id ='+u;
+	
 	var s = 'select * from adept.app_resource where user_id ='+u;
-	console.log(s);
 	try {
 		var z = await dbCall(s);
 		if (typeof(z) == "object" ) {
@@ -368,49 +284,37 @@ async function newUserApps(u,ao) {
 				+ ',current_timestamp'
 				+ ',\''+ ao.cores + '-' + ao.memory + '\') returning ua_id';
 	
-	console.log(s);
-	return new Promise(function(resolve, reject){
-		client.query(s, (err, res) => {
-			if ( typeof(res) !== "undefined" ) {
-			var ua_id = res.rows[0].ua_id;
-			console.log('debug '+ ua_id + ' ' + JSON.stringify(res));
-			addAppResources(u,ao,ua_id);
-			resolve(JSON.stringify(res));
-			} else {
-			console.log('err '+err);
-			reject("error noodle");	  	
-			}
-		});	     
-	});
-	/*
-	try {
+  try {
 		var z = await dbCall(s);
 		if (typeof(z) == "object" ) {
 			var b = z;
 		} else {
 			var b = JSON.parse(z);
 		}
+		var ua_id = b.rows[0].ua_id;
+		
+		if ( ao ) {
+		  var r = await	addAppResources(u,ao,ua_id);
+		}
+		
+ 
 		var dx = {};
 		dx.success = {};
 		
 		if ( b.rows ) {
 			dx.success.data =  b.rows;
-			console.log('debug ' +JSON.stringify(b.rows));
-			var ua_id = b.rows[0].ua_id;
-
-			var zd = await addAppResources(u,ao,ua_id);
-			console.log('debug ' +JSON.stringify(zd));
-			//return zd;
+			return dx;
 		} else {
 			return b;
 		}
 	} catch(e) {
 		return e;
 	}
-	*/
+ 
 
-	function addAppResources(u,o,fk) {
-		console.log(' addAppRes debug ' + u + JSON.stringify(o) + ' ' + fk);
+  
+async	function addAppResources(u,o,fk) {
+		
 		var s = 'insert into adept.user_app_resources (ur_id, user_id, app_id, res_type, res_id, state, created ) values ';
 		var x = '';
 		if ( typeof(o.test_sets) == 'undefined' && typeof(o.dict) == 'undefined' ) {
@@ -423,20 +327,7 @@ async function newUserApps(u,ao) {
 			if ( typeof(o.dict) !== 'undefined' ) {
 				s = s + x + ' (nextval(\'adept.user_app_res_seq\'),'+u+','+fk+',\'dict\','+o.dict+',\'new\',current_timestamp)';
 			}
-			console.log('app resources '+ s)
-			return new Promise(function(resolve, reject){
-				client.query(s, (err, res) => {
-					if ( typeof(res) !== "undefined" ) {
-					//var ua_id = res.rows[0].ua_id;
-					//var zd = addAppResources(u,ao,ua_id);
-					resolve(JSON.stringify(res));
-					} else {
-					console.log('err '+err);
-					reject("error noodle");	  	
-					}
-				});	     
-			});
-			/*
+			
 			try {
 				var z = await dbCall(s);
 				if (typeof(z) == "object" ) {
@@ -456,7 +347,7 @@ async function newUserApps(u,ao) {
 			} catch(e) {
 				return e;
 			}
-			*/
+      
 		}	
 	}
 	
@@ -465,7 +356,7 @@ async function newUserApps(u,ao) {
 async function fetchUsers(t, u) {
 
 	var s = 'select user_id, first_name, last_name, email, role_id, org_name, created, state from adept.users';
-	console.log('fetch users '+s)
+	
 	try {
 		var z = await dbCall(s);
 	
@@ -482,7 +373,7 @@ async function fetchUsers(t, u) {
 		} else {
 			return b;
 		}
-		//return z;
+	
 	} catch(e) {
 		return e;
 	}
@@ -519,7 +410,7 @@ async function updateUser(t, u, p, v) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -544,7 +435,7 @@ async function fetchTestSets(u) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -555,10 +446,10 @@ async function fetchCollections(u, c) {
     if ( c ) {
 		var s = 'select * from adept.getCollection('+u+','+c+')';
 	} else {
-		//var s = 'select * from adept.collectionset('+u+')';
+		
 		var s = 'select * from adept.collection_group where owner_id = '+u;
 	}
-	console.log('sql '+s);
+	
 	try {
 		var z = await dbCall(s);
 	
@@ -644,20 +535,7 @@ async function addSearchToCollection(i, t, u, c) {
 	var s = 'insert into adept.collection_search (col_id, col_desc, search_url, state, rec_count) '
 			+ ' values ('+i+',\''+t+'\',\''+u+'\',\'active\','+c+')';
 	console.log(s);
-
-	return new Promise(function(resolve, reject){
-		client.query(s, (err, res) => {
-			  if ( typeof(res) !== "undefined" ) {
-			  	resolve(JSON.stringify(res));
-			  } else {
-				console.log('err '+err);
-				reject("error noodle");	  	
-			  }
-		});
-		     
-	});
-    /*
-	try {
+  try {
 		var z = await dbCall(s);
 	
 		if (typeof(z) == "object" ) {
@@ -665,8 +543,6 @@ async function addSearchToCollection(i, t, u, c) {
 		} else {
 			var b = JSON.parse(z);
 		}
-		console.log(JSON.stringify(b));
-
 		var dx = {};
 		dx.success = {};
 		if ( b.rows ) {
@@ -677,10 +553,9 @@ async function addSearchToCollection(i, t, u, c) {
 		}
 
 	} catch(e) {
-		console.log('err'+JSON.stringify(e));
 		return e;
 	}
-	*/
+  
 }
 
 async function delCollection(c) {
@@ -820,7 +695,7 @@ async function fetchUserGroups(u, t) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -830,8 +705,7 @@ async function fetchUserGroups(u, t) {
 async function createNewUserGroup(u,n,d,m) {
 
 	var s = 'select * from adept.create_group('+u+',\''+n+'\',\''+d+'\',\''+m+'\')';
-    console.log('New group sql '+s);
-
+    
 	try {
 		var z = await dbCall(s);
 	
@@ -850,7 +724,7 @@ async function createNewUserGroup(u,n,d,m) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -871,7 +745,7 @@ async function joinGroup(u,g) {
 		} else {
 			var b = JSON.parse(z);
 		}
-		console.log('cngr '+JSON.stringify(b));
+		
 		var dx = {};
 		dx.success = {};
 		if ( b.rows ) {
@@ -881,7 +755,7 @@ async function joinGroup(u,g) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -891,8 +765,7 @@ async function joinGroup(u,g) {
 async function exitGroup(u,g) {
 
 	var s = 'delete from adept.group_members where user_id = '+u+' and group_id = '+g;
-    console.log('New member '+s);
-
+    
 	try {
 		var z = await dbCall(s);
 	
@@ -911,7 +784,7 @@ async function exitGroup(u,g) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -922,8 +795,7 @@ async function addObjectToGroup(u,g,t,o) {
 
 	var s = 'insert into adept.group_objects (group_id,object_type, object_id, created, state )' 
 			+'values ('+g+',\''+t+'\','+o+',current_timestamp,\'new\')';
-    console.log('New group sql '+s);
-
+    
 	try {
 		var z = await dbCall(s);
 	
@@ -932,17 +804,17 @@ async function addObjectToGroup(u,g,t,o) {
 		} else {
 			var b = JSON.parse(z);
 		}
-		console.log('cngr '+JSON.stringify(b));
+		
 		var dx = {};
 		dx.success = {};
 		if ( b.rows ) {
-			console.log('cngr success '+JSON.stringify(b.rows));
+			
 			dx.success.data =  b.rows;
 			return dx;
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -953,8 +825,6 @@ async function addMemberToGroup(g,m) {
 
 	var s = 'select * from adept.add_group_member ('+g+',\''+m+'\')';
 			
-    console.log('Add mem to group sql '+s);
-
 	try {
 		var z = await dbCall(s);
 	
@@ -963,7 +833,7 @@ async function addMemberToGroup(g,m) {
 		} else {
 			var b = JSON.parse(z);
 		}
-		console.log('cngr '+JSON.stringify(b));
+		
 		var dx = {};
 		dx.success = {};
 		if ( b.rows ) {
@@ -973,7 +843,7 @@ async function addMemberToGroup(g,m) {
 		} else {
 			return b;
 		}
-		//return z;
+		
 	} catch(e) {
 		return e;
 	}
@@ -987,19 +857,6 @@ router.get('/', async function(req, res) {
    res.sendFile(Path+'/public/adept-ssl.htm');
 });
 
-router.get('/test', async function(req, res) {
-  
-   var lp = '/adept/test';
-   routelog(req, lp);
-   var z = await testpool('x');
-   if ( z == null) {
-			res.send('No response');	
-		} else {
-			res.send(z);	
-		} 
-   //res.sendFile(Path+'/adept-ssl.htm');
-});
-
 router.get('/getToken', async function(req, res) {
 
 	var lp = '/adept/getToken';
@@ -1010,7 +867,7 @@ router.get('/getToken', async function(req, res) {
   	var pwh = sha512(lib,'5d097fe1065645c8');
  
   var px = await fetchAuth(quark, pwh.passwordHash, pwh.salt);
-  // console.log(' px ' + px);
+ 
   if ( typeof(px) !== "object" ) {
 	px = JSON.parse(px);
   }
@@ -1107,8 +964,6 @@ router.get('/createUser', async function( req, res ) {
 	u.em = req.query.em;
 	u.rp = req.query.a;
   
-	console.log('cu '+JSON.stringify(u));
-
 
 	try {
 		var cur = await createUser(u);
@@ -1141,8 +996,6 @@ router.get('/getLocalDictionaries', async function( req, res) {
 
 	var token = req.query.t;
 	var user_id = req.query.u;
-
-	console.log(' t' + token + ' ' + JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await getLocalDict(user_id);
@@ -1163,8 +1016,6 @@ router.get('/getProcessLog', async function( req, res) {
 
 	var token = req.query.t;
 	var user_id = req.query.u;
-
-	console.log(' t' + token + ' ' + JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await fetchProcessLog(user_id);
@@ -1185,8 +1036,6 @@ router.get('/getUserApps', async function( req, res) {
 
 	var token = req.query.t;
 	var user_id = req.query.u;
-
-	console.log(' t' + token + ' ' + JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await fetchUserApps(user_id);
@@ -1322,7 +1171,6 @@ router.get('/newCollection', async function( req, res) {
 	var token = req.query.t;
 	var user_id = req.query.u;
 	var cn = req.query.c;
-	//console.log('token '+token+' - '+JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await newCollection(user_id,cn);
@@ -1344,7 +1192,6 @@ router.get('/newLocalDictionary', async function( req, res) {
 	var token = req.query.t;
 	var user_id = req.query.u;
 	var dn = req.query.d;
-	//console.log('token '+token+' - '+JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await createNewLocalDict(user_id,dn);
@@ -1364,16 +1211,9 @@ router.get('/newSearchInCollection', async function( req, res) {
 
 	var token = req.query.t;
 	var url = req.query.u;
-	//if ( url ) {
-	//	url = decodeURIComponent(url);
-		
-	//}
-
 	var term = req.query.d;
 	var colid = req.query.i;
 	var count = req.query.c;
-
-	console.log('url '+url);
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await addSearchToCollection(colid, term, url, count);
@@ -1415,8 +1255,6 @@ router.get('/newRecordInCollection', async function( req, res) {
 	var token = req.query.t;
 	var doi = req.query.d;
 	var colid = req.query.i;
-
-	//console.log('token '+token+' - '+JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await addRecordToCollection(colid, doi);
@@ -1490,8 +1328,6 @@ router.get('/registerCollection', async function( req, res) {
 	var token = req.query.t;
 	var u = req.query.u;
 	var colid = req.query.c;
-
-	//console.log('token '+token+' - '+JSON.stringify(gAdeptKey));
 	
 	if ( gAdeptKey.includes(token) ) {
 		var cur = await addRecordToCollection(u, colid);

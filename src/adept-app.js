@@ -3,20 +3,16 @@
   
 */
 
-require('dotenv').config();
-var  Path = process.env.NODE_PATH;
+var  Path = '/<WORKING-DIR>/';
 var  fs = require("fs");
-console.log('Startup at ' + Date.now() + ' ' + Path);
+console.log('Node Adept app startup at ' + Date.now());
 
-const pg = require('pg');
-
-const connectionString = 'postgres://xx:xx@localhost:5432/';
-console.log(' connection ', connectionString );
-
-const port = process.env.PORT;
+const port = 80;
 var express = require('express'),
     app = express(),
     request = require('request');
+
+var adeptapi =  require("./adept-routes.js");
 
 app.use(function(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');
@@ -25,14 +21,10 @@ app.use(function(req, res, next){
     next();
 });
  
-app.use( bodyParser.json({limit: '50mb'}) ); 
-
 app.use('/img', express.static(__dirname + '/public/img'));
 app.use('/js', express.static(__dirname + '/public/js'));
 app.use('/css', express.static(__dirname + '/public/css'));
-const client = new pg.Client(connectionString);
-
-client.connect();
+app.use('/adept',adeptapi);
 
 app.get('/' , function(req,res) {
 	 var ip = req.headers['x-forwarded-for'] || 
@@ -48,6 +40,7 @@ app.get('/' , function(req,res) {
 } );
 
 app.listen(port, () => {
-  console.log('App running on port ${port}.')
+ 
+  console.log(`App running on port ${port}.`)
 });
 
