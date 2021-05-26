@@ -9,11 +9,23 @@
 
 
 ## Installation
+- installing the express generator
+  `npm install express-generator -g`
+ `express docker-app`
+  `npm install`
 - `git clone https://github.com/ngds/ADEPT_frontend.git`
 
 
 
 ### Start
+
+Building Docker images
+
+`sudo docker build -t node-adept` 
+
+Running a Docker image
+
+`sudo docker run -d --publish 8000:8000 --publish 5480:5432 node-adept`
  
 Access a shell and run custom commands inside a container
 
@@ -23,6 +35,9 @@ Access a shell and run custom commands inside a container
 
 
 ## Deploy and publish 
+
+
+SSL/certificates
 
 `sudo docker build -t node-adept-ssl`
 
