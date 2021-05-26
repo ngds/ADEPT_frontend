@@ -5,7 +5,7 @@
 ## Prerequisites
 - docker: https://docs.docker.com/install/
 - node.js
-- 
+- Postgre
 
 
 ## Installation
