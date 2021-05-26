@@ -23,3 +23,7 @@ Access a shell and run custom commands inside a container
 
 
 ## Deploy and publish 
+
+`sudo docker build -t node-adept-ssl`
+
+`sudo docker run -d --add-host= [URL]:[IP address] -p 80:80 -p 443:443 -p 5432:5432 node-adept-ssl`
