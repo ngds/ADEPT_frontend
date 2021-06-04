@@ -18,8 +18,8 @@ Edit and save adept-routes.js
 	The gdURl is url for geoDeepDive access. Verify that this is current and accurate.
   
 ##  Build Docker ignore file (Idockerignore)
-  node_modules
-  npm-debug.log
+  `node_modules
+   npm-debug.log`
   
 ## SSL/certificates
 
