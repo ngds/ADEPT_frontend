@@ -5,7 +5,7 @@
 
 Download or clone github repo
 
-1.  `git clone https://github.com/ngds/ADEPT_frontend.git`
+  `git clone https://github.com/ngds/ADEPT_frontend.git`
 
 Edit and save adept-routes.js 
   	
@@ -17,9 +17,9 @@ Edit and save adept-routes.js
 
 	The gdURl is url for geoDeepDive access. Verify that this is current and accurate.
   
-##  Build Docker ignore file (Idockerignore)
-  `node_modules
-   npm-debug.log`
+##  Create a Docker ignore file (.dockerignore)
+  	node_modules
+   	npm-debug.log
   
 ## SSL/certificates
 
@@ -29,7 +29,7 @@ Edit and save adept-routes.js
 
 
 
-### Start
+## Start
 
 1 - Build command in the directory with the docker file.
 
