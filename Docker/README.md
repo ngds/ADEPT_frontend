@@ -33,19 +33,19 @@ Edit and save adept-routes.js
 
 1 - Build command in the directory with the docker file.
 
-    `sudo docker build -t <user-id>/node-adept-ssl`
+    sudo docker build -t <user-id>/node-adept-ssl
 
 2 - Run Command
 
-    `sudo docker run -d --add-host=adept.<your-domain>:172.17.0.2 -p 80:80 -p 443:443 -p 5432:5432 <user-id>/node-adept-ssl`
+    sudo docker run -d --add-host=adept.<your-domain>:172.17.0.2 -p 80:80 -p 443:443 -p 5432:5432 <user-id>/node-adept-ssl
 
 3 - Get the Container ID and login
 
-	`sudo docker container ls`
+	sudo docker container ls
 
 	Login to container:
 
-	`sudo docker exec -ti <container-id>   /bin/bash`
+	sudo docker exec -ti <container-id>   /bin/bash
 
 4 - In the docker container - add the following to /etc/hosts
 
@@ -54,9 +54,9 @@ Edit and save adept-routes.js
 
 5 - Exit (ctrl-D), then restart the image.
 
-	`sudo docker container <container-id> stop`
+	sudo docker container <container-id> stop
 
-	`sudo docker container <container-id> start`
+	sudo docker container <container-id> start
 
 6 - Local Test
 
