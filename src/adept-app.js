@@ -3,7 +3,7 @@
   
 */
 
-var  Path = '/<WORKING-DIR>/';
+var  Path = '/app/src/';
 var  fs = require("fs");
 console.log('Node Adept app startup at ' + Date.now());
 
