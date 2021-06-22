@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 var bodyParser = require('body-parser');
-var  Path = '/<WORKING-DIR>';
+var  Path = '/app/src/';
 
 const  {Pool} = require('pg');
 
@@ -12,11 +12,11 @@ const  {Pool} = require('pg');
 // used to run Machine Learning apps. 
   
 const pool = new Pool({
-	user: 'db-username',
-	host: '10.x.x.x',
-	database: 'geothermal',
-	password: 'xxxxx',
-	port: 5432,
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
 	max: 25
   });
   
