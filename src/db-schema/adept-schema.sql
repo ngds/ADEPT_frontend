@@ -5,7 +5,7 @@
 -- Dumped from database version 12.4 (Ubuntu 12.4-0ubuntu0.20.04.1)
 -- Dumped by pg_dump version 12.3
 
--- Started on 2021-05-03 12:28:05
+-- Started on 2021-07-14 14:16:21
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -29,7 +29,7 @@ CREATE SCHEMA adept;
 ALTER SCHEMA adept OWNER TO ngdsdb;
 
 --
--- TOC entry 1889 (class 1247 OID 181499)
+-- TOC entry 1895 (class 1247 OID 181499)
 -- Name: colset; Type: TYPE; Schema: adept; Owner: ngdsdb
 --
 
@@ -46,7 +46,7 @@ CREATE TYPE adept.colset AS (
 ALTER TYPE adept.colset OWNER TO ngdsdb;
 
 --
--- TOC entry 1939 (class 1247 OID 214201)
+-- TOC entry 1945 (class 1247 OID 214201)
 -- Name: groupset; Type: TYPE; Schema: adept; Owner: ngdsdb
 --
 
@@ -66,7 +66,7 @@ CREATE TYPE adept.groupset AS (
 ALTER TYPE adept.groupset OWNER TO ngdsdb;
 
 --
--- TOC entry 1950 (class 1247 OID 215517)
+-- TOC entry 1956 (class 1247 OID 215517)
 -- Name: not_group; Type: TYPE; Schema: adept; Owner: ngdsdb
 --
 
@@ -81,7 +81,7 @@ CREATE TYPE adept.not_group AS (
 ALTER TYPE adept.not_group OWNER TO ngdsdb;
 
 --
--- TOC entry 1209 (class 1255 OID 214203)
+-- TOC entry 1212 (class 1255 OID 214203)
 -- Name: add_group_member(bigint, text); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -118,7 +118,7 @@ $_$;
 ALTER FUNCTION adept.add_group_member(bigint, text) OWNER TO ngdsdb;
 
 --
--- TOC entry 1201 (class 1255 OID 181501)
+-- TOC entry 1205 (class 1255 OID 181501)
 -- Name: collectionset(bigint); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -164,7 +164,7 @@ $_$;
 ALTER FUNCTION adept.collectionset(bigint) OWNER TO ngdsdb;
 
 --
--- TOC entry 1192 (class 1255 OID 214207)
+-- TOC entry 1196 (class 1255 OID 214207)
 -- Name: create_group(bigint, text, text, text); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -215,7 +215,7 @@ $_$;
 ALTER FUNCTION adept.create_group(bigint, text, text, text) OWNER TO ngdsdb;
 
 --
--- TOC entry 1199 (class 1255 OID 181502)
+-- TOC entry 1203 (class 1255 OID 181502)
 -- Name: deletecollection(bigint); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -241,7 +241,7 @@ $_$;
 ALTER FUNCTION adept.deletecollection(bigint) OWNER TO ngdsdb;
 
 --
--- TOC entry 1208 (class 1255 OID 214137)
+-- TOC entry 1214 (class 1255 OID 214137)
 -- Name: getcollection(bigint, bigint); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -251,7 +251,8 @@ CREATE FUNCTION adept.getcollection(bigint, bigint) RETURNS SETOF adept.colset
 with col as (
 		select col_id, col_name, user_id, proc_state
 		from adept.collections 
-		where user_id = $1 and col_id = $2 and state = 'active'
+		where --user_id = $1 and 
+		col_id = $2 and state = 'active'
 	),cs as (
 		select col_id, cs_id, col_desc, search_url, rec_count 
 		from adept.collection_search 
@@ -287,7 +288,7 @@ $_$;
 ALTER FUNCTION adept.getcollection(bigint, bigint) OWNER TO ngdsdb;
 
 --
--- TOC entry 1211 (class 1255 OID 214233)
+-- TOC entry 1215 (class 1255 OID 214233)
 -- Name: group_membership(bigint); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -355,7 +356,43 @@ $_$;
 ALTER FUNCTION adept.group_membership(bigint) OWNER TO ngdsdb;
 
 --
--- TOC entry 1210 (class 1255 OID 215518)
+-- TOC entry 1217 (class 1255 OID 215578)
+-- Name: insert_testset(bigint, bigint, text); Type: FUNCTION; Schema: adept; Owner: ngdsdb
+--
+
+CREATE FUNCTION adept.insert_testset(bigint, bigint, text) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    user_id ALIAS FOR $1;
+	cx_id ALIAS FOR $2;
+	apikey ALIAS FOR $3;
+	ts_url text;
+	ts_namex text;
+	status text;
+
+
+BEGIN
+
+	status := 'Start';
+	select col_name INTO ts_namex from adept.collections where col_id = cx_id;
+	ts_url := 'https://xdd.wisc.edu/api/products?api_key='||apikey||'&products='||ts_namex;
+	
+	insert into adept.test_sets 
+		(ts_id, user_id, col_id, ts_name, apikey, ts_url, proc_state, state, created) 
+	values ( nextval('adept.test_set_id'),
+		user_id,cx_id,ts_namex,apikey,ts_url,'ready','active',current_timestamp);
+	
+	status := 'DONE';
+	return status;
+END;
+$_$;
+
+
+ALTER FUNCTION adept.insert_testset(bigint, bigint, text) OWNER TO ngdsdb;
+
+--
+-- TOC entry 1213 (class 1255 OID 215518)
 -- Name: not_group_member(bigint); Type: FUNCTION; Schema: adept; Owner: ngdsdb
 --
 
@@ -764,7 +801,31 @@ CREATE TABLE adept.groups (
 ALTER TABLE adept.groups OWNER TO ngdsdb;
 
 --
--- TOC entry 347 (class 1259 OID 215535)
+-- TOC entry 307 (class 1259 OID 181381)
+-- Name: users; Type: TABLE; Schema: adept; Owner: ngdsdb
+--
+
+CREATE TABLE adept.users (
+    user_id bigint DEFAULT nextval('adept.adept_user_id'::regclass) NOT NULL,
+    first_name text,
+    last_name text,
+    email text,
+    org_name text,
+    purpose text,
+    apikey text,
+    role_id bigint,
+    auth_app text,
+    created timestamp without time zone,
+    password text,
+    user_name text,
+    state text
+);
+
+
+ALTER TABLE adept.users OWNER TO ngdsdb;
+
+--
+-- TOC entry 347 (class 1259 OID 215540)
 -- Name: collection_group; Type: VIEW; Schema: adept; Owner: ngdsdb
 --
 
@@ -801,15 +862,17 @@ CREATE VIEW adept.collection_group AS
  SELECT c.col_id,
     c.col_name,
     c.user_id,
+    u.email,
     c.state,
     c.created,
     s.scnt,
     s.srecs,
     s.mdcnt,
     gc.jgrp
-   FROM ((adept.collections c
+   FROM (((adept.collections c
      LEFT JOIN sr s ON ((c.col_id = s.col_id)))
-     LEFT JOIN gc ON ((c.col_id = gc.col_id)));
+     LEFT JOIN gc ON ((c.col_id = gc.col_id)))
+     LEFT JOIN adept.users u ON ((c.user_id = u.user_id)));
 
 
 ALTER TABLE adept.collection_group OWNER TO ngdsdb;
@@ -992,6 +1055,164 @@ CREATE TABLE adept.group_members (
 ALTER TABLE adept.group_members OWNER TO ngdsdb;
 
 --
+-- TOC entry 348 (class 1259 OID 215545)
+-- Name: group_member_collection_datasets; Type: VIEW; Schema: adept; Owner: ngdsdb
+--
+
+CREATE VIEW adept.group_member_collection_datasets AS
+ WITH gm AS (
+         SELECT g.group_id,
+            g.created,
+            g.group_name,
+            g.owner_id,
+            u.email AS owner_name,
+            m.user_id,
+            m.created AS member_start,
+            m.state AS member_state
+           FROM adept.group_members m,
+            adept.groups g,
+            adept.users u
+          WHERE ((m.group_id = g.group_id) AND (g.owner_id = u.user_id))
+        ), gox AS (
+         SELECT o.group_id,
+            o.object_id,
+            c.col_name,
+            c.created AS col_created
+           FROM adept.group_objects o,
+            adept.collections c
+          WHERE ((o.object_type = 'dataset'::text) AND (o.object_id = c.col_id))
+        )
+ SELECT gm.group_id,
+    gm.created,
+    gm.group_name,
+    gm.owner_id,
+    gm.owner_name,
+    gm.user_id,
+    gm.member_start,
+    gm.member_state,
+    gox.object_id,
+    gox.col_name,
+    gox.col_created
+   FROM gm,
+    gox
+  WHERE (gm.group_id = gox.group_id);
+
+
+ALTER TABLE adept.group_member_collection_datasets OWNER TO ngdsdb;
+
+--
+-- TOC entry 315 (class 1259 OID 181458)
+-- Name: user_dictionaries; Type: TABLE; Schema: adept; Owner: ngdsdb
+--
+
+CREATE TABLE adept.user_dictionaries (
+    did bigint DEFAULT nextval('adept.dict_seq_id'::regclass) NOT NULL,
+    dict_id bigint,
+    user_id bigint NOT NULL,
+    proc_state text,
+    source text,
+    filter_flag text,
+    state text,
+    name text
+);
+
+
+ALTER TABLE adept.user_dictionaries OWNER TO ngdsdb;
+
+--
+-- TOC entry 351 (class 1259 OID 215571)
+-- Name: group_view_objects; Type: VIEW; Schema: adept; Owner: ngdsdb
+--
+
+CREATE VIEW adept.group_view_objects AS
+ WITH go AS (
+         SELECT g.group_id,
+            g.group_name,
+            o.go_id,
+            o.object_type,
+            o.object_id,
+            o.created,
+            o.state
+           FROM adept.groups g,
+            adept.group_objects o
+          WHERE (g.group_id = o.group_id)
+        ), gc AS (
+         SELECT go.group_id,
+            go.group_name,
+            go.go_id,
+            go.object_type,
+            go.object_id,
+            go.created,
+            go.state,
+            c.col_id AS id,
+            c.col_name AS name
+           FROM go,
+            adept.collections c
+          WHERE ((go.object_id = c.col_id) AND (go.object_type = 'dataset'::text))
+        ), gd AS (
+         SELECT go.group_id,
+            go.group_name,
+            go.go_id,
+            go.object_type,
+            go.object_id,
+            go.created,
+            go.state,
+            d.dict_id AS id,
+            d.name
+           FROM go,
+            adept.user_dictionaries d
+          WHERE ((go.object_id = d.dict_id) AND (go.object_type = 'dictionary'::text))
+        ), ga AS (
+         SELECT go.group_id,
+            go.group_name,
+            go.go_id,
+            go.object_type,
+            go.object_id,
+            go.created,
+            go.state,
+            a.ua_id AS id,
+            a.app_name AS name
+           FROM go,
+            adept.user_applications a
+          WHERE ((go.object_id = a.ua_id) AND (go.object_type = 'application'::text))
+        )
+ SELECT gc.group_id,
+    gc.group_name,
+    gc.go_id,
+    gc.object_type,
+    gc.object_id,
+    gc.created,
+    gc.state,
+    gc.id,
+    gc.name
+   FROM gc
+UNION
+ SELECT gd.group_id,
+    gd.group_name,
+    gd.go_id,
+    gd.object_type,
+    gd.object_id,
+    gd.created,
+    gd.state,
+    gd.id,
+    gd.name
+   FROM gd
+UNION
+ SELECT ga.group_id,
+    ga.group_name,
+    ga.go_id,
+    ga.object_type,
+    ga.object_id,
+    ga.created,
+    ga.state,
+    ga.id,
+    ga.name
+   FROM ga;
+
+
+ALTER TABLE adept.group_view_objects OWNER TO ngdsdb;
+
+--
 -- TOC entry 320 (class 1259 OID 181503)
 -- Name: proc_active_seq; Type: SEQUENCE; Schema: adept; Owner: ngdsdb
 --
@@ -1045,50 +1266,7 @@ CREATE TABLE adept.roles (
 ALTER TABLE adept.roles OWNER TO ngdsdb;
 
 --
--- TOC entry 315 (class 1259 OID 181458)
--- Name: user_dictionaries; Type: TABLE; Schema: adept; Owner: ngdsdb
---
-
-CREATE TABLE adept.user_dictionaries (
-    did bigint DEFAULT nextval('adept.dict_seq_id'::regclass) NOT NULL,
-    dict_id bigint,
-    user_id bigint NOT NULL,
-    proc_state text,
-    source text,
-    filter_flag text,
-    state text,
-    name text
-);
-
-
-ALTER TABLE adept.user_dictionaries OWNER TO ngdsdb;
-
---
--- TOC entry 307 (class 1259 OID 181381)
--- Name: users; Type: TABLE; Schema: adept; Owner: ngdsdb
---
-
-CREATE TABLE adept.users (
-    user_id bigint DEFAULT nextval('adept.adept_user_id'::regclass) NOT NULL,
-    first_name text,
-    last_name text,
-    email text,
-    org_name text,
-    purpose text,
-    apikey text,
-    role_id bigint,
-    auth_app text,
-    created timestamp without time zone,
-    password text,
-    user_name text,
-    state text
-);
-
-
-ALTER TABLE adept.users OWNER TO ngdsdb;
-
---
--- TOC entry 4370 (class 2606 OID 214189)
+-- TOC entry 4386 (class 2606 OID 214189)
 -- Name: user_app_instance ax_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1097,7 +1275,7 @@ ALTER TABLE ONLY adept.user_app_instance
 
 
 --
--- TOC entry 4346 (class 2606 OID 181424)
+-- TOC entry 4362 (class 2606 OID 181424)
 -- Name: collections col_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1106,7 +1284,7 @@ ALTER TABLE ONLY adept.collections
 
 
 --
--- TOC entry 4350 (class 2606 OID 181442)
+-- TOC entry 4366 (class 2606 OID 181442)
 -- Name: collection_records cr_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1115,7 +1293,7 @@ ALTER TABLE ONLY adept.collection_records
 
 
 --
--- TOC entry 4348 (class 2606 OID 181433)
+-- TOC entry 4364 (class 2606 OID 181433)
 -- Name: collection_search cs_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1124,7 +1302,7 @@ ALTER TABLE ONLY adept.collection_search
 
 
 --
--- TOC entry 4352 (class 2606 OID 181450)
+-- TOC entry 4368 (class 2606 OID 181450)
 -- Name: dictionaries did_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1133,7 +1311,7 @@ ALTER TABLE ONLY adept.dictionaries
 
 
 --
--- TOC entry 4356 (class 2606 OID 181475)
+-- TOC entry 4372 (class 2606 OID 181475)
 -- Name: dictionary_terms dt_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1142,7 +1320,7 @@ ALTER TABLE ONLY adept.dictionary_terms
 
 
 --
--- TOC entry 4366 (class 2606 OID 214136)
+-- TOC entry 4382 (class 2606 OID 214136)
 -- Name: group_members gm_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1151,7 +1329,7 @@ ALTER TABLE ONLY adept.group_members
 
 
 --
--- TOC entry 4372 (class 2606 OID 214232)
+-- TOC entry 4388 (class 2606 OID 214232)
 -- Name: group_objects go_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1160,7 +1338,7 @@ ALTER TABLE ONLY adept.group_objects
 
 
 --
--- TOC entry 4364 (class 2606 OID 214127)
+-- TOC entry 4380 (class 2606 OID 214127)
 -- Name: groups group_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1169,7 +1347,7 @@ ALTER TABLE ONLY adept.groups
 
 
 --
--- TOC entry 4360 (class 2606 OID 181516)
+-- TOC entry 4376 (class 2606 OID 181516)
 -- Name: process_activity pa_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1178,7 +1356,7 @@ ALTER TABLE ONLY adept.process_activity
 
 
 --
--- TOC entry 4342 (class 2606 OID 181402)
+-- TOC entry 4358 (class 2606 OID 181402)
 -- Name: roles role_name_key; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1187,7 +1365,7 @@ ALTER TABLE ONLY adept.roles
 
 
 --
--- TOC entry 4344 (class 2606 OID 181400)
+-- TOC entry 4360 (class 2606 OID 181400)
 -- Name: roles role_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1196,7 +1374,7 @@ ALTER TABLE ONLY adept.roles
 
 
 --
--- TOC entry 4358 (class 2606 OID 181486)
+-- TOC entry 4374 (class 2606 OID 181486)
 -- Name: test_sets ts_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1205,7 +1383,7 @@ ALTER TABLE ONLY adept.test_sets
 
 
 --
--- TOC entry 4362 (class 2606 OID 181545)
+-- TOC entry 4378 (class 2606 OID 181545)
 -- Name: user_applications ua_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1214,7 +1392,7 @@ ALTER TABLE ONLY adept.user_applications
 
 
 --
--- TOC entry 4354 (class 2606 OID 181466)
+-- TOC entry 4370 (class 2606 OID 181466)
 -- Name: user_dictionaries udid_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1223,7 +1401,7 @@ ALTER TABLE ONLY adept.user_dictionaries
 
 
 --
--- TOC entry 4368 (class 2606 OID 214166)
+-- TOC entry 4384 (class 2606 OID 214166)
 -- Name: user_app_resources ur_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1232,7 +1410,7 @@ ALTER TABLE ONLY adept.user_app_resources
 
 
 --
--- TOC entry 4340 (class 2606 OID 181389)
+-- TOC entry 4356 (class 2606 OID 181389)
 -- Name: users user_pkey; Type: CONSTRAINT; Schema: adept; Owner: ngdsdb
 --
 
@@ -1240,7 +1418,7 @@ ALTER TABLE ONLY adept.users
     ADD CONSTRAINT user_pkey PRIMARY KEY (user_id);
 
 
--- Completed on 2021-05-03 12:28:06
+-- Completed on 2021-07-14 14:16:21
 
 --
 -- PostgreSQL database dump complete
