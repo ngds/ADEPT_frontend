@@ -5,7 +5,7 @@
 -- Dumped from database version 12.4 (Ubuntu 12.4-0ubuntu0.20.04.1)
 -- Dumped by pg_dump version 12.3
 
--- Started on 2021-07-14 14:16:21
+-- Started on 2021-07-15 11:30:07
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -364,24 +364,31 @@ CREATE FUNCTION adept.insert_testset(bigint, bigint, text) RETURNS text
     LANGUAGE plpgsql
     AS $_$
 DECLARE
-    user_id ALIAS FOR $1;
+    us_id ALIAS FOR $1;
 	cx_id ALIAS FOR $2;
 	apikey ALIAS FOR $3;
 	ts_url text;
 	ts_namex text;
 	status text;
-
+	v_count bigint;
 
 BEGIN
 
 	status := 'Start';
+	
+	select count(*) into v_count from adept.test_sets where user_id = us_id and col_id = cx_id;
+	
 	select col_name INTO ts_namex from adept.collections where col_id = cx_id;
 	ts_url := 'https://xdd.wisc.edu/api/products?api_key='||apikey||'&products='||ts_namex;
+	
+	if v_count > 0 then
+		ts_namex := ts_namex||'-'||v_count;
+	end if;
 	
 	insert into adept.test_sets 
 		(ts_id, user_id, col_id, ts_name, apikey, ts_url, proc_state, state, created) 
 	values ( nextval('adept.test_set_id'),
-		user_id,cx_id,ts_namex,apikey,ts_url,'ready','active',current_timestamp);
+		us_id,cx_id,ts_namex,apikey,ts_url,'ready','active',current_timestamp);
 	
 	status := 'DONE';
 	return status;
@@ -1418,7 +1425,7 @@ ALTER TABLE ONLY adept.users
     ADD CONSTRAINT user_pkey PRIMARY KEY (user_id);
 
 
--- Completed on 2021-07-14 14:16:21
+-- Completed on 2021-07-15 11:30:07
 
 --
 -- PostgreSQL database dump complete
