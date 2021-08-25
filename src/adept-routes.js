@@ -15,9 +15,9 @@ const  {Pool} = require('pg');
   
 const pool = new Pool({
 	user: 'ngdsdb',
-	host: '10.208.3.122',
-	database: 'geothermal',
-	password: 'geonewton',
+	host: 'xxxxxxx',
+	database: 'xxxxxxxxx',
+	password: 'xxxxxxxx',
 	port: 5432,
 	max: 25
   });
