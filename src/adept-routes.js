@@ -363,7 +363,7 @@ async function newUserApps(u,ao) {
             secure: false,
             auth: {
             user: "uwxdd.contact", 
-            pass: "!qWnNXj8Htq$LdZ27W$3", 
+            pass: "xxxxxxxxx", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -374,7 +374,7 @@ async function newUserApps(u,ao) {
 
         let info = await transporter.sendMail({
             from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
-            to: "lbookman@email.arizona.edu", // list of receivers
+            to: "Email@email.com", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
@@ -534,7 +534,7 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             secure: false,
             auth: {
             user: "uwxdd.contact", 
-            pass: "!qWnNXj8Htq$LdZ27W$3", 
+            pass: "xxxxxxxxxx", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -545,7 +545,7 @@ async function execAppInstance(u,i,n,c,m,t,d) {
 
         let info = await transporter.sendMail({
             from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
-            to: "lbookman@email.arizona.edu", // list of receivers
+            to: "email@email.com", // list of receivers
             subject: "New Application Run Request", // Subject line
             text: "", 
             html: es
