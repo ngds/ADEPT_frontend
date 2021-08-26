@@ -4838,7 +4838,7 @@ var showDatasets = function() {
 var getMemberDatasets = function(o,gType) {
 
    // Get collections that I are in groups I am a member of
-   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&m='+gUser.id;
+   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&u='+gUser.id;
 
    var jqxhr = $.get(pUrl, function() {
      var ssu = 'success member collections'; 
