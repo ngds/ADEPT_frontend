@@ -6,18 +6,18 @@ var crypto = require('crypto');
 const https = require('https');
 const nodemailer = require("nodemailer");
 const { getMaxListeners } = require("process");
-
-var  Path = process.env.NODE_PATH;
+// This is the docker path
+var  Path = '/app';
 const  {Pool} = require('pg');
 
 // The ADEPT Database is a postgres database containing user, stored datasets, & applications control
 // used to run Machine Learning apps. 
   
 const pool = new Pool({
-	user: 'ngdsdb',
-	host: 'xxxxxxx',
-	database: 'xxxxxxxxx',
-	password: 'xxxxxxxx',
+	user: 'dbname',
+	host: '',
+	database: 'geothermal',
+	password: '',
 	port: 5432,
 	max: 25
   });
@@ -127,32 +127,25 @@ async function createUser(uo) {
 
   }
 
-async function dbCall(s) {
-	//using pgPool
-	var qUrl =  qbUrl + s; 
-	var qr = require('request');
-	var body = '';
-	return new Promise(function(resolve, reject){
-	
-		try {
-			qr.get(qUrl)
-			.on ('response',function(response) {         		
-			})
-			.on ('data', function(chunk) {
-				body += chunk;
-			}).on ('end', function() {
-			
-				resolve(body);
-			}).on ('error', function(err) {
-
-				reject('db call error '+err);
-			});	
-		} catch(e) {
-			reject('db error '+e);
-		}
-	});
-
+async function dbCall(q) {
+   	return new Promise(function(resolve, reject) {
+		pool.connect()
+			.then(client => {
+				return client
+				.query(q)
+				.then(res => {
+					client.release();
+					resolve(res);
+				})
+				.catch(err => {
+					client.release()
+					console.log(err.stack)
+					reject(err);
+				})
+			});
+		});
 }
+
 
 async function fetchAuth(u,p,s ) {
 
@@ -362,8 +355,8 @@ async function newUserApps(u,ao) {
             port: 587,
             secure: false,
             auth: {
-            user: "uwxdd.contact", 
-            pass: "xxxxxxxxx", 
+            user: "", 
+            pass: "", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -373,8 +366,8 @@ async function newUserApps(u,ao) {
                 "Cores " + ao.cores + "Memory: " + ao.memory;
 
         let info = await transporter.sendMail({
-            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
-            to: "Email@email.com", // list of receivers
+            from: '', // sender address
+            to: "", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
@@ -502,6 +495,7 @@ async function execAppInstance(u,i,n,c,m,t,d) {
         tz = tz+']';
         
         var s = 'select * from adept.addNewInstance('+u+','+i+',\''+n+'\',\''+c+'\',\''+m+'\','+tz+')';
+       
 
 		try {
 			var z = await dbCall(s);
@@ -514,6 +508,11 @@ async function execAppInstance(u,i,n,c,m,t,d) {
 			var dx = {};
 			dx.success = {};
 			if ( b.rows ) {
+				
+				var ax_id = b.rows[0].addnewinstance;   
+				var axa = ax_id.split('-')[1];
+				
+				var z = await sendAppInstanceEmail(u,i,n,c,m,t, axa);
 				dx.success.data =  b.rows;
 				return dx;
 			} else {
@@ -533,8 +532,8 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             port: 587,
             secure: false,
             auth: {
-            user: "uwxdd.contact", 
-            pass: "xxxxxxxxxx", 
+            user: "", 
+            pass: "", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -544,22 +543,24 @@ async function execAppInstance(u,i,n,c,m,t,d) {
                 "Cores " + c + "Memory: " + m + "Test Sets : " + t ;
 
         let info = await transporter.sendMail({
-            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
-            to: "email@email.com", // list of receivers
+            from: '', // sender address
+            to: "", // list of receivers
             subject: "New Application Run Request", // Subject line
             text: "", 
             html: es
         });
         if ( info ) {
-            
-            updateAppInstanceStatus(u,i,n,c,m,t,d, ax_id)
+           
+            updateAppInstanceStatus(u,i,n,c,m,t, ax_id)
         }
+       
         return info;
     }
 
     async function updateAppInstanceStatus(u,i,n,c,m,t,ax_id  ) {
-
+        
         var s = 'update adept.user_app_instance set state = \'active\' where ax_id = '+ax_id;
+		
 		try {
 			var z = await dbCall(s);
 			if (typeof(z) == "object" ) {
@@ -585,6 +586,7 @@ async function execAppInstance(u,i,n,c,m,t,d) {
 
     insertAppInstance(u,i,n,c,m,t);
 }
+
 
 async function fetchAppHistory (a) {
 
@@ -1661,11 +1663,11 @@ router.get('/getCollections', async function( req, res) {
     var memid = req.query.m;
 
 	if ( gAdeptKey.includes(token) ) {
-		if ( typeof(memid) !== "undefined" ) {
-			var cur = await fetchMemberCollections(memid);
-		} else {
+		//if ( typeof(memid) !== "undefined" ) {
+		//	var cur = await fetchMemberCollections(memid);
+		//} else {
 			var cur = await fetchCollections(user_id, colid);
-		}
+		//}
 		
 		if ( cur == null) {
 			res.send('No response');	
