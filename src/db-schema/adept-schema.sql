@@ -5,7 +5,7 @@
 -- Dumped from database version 12.4 (Ubuntu 12.4-0ubuntu0.20.04.1)
 -- Dumped by pg_dump version 12.3
 
--- Started on 2021-08-24 15:18:35
+-- Started on 2021-08-26 15:00:33
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1223,7 +1223,7 @@ ALTER TABLE ONLY adept.users
     ADD CONSTRAINT user_pkey PRIMARY KEY (user_id);
 
 
--- Completed on 2021-08-24 15:18:36
+-- Completed on 2021-08-26 15:00:34
 
 --
 -- PostgreSQL database dump complete
