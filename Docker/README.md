@@ -17,18 +17,18 @@ Edit and save adept-routes.js
 
 	The gdURl is url for geoDeepDive access. Verify that this is current and accurate.
 	
-	Enter in Email Password on line 366 and 537	
+	Enter in Email user and  password on line 358, 359 and 535, 536	
 	let transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             port: 587,
             secure: false,
             auth: {
-            user: "uwxdd.contact", 
+            user: "user", // enter username
             pass: "xxxxxxxx", // enter password
             },
         });
 
-	Enter receivers Email on lines 377 and 548
+	Enter From and Receivers Email on lines 369,370 and 546, 547
         let info = await transporter.sendMail({
             from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
             to: "email@email.com", // list of receivers
