@@ -17,8 +17,11 @@
   var gDictList = [];
   var gTestSets = [];
   var gCollections = [];
-
+  var gMemberCollections = [];
   var gSelCollection = {};
+  var gMemberSelCollection = {};
+  var gGrpSelColSearch =[];
+   
   var gProcLog = [];
   var gApps = [];
   var gSelApp = {};
@@ -30,8 +33,8 @@
   var gDict = {};
   var gSetInit = true;
   var gSelDict = {k : "", dict_id : "", count: 0 };
-  //var gdUrl='https://xdddev.chtc.io/api/v1' ;
   var gdUrl='https://xdd.wisc.edu/api/v1';
+
   // find records header info
   var gFRHdr = {};
 
@@ -126,7 +129,7 @@
         $("#shTitle").text('Search Term History');
       }
      
-      //$("#shTitle").text("Search History");
+      
       for (k in gSearchHistory) {
         var hs = gSearchHistory[k];
       if ( hs ) {
@@ -156,27 +159,27 @@
 		$("#Cex").show();
 		if ( gMenuSel == 's' ) {
 			$("#Cex").show();
-		//	$("#leftMDRecord").hide();
+		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
-			//$("#leftMDRecord").show();
+			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
 			console.log('logged in whlie viewing map');
-		//	$("#leftMDRecord").hide();
+	
 			
 		}
 		
 	} else if ( kmu(gKey) && gKey.agentRole == "4"  ) {
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-			//$("#leftMDRecord").hide();
+		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
 			$("#leftMDRecord").show();
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		//	$("#leftMDRecord").hide();
+		
 			console.log('logged in while viewing map');
 			
 		}
@@ -184,13 +187,13 @@
 		// logging out
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-		//	$("#leftMDRecord").hide();
+		
 		} else if ( gMenuSel == 'r' ) {
 			 $("#widget-view").empty();
-			// $("#leftMDRecord").show();
+			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		//	$("#leftMDRecord").hide();
+		
 			console.log('logged in whie viewing map');	
 		}
 	}
@@ -201,7 +204,7 @@
     // if its typeahead append, if its search history replace
     if (o.id.substr(0,2) == 'ta') {
       var tbx = o.text;
-      var ng =  $("#gSearchBox").val(); //.substr(gTApre.length-1);
+      var ng =  $("#gSearchBox").val(); 
       $("#gSearchBox").val(ng.slice(0,-gTApre.length)+tbx);
     } else if ( o.id.substr(0,2) == 'dl' ) {
       var tbx = o.id.substr(3);
@@ -235,7 +238,55 @@
     gSearchHistory=[];
     localStorage.setItem("adSearchHistory","");
     $("#sHistoryItems").empty();
+    clearSearch();
+  }
 
+  function showContact(o) {
+    
+  
+    var h = $('<h4> Email: contact@geodeepdive.org </h4>')
+                    .css("margin-top", "8px")
+                    .css("margin-bottom", "10px")
+                    .css("text-align", "center")
+                    .css("padding","2px 2px");
+
+    var sBtn =   $('<a id="surlbtn" class="res-tag" >Close</a>')
+                    .css("font-size", "14px")
+                    .css("margin-top", "6px")
+                    .css("margin-left", "125px")
+                    .css("padding","2px 2px")
+                    .css("background-color", "#0971B2" )
+                    .attr('onclick','closeUrl(this);');
+
+    var conDiv = $('<div class="dijitTitlePaneTextNode" id="sdinx"></div>')
+                    .css('background-color','#ffffff') 
+                    .css('margin','auto')
+                    .css("width", "98%")
+                    .css("height", "96%")
+                    .css('border-style','solid')
+                    .css('border-color','#aaaaaa')
+                    .css('position','relative');   
+                     
+    var urlDiv = $('<div class="dijitTitlePaneTextNode" id="showUrl"></div>')
+                    .css('background-color','#cccccc')
+                    .css('position','absolute')
+                    .css('top','120px')
+                    .css('margin','0')
+                    .css('left','700px')
+                    .css('width','300px')
+                    .css('height','100px');            
+
+    conDiv.append(h);             
+    conDiv.append('</br>');
+    conDiv.append(sBtn);
+    urlDiv.append(conDiv);
+    urlDiv.appendTo(document.body);
+
+  }
+
+
+  function closeUrl(o) {
+    $("#showUrl").remove();
   }
 
   function showSearchUrl(o) {
@@ -253,7 +304,7 @@
                     .css("margin-top", "8px")
                     .css("margin-bottom", "10px")
                     .css("text-align", "center");
-                    //.css("padding","2px 2px");
+                    
 
     var p = $('<a href="'+sUrl+'" target="blank_" >'+sUrl+'</a>')
               .css("margin-left", "10px")
@@ -292,7 +343,7 @@
     uriDiv.append(sBtn);
     urlDiv.append(uriDiv);
     urlDiv.appendTo(document.body);
-    //$("#cb").prepend(urlDiv);
+   
 
   }
 
@@ -303,17 +354,111 @@
 
   function saveSearch(o) {
 
+    var bp = $("#saveSearchBtn").position();
+    var popSave = $('<div id="popSave"></div>')
+                .css('top',bp.top)
+                .css('left',bp.left)
+                .css('width','250px')
+                .css('background-color','rgb(208, 230, 240)')
+                .css('border-radius','5px')
+                .css('border-color','#0971B2')
+                .css('border','1px')
+                .css('position','absolute')
+                .css('display','block');
+
+    $("body").append(popSave);
+
+    var saveLabel = $('<span>Select Set to Save Search To</span>')
+              .css("font-family","calibri")
+              .css("font-weight","bold")
+              .css("margin","4px 4px")
+              .css("font-size","12px");
+
+    popSave.append(saveLabel);
+    popSave.append('</br>');
+
+    var selSet = $('<select id="selSearchSet"></select>')
+                .css("font-family","calibri")
+                .css("font-weight","bold")
+                .css("border-style","solid 1px")
+                .css("margin","4px 4px");
+
+    popSave.append(selSet);
+
+    var sBtn =  $('<a id="saveSearchBtn" class="res-tag" >Save</a>')
+                .css("font-size", "12px")
+                .css("margin", "2px")
+                .css("padding","2px 2px")
+                .css("background-color", "#0971B2")
+                .attr('onclick','saveSearchSetup(this);');
+
+    var sCan =  $('<a id="cancelSaveBtn" class="res-tag" >Cancel</a>')
+                .css("font-size", "12px")
+                .css("margin", "2px")
+                .css("padding","2px 2px")
+                .css("background-color", "#0971B2")
+                .attr('onclick','cancelSaveSearch(this);');
+
+    popSave.append(sBtn);
+    popSave.append(sCan);
+
+    var init = 0;
+    if ( gCollections ) {
+      for (z in gCollections ) {
+        var so = $('<option value="'+gCollections[z].col_id+'">'+gCollections[z].col_name+'</option>')
+                .css("font-family", "calibri");
+        if ( init == 0 ) {so.attr("selected","selected"); }
+        selSet.append(so);
+      }
+    }
+    
+}
+
+function cancelSaveSearch(o) {
+      $("#popSave").remove();
+}
+
+function saveSearchSetup(o) {
+  var selSetId = $("#selSearchSet option:selected").val();   
+  var found = false; 
+  for (z in gCollections ) {
+    if ( gCollections[z].col_id == selSetId ) {
+      gSelCollection =  gCollections[z];
+      gSelCollection.col_k = z;
+      found = true;
+      saveSearchToCollection(o);
+      $("#popSave").remove();
+    }
+  }
+  
+}
+
+  function OLDsaveSearch(o) {
+
     if ( kmu(gKey) ) {
       if ( gSelCollection.col_id ) {
-        var srch=searchSettings();
-        var srch=JSON.stringify(gSE);
+        
+       var srch = '?';
+        var inx = 0;
+
+        Object.keys(gSE).forEach(key => {
+          if ( gSE[key].length > 0 ) {
+            if ( inx == 0 ) {
+              var sps = key+'='+gSE[key];
+            } else {
+              var sps = '&'+key+'='+gSE[key];
+            }
+            srch=srch+sps;
+          }
+        });
 
         var sUrl = gdUrl + '/articles?full_results';
         if ( srch.length )  {
           sUrl = sUrl + srch;
+          console.log('Search URL '+sUrl);
         }
         sUrl = encodeURIComponent(sUrl);
-        saveSearchToCollection(sUrl); 
+        saveSearchToCollection(sUrl);
 
       } else {
         alert('Please select a set to save the search ');
@@ -345,6 +490,14 @@
       }
     } else {
       // need to delete records here
+       
+      var oid = o.id.substr(3);
+      var mdv = gSRA[oid];
+      var doi = mdv.identifier[0].id;
+      var id = mdv._gddid;
+ 
+      var zx = deleteRecFromCollection(id);
+
 
       o.text = 'Save';
       o.style.backgroundColor="#0971b2";
@@ -359,7 +512,6 @@
       console.log( "typeahead success ..." );
     })
     .done(function(data) { 
-      //console.log( "typeahead data ..." + JSON.stringify(data) );
       if (typeof(data) == "object" ) {
         var dres = data;
       } else {
@@ -382,7 +534,22 @@
 
   }
 
+
 function showSaved(o) {
+
+  $("#rec-results").empty();
+
+    var k = gSelCollection.col_k;
+    var z = gSelCollection.sid;
+    var so = gCollections[k].search_set[z].search_url;
+ 
+  applySearch(so);
+  findRecords(0);
+
+}
+
+
+function OLDshowSaved(o) {
     var sTerm =  $("#gSearchBox").val();
     var guidA=[];
     var showState = $("#shoSavBtn").text();
@@ -458,6 +625,7 @@ function savedData(o) {
   } else {
     $("#ugbtn").hide();
   }
+  $("#uploadbtn").hide();
 
 }
 
@@ -478,9 +646,6 @@ function recentClk(o) {
 var searchSettings = function() {
 
   var searchStr = "";
-  if ( init ) {
-    gSE.dataset='geothermal';
-  }
  
   gSE.term = $("#gSearchBox").val();
 
@@ -528,7 +693,13 @@ var applySearch = function(o) {
 
   if ( o ) {
     clearSearch();
-    var jst = JSON.parse(o);
+    //var jst = JSON.parse(o);
+    if (typeof(o) == "object" ) {
+      var jst = o;
+    } else {
+      var jst = JSON.parse(o);
+    }
+
     Object.keys(jst).forEach(key => {
       gSE[key] = jst[key];
     });
@@ -542,9 +713,9 @@ var applySearch = function(o) {
   if ( gSE.firstname )  { $("#gAFName").val(gSE.firstname); }
   if ( gSE.lastname )  { $("#gALName").val(gSE.lastname); }
 
- 
 
 }
+
 var clearSearch = function(o) {
   $("#gSearchBox").val("");
   $("#gPubName").val("");
@@ -580,10 +751,9 @@ var dtm =function(o) {
 
 function findRecords(page,g) {
 
-  if (  init == true) {
+  /*if (  init == true) {
     gSE.dict = gDefaultDict;
-  }
-
+  }*/
   if ( !page ) { page = 0 }
   if ( page == 0 ) {
     var srch=searchSettings();
@@ -606,8 +776,6 @@ function findRecords(page,g) {
       var ssu = 'success findrecords'; 
     })
     .done(function(data) { 
-        //spinner.stop();
-        //$("#rec-results").css("background-color", "white");
         console.log('-->> '+dx.getTime());
         if (typeof(data) == "object" ) {
           var dres = data;
@@ -700,16 +868,21 @@ function findTemplate(page) {
         var linkz =  xtm.link;
       }
 
-      var savd = localStorage.getItem('sr-'+gs);
       var bt = 'Save';
       var bc =  "#2191c2";
+      
 
-      if ( savd ) {
-        bt = 'Clear';
-        bc =  "#21b229";
-      }
+      if ( gSelCollection.record_set) {
+            for ( z in gSelCollection.record_set ) {
+                if ( gs == gSelCollection.record_set[z] ) {
+                    bt = 'Clear';
+                    bc = '#21b229'
+                }
+            } 
+     }
+    
       var sBtn =   $('<a id="sr-'+i+'" class="res-tag" >'+bt+'</a>')
-                    .css("font-size", "11px")
+                    .css("font-size", "14px")
                     .css("margin", "2px")
                     .css("padding","2px 2px")
                     .css("background-color", bc)
@@ -719,7 +892,7 @@ function findTemplate(page) {
                   .css("height", "16px" )
                   .css("margin", "2px")
                   .css("padding","2px 2px")
-                  .css("font-size", "16px")
+                  .css("font-size", "18px")
                   .css("font-weight", "bold")           
                   .css("cursor","pointer")
                   .attr('onclick','javascript:mdView(this);');
@@ -765,10 +938,10 @@ function findTemplate(page) {
         }
       }
 
-      var cJ = $('<span>Publisher ' + xtm.publisher+' Journal '+xRClean(xtm.journal)+' Vol: '+xtm.volume+' Pages: '+xtm.pages+'</span>')
+      var cJ = $('<span>Publisher: ' + xtm.publisher+' Journal '+xRClean(xtm.journal)+' Vol: '+xtm.volume+' Pages: '+xtm.pages+'</span>')
                   .css("padding","5px 2px")
                   .css("margin","5px 5px")
-                  .css("font-size", "12px");
+                  .css("font-size", "14px");
     
       var idS = "";
       if ( xtm.identifier && xtm.identifier.length ) {
@@ -784,12 +957,10 @@ function findTemplate(page) {
       var cGuid = $('</br><span>Identifier: '+idS+'</span>')
                   .css("padding","2px 2px")
                   .css("margin","5px 5px")
-                  .css("font-size", "12px");
+                  .css("font-size", "14px");
 
       var gCard = $('<div id ="gCard-' + i + '" class="g-item-card" />')
           .css("margin", "5px" )
-          .css("padding","2px 2px")
-          //.css("border","solid")
           .css("background-color", "white" )
           .hover(function() { 
               $(this).css("background-color", "powderblue"); 
@@ -1038,7 +1209,6 @@ var getSnippets = function(doi) {
                   .css("background", "slate" );
 
           snipDiv.append('<h2 style="font-size:14px; margin-bottom: 10px" >Text Highlights</h2>');
-          //snipDiv.append('</br>');
 
           for (k in hla) {
             var hls = $('<span>[ '+ hla[k] +' ]</span>').css("margin-top", "10px");
@@ -1085,7 +1255,6 @@ var getDictTerms = function(doi) {
 
             for (k in kta) {
               var kts = $('<a id="'+ kta[k]+'" onclick="ktFind(this)" class="tag">' +  kta[k] + '</a>');
-            //var kts = $('<span>[ '+ kta[k] +' ]</span>').css("margin-top", "10px");
               ktDiv.append(kts);
   
             }
@@ -1207,7 +1376,7 @@ var facetPubView = function() {
     var a = gPub[k].articles;
     
     var pl = $('<a class="npv" id="'+p+'-'+j+'-'+a+'" style="cursor: pointer;" onclick="selectPub(this);" >' + p + '</a>')
-        .css("font-size", "12px")
+        .css("font-size", "14px")
         .css("color", "#222222")
         .css("font-weight", "bold")
         .hover(function() { 
@@ -1280,16 +1449,8 @@ var searchJrn = function() {
   gJSearch = $("#jstext").val();
   gjPage = 0;
   journalTemplate();
-  /*
-  if ( jsx ) {
-    gJSearch = jsx;
-    gjPage = 0;
-    journalTemplate();
-  } else {
-    gJSearch = "";
-  }*/
-
 }
+
 // Journal functions that build that right panel catalog
 var journalView = function(o) {
 
@@ -1419,8 +1580,6 @@ var journalTemplate = function() {
     })
   }
   
-  //var jpstart = gjPage*50;
-  //var jpd = 0;
   var jpStart = gjPage*25;
   var jpEnd = jpStart+25;
   var jpd = 0;
@@ -1451,7 +1610,7 @@ var journalTemplate = function() {
       
     }
 
-    //if ( df == true && jpd < 50 && k > jpstart ) {
+   
     if ( df ) {
       jpd++;
       tc++;
@@ -1473,7 +1632,6 @@ var journalTemplate = function() {
           
           var e = gJrn[k].eissn;
 
-          //var i = $('<td id="ji-'+k+'" class="jtd">'+gJrn[k].issn+'</td>').css("width","80px");
           var y = gJrn[k].years_covered;
           var ys = y[0] + '-'+ y[y.length-1] + ' '+ y.length;
           var yx = $('<td id="jy-'+k+'" class="jtd">'+ys+'</td>').css("width","80px");
@@ -1482,7 +1640,6 @@ var journalTemplate = function() {
           tr.append(p);
           tr.append(a);
           tr.append(yx);
-         // tr.append(i);
           jT.append(tr);
         }
     }
@@ -1522,7 +1679,6 @@ var facetSet = function(o) {
   })
   .done(function(data) { 
 
-        //$("#rec-results").css("background-color", "white");
         if (typeof(data) == "object" ) {
           var dres = data;
         } else {
@@ -1540,21 +1696,6 @@ var facetSetView = function() {
   $(".nsv-category").each(function() {
     $( this ).remove();
   })
-
-  if ( gSetInit ) {
-    var pl = $('<a class="nsv" id="geothermal" style="cursor: pointer;" onclick="selectSet(this);" >geothermal</a>')
-        .css("font-size", "12px")
-        .css("color", "#222222")
-        .css("background-color", "yellow")
-        .css("font-weight", "bold");
-    var cax = $('<div class="nsv-category" />')
-        .css("margin-left", "11px")
-        .css("display", "block")
-        .css("height", "14px");
-        cax.append(pl);
-        $("#SetList").append(cax);
-    gSetInit = false;
-  }
 
   for (k in gSet) {
     var n = gSet[k].name;
@@ -1627,7 +1768,7 @@ function facetDictView() {
     //var a = gSet[k].details;
     
     var pl = $('<a class="ndv" id="'+k+'-'+i+'" style="cursor: pointer;" onclick="selectDict(this);" >' + n + '</a>')
-        .css("font-size", "12px")
+        .css("font-size", "14px")
         .css("color", "#222222")
         .css("font-weight", "bold");
     if ( init == true && n == gDefaultDict) {
@@ -1638,7 +1779,7 @@ function facetDictView() {
       var defd = pl;
     }
     var cax = $('<div class="ndv-category" />')
-        .css("margin-left", "12px")
+        .css("margin-left", "14px")
         .css("display", "block")
         .css("height", "14px");
         cax.append(pl);
@@ -1692,7 +1833,6 @@ function getDicTerms(o, cb) {
         }
         if ( dres.success.data[0].term_hits) {
           gDict = dres.success.data[0].term_hits
-          //gDict = Object.keys(gDict).sort();
           gSelDict.count = Object.keys(gDict).length;
           if ( cb ) {
             cb();
@@ -1740,7 +1880,6 @@ function logmein(o, cb) {
         $("#laname").text(un).css("font-size","12px")
             .css("font-family","Arial, Lucida Grande, sans-serif");
         $("#loginBtn").text("Logout");
-        //$("#Cex").css("display","block");
         $("#loginDiv").hide();
         $("#myDataTab").show();
         $("#saveSetGrp").show();
@@ -1771,19 +1910,46 @@ function loginSelCol(o) {
   $("#selSavedSets").empty();
 
   if ( gCollections ) {
+    var init=0;
     for (k in gCollections) {
       var i =  gCollections[k].col_id;
       var n =  gCollections[k].col_name;
-      var so = $('<option value="'+k+'-'+i+'">'+n+'</option>')
-        .css("font-family", "calibri");
-      if ( k == 0 ) {
-        so.attr("selected","selected");
-  
-        gSelCollection.col_id = i;
-        gSelCollection.col_k = parseInt(k);
-        gSelCollection.col_name = n;
+      var s =  gCollections[k].search_set;
+    
+      if ( s ) {
+        for (z in s ) {
+          var so = $('<option value="'+k+'-'+i+'-'+z+'">'+n+'/'+s[z].col_desc+'</option>')
+                  .css("font-family", "calibri");
+          if ( init == 0 ) {so.attr("selected","selected"); }
+          $("#selSavedSets").append(so);
+        }
+      } else {
+        var so = $('<option value="'+k+'-'+i+'">'+n+'</option>')
+                  .css("font-family", "calibri");
+        if ( init == 0 ) {so.attr("selected","selected"); }
+        $("#selSavedSets").append(so); 
       }
-      $("#selSavedSets").append(so);
+    
+      // if a collection is already selected, load the record_set from gCollections
+      // if its an init, setups up the selected collection from the first item in the gCollections list, adding the record_set
+      if ( gSelCollection.col_id ) {
+        for ( z in gCollections ) {
+            if ( gCollections[z].col_id == gSelCollection.col_id ) {
+                gSelCollection.record_set = gCollections[z].record_set;
+            }
+        }
+      } else {
+        if ( init == 0 ) {
+            gSelCollection.col_id = i;
+            gSelCollection.col_k = parseInt(k);
+            gSelCollection.col_name = n;
+            gSelCollection.sid = 0;
+            gSelCollection.record_set = gCollections[k].record_set;
+          }
+      }
+
+     
+      init=1;
 
     }
   } else {
@@ -1792,14 +1958,34 @@ function loginSelCol(o) {
   }
 }
 
+
+
 function getSavedSetOpt(o) {
   var ov = o.value.split('-');
   var k = ov[0];
   var t = ov[1];
+  var s = ov[2];
+  k = parseInt(k);
   gSelCollection.col_id = t;
-  gSelCollection.col_k = parseInt(k);
-  gSelCollection.col_name = gCollections[k].col_name;
+  gSelCollection.col_k = k;
+  if ( ov.length == 4 ) {
+    gSelCollection.type = 'group';
+    gSelCollection.group_id = gGrpSelColSearch[k].group_id;
+    gSelCollection.group_name = gGrpSelColSearch[k].group_name;
+    gSelCollection.col_name =  gGrpSelColSearch[k].col_name;
+    gSelCollection.sid = s;
+    gSelCollection.sname = gGrpSelColSearch[k].search_set[s].col_desc;
+    
+  } else {
 
+    gSelCollection.type = 'owner'; 
+    gSelCollection.col_name = gCollections[k].col_name;
+    gSelCollection.sid = s;
+    gSelCollection.record_set = gCollections[k].record_set;
+
+
+  }
+  
 }
 
 function logmeinx(o, cb) {
@@ -1820,7 +2006,7 @@ function logmeinx(o, cb) {
           var dres = JSON.parse(data);
        }
       
-        //for (var k in dres) {
+        
         if ( dres.authtoken == dres.kv ) {
             gKey = {};
             gKey[dres.authtoken] = dres.kv;
@@ -1828,7 +2014,6 @@ function logmeinx(o, cb) {
             $("#laname").text(un).css("font-size","12px")
 				.css("font-family","Arial, Lucida Grande, sans-serif");
             $("#loginBtn").text("Logout");
-            //$("#Cex").css("display","block");
             $("#loginDiv").hide();
             cb();
             return;
@@ -1939,7 +2124,6 @@ var resetPw = function(o) {
     rf.append(dsclm);
     rf.append('</br>');
     rf.append(bsp);
-    //rf.append(cancelBtn);
     
   }
 
@@ -2036,7 +2220,6 @@ var register = function(o) {
     rf.append(dsclm);
     rf.append('</br>');
     rf.append(bsp);
-    //rf.append(cancelBtn);
     
   }
 
@@ -2081,15 +2264,10 @@ var submitReg = function(o) {
   }
 
   if ( valid && !e ) {
-   // $("#rEmail").css("color","red");
     $("#emsp").text("Valid email is required").css("color","red");
     valid = false;
   }
 
-  //if ( valid && !e && !u ) {
-  //  $("#rUname").css("color","red");
-  //  valid = false;
-  //}
 
   var rUrl = '/adept/createUser?em='+e+'&u='+u+'&p='+p+'&f='+f+'&l='+l+'&o='+o+'&d='+d;
   console.log(rUrl);
@@ -2126,7 +2304,6 @@ var showLogin = function() {
   } else {
     $("#Cex").css("display","block");
     //TEMP FOR DEV - use toggle !!
-    //toggleLogin();
   } 
 }
 
@@ -2163,7 +2340,6 @@ var toggleLogin = function(o, cb) {
 }
 
 var viewTos = function(o) {
-  //$("#loginDiv").hide();
   $("#tosDiv").toggle();
 }
 
@@ -2172,15 +2348,50 @@ var viewTos = function(o) {
 var dictionaryMan = function(o) {
 
   $("#rud-results").empty();
+  $("#dm-dl-div").remove();
+  gDLType = "Filtered";
   $("#rud-help").hide();
   var dmdiv = $('<div id="dmdiv"></div>') 
             .css('width','600px')
             .css('float','left')
             .css('display','block');
+    
+  var dmTx = $('<span>Dictionary Manager</span>').css('font-size','20px');
+  var aphb = $('<a id="naBtn" class="res-tag" type="submit" onclick="helpToggle();" >?</a>')
+              .css('font-size','12px')
+              .css('background-color','rgb(33,145,194)')
+              .css('margin','5px')
+              .css('width','15px');
 
-  var dmTx = $('<h4>Dictionary Manager</h4>').css('margin', '4px');
+  var ahdiv = $('<div id="app-help-div"></div>')
+              .css('display','none');
+  var apin = $('<span></span>')
+              .css('font-size','12px');
+  ahdiv.append(apin);
+
+  apin.append('<h3>About</h3>');
+  apin.append('A dictionary is a list of keywords that can be used to identify sets of xDD documents that contain <b><i>one or more</i></b> ');
+  apin.append(' of the listed keywords. Users must contact the xDD administrative team'); 
+  apin.append(' <a href = "mailto: contact@geodeepdive.org">contact@geodeepdive.org</a> to create dictionaries with more complex set logic, such as <i>"includes X and Y, but excludes Z"</i>.  ');
+  apin.append('<h3>View Existing Dictionaries</h3>');
+  apin.append(' Users can view a list of pre-made dictionaries offered by the xDD team by clicking the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">All</b> button. ');
+  apin.append(' Many of these dictionaries were created for specific projects and are unlikely to hold terms of interest to other users, but users can click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Filtered</b> button to see a curated list of dictionaries that is more likely to be generally useful. ');
+  apin.append('<h3>Local Dictionaries</h3>');
+  apin.append('Users can also create new, custom dictionaries through the ADEPT interface by clicking the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Local</b> button and filling out the resulting form.  ');
+  apin.append('A dictionary made through this method is private and only visible to the user who created it from this pane. ');
+  apin.append('A user can <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">request a test set</b> (e.g., a random sample of 200 documents containing one or more of the keywords in the dictionary) for any local, user-created dictionary. ');
+  apin.append('A URL to the requested test-set will be accessible by navigating to the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> tab.');
+
   dmdiv.append(dmTx);
+  dmdiv.append(aphb);
+  dmdiv.append('</br>');
+  dmdiv.append(ahdiv);
+  dmdiv.append('</br>');
+
   $("#rud-results").append(dmdiv);
+  var d = {};
+  d.id = 'fdBtn';
+  getDictList(d);
   
   dictManTemplate()
   
@@ -2192,24 +2403,28 @@ function getDictList(o) {
     gDLType = 'All';
     var pUrl = gdUrl+'/dictionaries?all';
     $("#ndBtn").hide();
+    $("#ddBtn").hide();
     $("#edBtn").hide();
-    $("#updBtn").hide();
+    $("#rtsBtn").hide();
+
   }
 
   if ( o.id == 'fdBtn' ) {
     gDLType = 'Filtered';
     var pUrl = '/adept/getFilteredDictionaries';
     $("#ndBtn").hide();
+    $("#ddBtn").hide();
     $("#edBtn").hide();
-    $("#updBtn").hide();
+    $("#rtsBtn").hide();
   }
 
-  if ( o.id == 'sdBtn' ) {
+  if ( o.id == 'sdBtn'|| o.id == 'ddBtn' ) {
     pUrl = '/adept/getLocalDictionaries?t='+ kmu(gKey)+'&u='+gUser.id;
     gDLType = 'Local Saved';
     $("#ndBtn").show();
+    $("#ddBtn").show();
     $("#edBtn").show();
-    $("#updBtn").show();
+    $("#rtsBtn").show();
   }
  
   var jqxhr = $.get(pUrl, function() {
@@ -2260,31 +2475,31 @@ var dictManTemplate = function(o) {
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
         .css('width','80px');
-
-  var udBtn = $('<a id="edBtn" class="res-tag" type="submit" onclick="uploadDict();" >Upload</a>')
-        .css('font-size','12px')
-        .css('display','none')
-        .css('background-color','rgb(33,145,194)')
-        .css('margin','5px')
-        .css('width','80px');
-
-  var rtBtn = $('<a id="updBtn" class="res-tag" type="submit" onclick="dicRequestTS();" >Request Test Set</a>')
+  
+  var rtBtn = $('<a id="rtsBtn" class="res-tag" type="submit" onclick="dicRequestTS();" >Request Test Set</a>')
         .css('font-size','12px')
         .css('display','none')
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
         .css('width','120px');
 
+  var ddBtn = $('<a id="ddBtn" class="res-tag" type="submit" onclick="delDict(this);" >Delete</a>')
+        .css('font-size','12px')
+        .css('display','none')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+
+
   $("#dmdiv").append(adBtn);
   $("#dmdiv").append(fdBtn);
   $("#dmdiv").append(sdBtn);
   $("#dmdiv").append(ndBtn);
-  $("#dmdiv").append(udBtn);
+  $("#dmdiv").append(ddBtn)
   $("#dmdiv").append(rtBtn);
   $("#dmdiv").append('</br>');
 
   var dldiv = $('<div id="dm-dl-div">'+gDLType+'</br></div>')
-  //$("#dmdiv").append('<div id="dm-dl-div">'+gDLType+'</br></div>')
         .css('width','180px')
         .css('height','420px')
         .css("overflow-x","hidden")
@@ -2297,15 +2512,12 @@ var dictManTemplate = function(o) {
         .css('width','400px')
         .css('height','20px')
         .css('background-color','rgb(230, 230, 230)')
-        //.css("overflow-x","hidden")
-        //.css("overflow-y", "scroll")
         .css('float','right')
         .css('display','block');
 
   var dtdiv = $('<div id="dm-term-div"></div>')
         .css('width','400px')
         .css('height','400px')
-        //.css('background-color','rgb(238, 238, 238)')
         .css('border','solid 1px')
         .css("overflow-x","hidden")
         .css("overflow-y", "scroll")
@@ -2319,8 +2531,6 @@ var dictManTemplate = function(o) {
     showDictList();
   }
 
-  //$("#rud-results").append(dmdiv);
-
 }
 
 function showDictList() {
@@ -2329,21 +2539,21 @@ function showDictList() {
     $( this ).remove();
   })
 
+  $("#dm-term-div").empty();
   $("#dm-dl-div").text(gDLType);
 
   for (k in gDictList) {
     var i =  gDictList[k].dict_id;
     var n =  gDictList[k].name;
     var s =  gDictList[k].source;
-    //var a = gSet[k].details;
     
     var pl = $('<a class="ndx-dm" id="'+k+'-'+i+'" onclick="selectDmDict(this);" >' + n + '</a>')
-        .css("font-size", "12px")
+        .css("font-size", "14px")
         .css("color", "#222222")
         .css("cursor", "pointer")
         .css("font-weight", "bold");
     var cax = $('<div class="ndx-dm" />')
-        .css("margin-left", "12px")
+        .css("margin-left", "14px")
         .css("display", "block")
         .css("height", "14px");
         cax.append(pl);
@@ -2352,13 +2562,11 @@ function showDictList() {
 }
 
 function selectDmDict(o) {
-  // key, dict_id
   var da = o.id.split('-');
  
   $(".ndx-dm").css("background-color","#ffffff");
   $("#dm-term-div").empty();
   $("#dm-th-div").empty();
-  //$("#dm-term-div").append('<h5>Terms</h5>');
 
   if ( da[0] == gSelDict.k ) {
     gSelDict.k = "";
@@ -2376,16 +2584,41 @@ function selectDmDict(o) {
     dmDicTerms(o);
   }
 }
+var delDict = function(o) {
+
+  if ( gSelDict.dict_id.length ) {
+    var pUrl ='/adept/delLocalDict?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+gSelDict.dict_id;
+    var jqxhr = $.get(pUrl, function() {
+      var ssu = 'success dict terms'; 
+    })
+    .done(function(data) { 
+          if (typeof(data) == "object" ) {
+            var dres = data;
+          } else {
+            var dres = JSON.parse(data);
+          }
+          var dl = dres.success.data[0].delete_local_dict
+          if ( dl == "dictionary deleted" ) {
+            getDictList(o);
+            alert(dl+' '+gSelDict.name);
+          } else {
+            alert(dl+' '+gSelDict.name);
+          }
+        });
+  }
+
+}
+
 
 var dmDicTerms = function() {
 
   gDict = {};
   if ( gDLType == 'Local Saved') {
-    var pUrl ='/adept/getLocalDicTerms?dict_id='+gSelDict.dict_id+'&show_terms';
+    var pUrl ='/adept/getLocalDicTerms?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+gSelDict.dict_id;
   } else if ( gDLType == 'Filtered') {
-    var pUrl = gdUrl+'/dictionaries?dict_id='+gSelDict.dict_id+'&show_terms';
+    var pUrl = gdUrl+'/dictionaries?t='+ kmu(gKey)+'&dict_id='+gSelDict.dict_id+'&show_terms';
   } else {
-    var pUrl = gdUrl+'/dictionaries?dict_id='+gSelDict.dict_id+'&show_terms';
+    var pUrl = gdUrl+'/dictionaries?t='+ kmu(gKey)+'&dict_id='+gSelDict.dict_id+'&show_terms';
   }
   
   var jqxhr = $.get(pUrl, function() {
@@ -2400,11 +2633,14 @@ var dmDicTerms = function() {
 
         if ( dres.error ) {
           alert( 'Data Retrieval error ' + dres.error.message );
-        } else if ( dres.success.data[0].term_hits) {
+        } else if ( gDLType == 'Local Saved') {
+          gDict = dres.success.data;
+          dlTermView();
+        } else if ( dres.success.data[0].term_hits) { 
           gDict = dres.success.data[0].term_hits
           gSelDict.count = Object.keys(gDict).length;
           dmTermView();
-        }
+        } 
   });
 
 }
@@ -2418,7 +2654,6 @@ var dmTermView = function() {
           .css("color", "#222222")
           .css("font-weight", "bold");
   $("#dm-th-div").append(dmhdr);
-  $("#dm-th-div").append(nb);
 
   var kt = $('<table id="kdt" style="border: none; background-color: white;"></table>');
 
@@ -2437,45 +2672,94 @@ var dmTermView = function() {
       var st = '<a id="dml-'+key+'" class="sh-item" style="font-size:12px; margin: 2px 2px;" onclick="dmt-Edit(this);" >'+key+'</a>'; 
       tkt.append(st);
 
-      var tc = $('<td style="border: none; background-color: white;"><span style="font-size:12px; font-family: calibri">'+ gDict[key] +'</span></td>');
+      var tc = $('<td style="border: none; background-color: white;"><span style="font-size:12px; font-family: calibri">'+ key +'</span></td>');
+      
+      var tn = $('<td style="border: none; background-color: white;"><span style="font-size:12px; font-family: calibri">'+ gDict[key] +'</span></td>');
 
       if ( px < 500 ) {
-        kr.append(tx);
-        kr.append(tkt);
         kr.append(tc);
+        kr.append(tn);
         kt.append(kr);
       } else {
         return
-      }
-      //if ( px < 500 ) { 
-        //$("#dm-term-div").append(st);
-      //}//    
+      } 
       px++;
     });
     $("#dm-term-div").append(kt);
 }
 
+var dlTermView = function(o) {
+
+  $("#dm-term-div").empty();
+  $("#dm-th-div").empty();
+  var dmhdr = $('<span>'+gSelDict.name+'</span>').css("margin","4px");
+  var nb = $('<a class="tag" id="ntBtn" onclick="newLocalDictTerm(this);" >+</a>')
+          .css("font-size", "12px")
+          .css("color", "#222222")
+          .css("font-weight", "bold");
+  $("#dm-th-div").append(dmhdr);
+  $("#dm-th-div").append(nb);
+
+  var kt = $('<table id="kdt" style="border: none; background-color: white;"></table>');
+  
+  for (k in gDict ) {
+    var kr = $('<tr></tr>');
+    var dxt = '<i id="kdel-'+gDict[k].dt_id+'" class="fa fa-trash-alt" id="ds-225" onclick="deleteLocalDictTerm(this)" style="color: rgb(33, 145, 194);"></i>'
+    var tx = $('<td></td>');
+    tx.append(dxt);
+  
+    var st = '<a id="dle-'+gDict[k].dt_id+'" class="sh-item" style="font-size:12px; margin: 2px 2px;" onclick="editLocalDictTerm(this);" >'+gDict[k].term+'</a>'; 
+    var tc = $('<td></td>');
+    tc.append(st);
+
+    kr.append(tx);
+    kr.append(tc);
+    kt.append(kr);
+  }
+  $("#dm-term-div").append(kt);
+
+}
+
 var newDict = function(o) {
 
   $("#dm-term-div").empty();
+  $(".ndx-dm").css("background-color","#ffffff");
+  gSelDict.k = "";
+  gSelDict.name = "";
+  gSelDict.dict_id = "";
+  gSelDict.count = 0;
+
   var cni = $('<input class="form-control" placeholder="Dictionary Name" size=25 id="dictname">')
               .css("margin", "2px 0px");
+
+  var tta = $('<textarea rows="8" cols="40" id="dictTerms" placeholder="Paste comma delimited Terms">');
 
   var csBtn = $('<a id="csBtn" class="res-tag" type="submit" onclick="createNewDict(this);">Save</a>')
               .css('font-size','12px')
               .css('background-color','rgb(33,145,194)')
               .css('margin','5px')
               .css('width','80px');
-  
+
+  var cxBtn = $('<a id="cxBtn" class="res-tag" type="submit" onclick="cancelNewDict(this);">Cancel</a>')
+              .css('font-size','12px')
+              .css('background-color','rgb(33,145,194)')
+              .css('margin','5px')
+              .css('width','80px');
+
   $("#dm-term-div").append(cni);
   $("#dm-term-div").append('</br>');
+  $("#dm-term-div").append(tta);
+  $("#dm-term-div").append('</br>');
   $("#dm-term-div").append(csBtn);
+  $("#dm-term-div").append(cxBtn);
 
 }
 
 var createNewDict = function(o) {
   var dn = $("#dictname").val();
-  var pUrl = '/adept/newLocalDictionary?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+dn;
+  var dt = $("#dictTerms").val();
+
+  var pUrl = '/adept/newLocalDictionary?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+dn+'&dt='+dt;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success dict terms'; 
@@ -2486,30 +2770,119 @@ var createNewDict = function(o) {
         } else {
           var dres = JSON.parse(data);
         }
-        var k = gDictList.length;
-        var i = 0;
-        var pl = $('<a class="ndx-dm" id="'+k+'-'+i+'" onclick="selectDmDict(this);" >' + dn + '</a>')
-              .css("font-size", "12px")
-              .css("color", "#222222")
-              .css("cursor", "pointer")
-              .css("font-weight", "bold");
-        var cax = $('<div class="ndx-dm" />')
-              .css("margin-left", "12px")
-              .css("display", "block")
-              .css("height", "14px");
-        cax.append(pl);
-        $("#dm-dl-div").append(cax);
+        $("#dm-term-div").empty();
+        var o = {};
+        o.id = 'sdBtn';
+        getDictList(o);
+  });
+}
 
-        $("#dictname").remove();
-        $("#csBtn").remove();
-        if ( dres.success.data ) {
-          gTestSets = dres.success.data;
-          if ( gTestSets.length ) {
-            showTestSetList();
-          } else {
-            // empty it out
-          }
-        }
+var cancelNewDict = function(o) {
+
+  $("#dm-term-div").empty();
+
+}
+
+var newLocalDictTerm = function(o) {
+
+  var cni = $('<input class="form-control" placeholder="Enter Term" size=25 id="dictTerm">')
+      .css("margin", "2px 0px");
+  var csBtn = $('<a id="cvBtn" class="res-tag" type="submit" onclick="saveNewDT(this);">Add</a>')
+      .css('font-size','11px')
+      .css('background-color','rgb(33,145,194)')
+      .css('margin','5px')
+      .css('width','40px');
+  $("#dm-term-div").prepend(csBtn);
+  $("#dm-term-div").prepend(cni);
+
+}
+
+var saveNewDT = function(o) {
+
+  var tv = $("#dictTerm").val();
+  var pUrl ='/adept/newLocalDictTerm?t='+ kmu(gKey) +'&u='+gUser.id+'&d='+gSelDict.dict_id+'&dt='+tv;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success users'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    dmDicTerms();
+  });
+}
+
+var editLocalDictTerm = function(o) {
+  var dtx = o.id.split('-');
+  var dtid= dtx[1];
+  var cni = $('<input class="form-control" placeholder="Enter Term" size=25 id="dictTerm">')
+      .css("margin", "2px 0px");
+  var csBtn = $('<a id="cvBtn" class="res-tag" type="submit" onclick="saveEditDT('+dtid+');">Edit</a>')
+      .css('font-size','11px')
+      .css('background-color','rgb(33,145,194)')
+      .css('margin','5px')
+      .css('width','40px');
+  $("#dm-term-div").prepend(csBtn);
+  $("#dm-term-div").prepend(cni);
+
+}
+
+var saveEditDT = function(o) {
+  
+  var tv = $("#dictTerm").val();
+  var pUrl ='/adept/editLocalDictTerm?t='+ kmu(gKey) +'&u='+gUser.id+'&d='+o+'&dt='+tv;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success users'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    dmDicTerms();
+  });
+}
+
+var deleteLocalDictTerm = function(o) {
+  var dtx = o.id.split('-');
+  var dtid= dtx[1];
+
+  var pUrl ='/adept/deleteLocalDictTerm?t='+ kmu(gKey) +'&u='+gUser.id+'&dt='+dtid;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success users'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    dmDicTerms();
+  });
+
+}
+
+var dicRequestTS = function(o) {
+
+  var pUrl ='/adept/registerDictionary?t='+ kmu(gKey) +'&u='+gUser.id+'&d='+gSelDict.dict_id;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success reg dict'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    alert('Most requests will be available within a few seconds, please go to Test Sets');
+  
   });
 }
 
@@ -2612,7 +2985,7 @@ var showUsers = function() {
     var tr = $('<tr></tr>');
 
     var userx = $('<a class="tsx-dm" id="'+k+'" onclick="selectUser(this);" >' + f + ' ' + l + '</a>')
-        .css("font-size", "12px")
+        .css("font-size", "14px")
         .css("color", "#222222")
         .css("cursor", "pointer")
         .css("font-weight", "bold");
@@ -2668,15 +3041,6 @@ var selectUser = function(o) {
     gSelUser = {};
   }
 
-
-  //for (k in gUsers) {
-  //   if ( gUsers[k].user_id == sid) {
-  //    gSelUser = gUsers[k];
-  //   }
-  //}
-
-  //console.log(JSON.stringify(gSelUser));
-
 }
 
 var uChgStatus = function(o) {
@@ -2720,9 +3084,12 @@ var uChgRole = function(o) {
       $("#ut5-"+nk).text('admin');
     }
     gSelUser.role_id = nuRole;
-    updateUser(gSelUser.user_id,'role_id',nuRole);
-  } else {
-    alert('Select a user');
+
+    if ( gSelUser.user_id == gUser.id && nuRole == 2 ) {
+      alert('Cannot demote yourself from admin status !');
+    } else {
+      updateUser(gSelUser.user_id,'role_id',nuRole);
+    }
   }
 }
 
@@ -2774,27 +3141,46 @@ var testSetMan = function(o) {
   $("#rud-results").empty();
   $("#rud-help").hide();
 
-  var tsdiv = $('<div id="tsdiv"></div>');
-  var tsTx = $('<h3>Test Set Manager</h3>');
+  var tsdiv = $('<div id="tsdiv"></div>')
+  .css('width','600px')
+  .css('float','left')
+  .css('display','block');
+  var tsTx = $('<span>Test Set Manager</span>').css('font-size','20px');
+
+  var aphb = $('<a id="naBtn" class="res-tag" type="submit" onclick="helpToggle();" >?</a>')
+      .css('font-size','12px')
+      .css('background-color','rgb(33,145,194)')
+      .css('margin','5px')
+      .css('width','15px');
+
+  var ahdiv = $('<div id="app-help-div"></div>')
+      .css('display','none');
+  var apin = $('<span></span>')
+      .css('font-size','12px');
+  ahdiv.append(apin);
+
+  apin.append('<h3>About</h3>');
+  apin.append('ADEPT defines a <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> as a random sample of 200 documents from its library that meet a particular set of search criteria. ');
+  apin.append(' Users can request the creation of a new test set from the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Dictionaries</b> tab or the  <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Sets</b> tab. '); 
+  apin.append(' Once requested, a URL to the test-set will be recorded below.  ');
+  apin.append(' Please note that there may be a 30-90 second delay between requesting a test set and its appearance below.');
+  apin.append('<br></br>');
+  apin.append(' The principal purpose of a test set is to provide users with a realistic example of the data input that goes into a xDD application. ');
+  apin.append(' More information about how a test-set can be used in an xDD application can be found <a href=" https://github.com/UW-xDD/xdd-docker-recipe#objective "style="color:#0000FF;">here</a>.');
+
+
   tsdiv.append(tsTx);
+  tsdiv.append(aphb);
+  tsdiv.append('</br>');
+  tsdiv.append(ahdiv);
+  tsdiv.append('</br>');
+
   $("#rud-results").append(tsdiv);
   tsTemplate();
 
 }
 
 var tsTemplate = function() {
-
-  var tsnBtn = $('<a id="tsnBtn" class="res-tag" type="submit" onclick="tsNew(this);">New</a>')
-    .css('font-size','12px')
-    .css('background-color','rgb(33,145,194)')
-    .css('margin','5px')
-    .css('width','80px');
-
-  var tsrBtn = $('<a id="tsrBtn" class="res-tag" type="submit" onclick="tsSync(this);">Sync Cyverse</a>')
-      .css('font-size','12px')
-      .css('background-color','rgb(33,145,194)')
-      .css('margin','5px')
-      .css('width','100px');
 
   var tldiv = $('<div id="tslist-div">Test Sets</br></div>')
             .css('width','180px')
@@ -2803,20 +3189,22 @@ var tsTemplate = function() {
             .css("overflow-y", "scroll")
             .css('float','left')
             .css('display','block');
-  
-  var tsdv = $('<div id="ts-detail-div"></div>')
-            .css('width','400px')
-            .css('height','400px')
-            //.css('background-color','rgb(238, 238, 238)')
-            .css("border","solid 1px")
-            .css("overflow-x","hidden")
-            .css("overflow-y", "scroll")
+
+  var txdiv = $('<div id="txlist-div"></div>')
+            .css('width','10px')
             .css('float','left')
             .css('display','block');
 
-  $("#tsdiv").append(tsnBtn);
-  $("#tsdiv").append(tsrBtn);
-  $("#tsdiv").append('</br>');
+  
+  var tsdv = $('<div id="ts-detail-div"></div>')
+            .css('width','400px')
+            .css('margin', '10px 2px')
+            .css("border","solid 0px")
+            .css("overflow-x","hidden")
+            .css('float','right')
+            .css('display','block');
+
+ 
   $("#tsdiv").append(tldiv);
   $("#tsdiv").append(tsdv);
 
@@ -2857,22 +3245,21 @@ var showTestSetList = function() {
     $( this ).remove();
   })
 
-  $("#tslist-div").text(gDLType);
+  $("#tslist-div").text("Select Test Set");
 
   for (k in gTestSets) {
     var t =  gTestSets[k].ts_id;
     var c =  gTestSets[k].col_id;
     var n =  gTestSets[k].ts_name;
-    //var s =  gDictList[k].source;
-    //var a = gSet[k].details;
+
     
     var pl = $('<a class="tsx-dm" id="'+k+'-'+t+'" onclick="selectTestSet(this);" >' + n + '</a>')
-        .css("font-size", "12px")
+        .css("font-size", "14px")
         .css("color", "#222222")
         .css("cursor", "pointer")
         .css("font-weight", "bold");
     var cax = $('<div class="tsx-dm" />')
-        .css("margin-left", "12px")
+        .css("margin-left", "14px")
         .css("display", "block")
         .css("height", "14px");
         cax.append(pl);
@@ -2889,12 +3276,22 @@ var selectTestSet = function(o) {
 
   $("#ts-detail-div").empty();
 
-  var tsn = $('<span>Name: '+gTestSets[k].ts_name+'</span>');
-  var tsu = $('<span>Url: '+gTestSets[k].ts_url+'</span>');
+  var tsn = $('<span><b>Name:</b> '+gTestSets[k].ts_name+'</span>');
+  var urlx = '<a href="'+gTestSets[k].ts_url+'" target="blank_" >'+gTestSets[k].ts_url+'</a>'
+  var tsu = $('<span><b>Url:</b> '+urlx+'</span>');
+  var d = new Date(gTestSets[k].created);
+      d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
+        + "-" + ('0' + d.getDate()).slice(-2);
+  var tsd = $('<span><b>Created:</b> '+d+'</span>');
+
+
+
 
   $("#ts-detail-div").append(tsn);
   $("#ts-detail-div").append('</br>');
   $("#ts-detail-div").append(tsu);
+  $("#ts-detail-div").append('</br>');
+  $("#ts-detail-div").append(tsd);
 
 }
 
@@ -2910,45 +3307,47 @@ var appMan = function(o) {
   var aphdr = $('<div id="app-hdr-div"></div>');
   var apdiv = $('<div id="app-man-div"></div>');
 
-  var apTx = $('<h5>Application Manager</h5>');
+  var apTx = $('<span>Application Manager</span>')
+          .css('font-size','20px');
+
+  var aphb = $('<a id="naBtn" class="res-tag" type="submit" onclick="helpToggle();" >?</a>')
+              .css('font-size','12px')
+              .css('background-color','rgb(33,145,194)')
+              .css('margin','5px')
+              .css('width','15px');
+
+  var ahdiv = $('<div id="app-help-div"></div>')
+              .css('display','none');
+  var apin = $('<span></span>')
+              .css('font-size','12px');
+  ahdiv.append(apin);
+
+  apin.append('</br>');
+  apin.append('ADEPT defines an xDD application as a dockerized set of machine-learning scripts for the purpose of bulk text data-mining. ');
+  apin.append('xDD administrators need to monitor whether a submitted application is'); 
+  apin.append('   1) respectful of the ADEPT <a href="https://github.com/ngds/ADEPT_frontend/blob/main/TOS.md#terms-of-service"style="color:#0000FF;"> Terms of Service</a> and will work properly on ADEPT\'s high-throughput computing infrastructure.  ');
+  apin.append('More details on how to build an xDD application using docker can be found <a href="https://github.com/UW-xDD/xdd-docker-recipe#objective"style="color:#0000FF;">here</a>.');
+  apin.append('<h3>Application Review Request and Approval Process</h3>');
+  apin.append(' Users can use the applications tab to request that an xDD administrator review and approve an application by clicking on the new button');
+  apin.append(' and filling out the application submission form. Users can expect approval or rejection of their submission within 7 business days and');
+  apin.append(' can check on the status of the approval request from the applications tab.')
+  apin.append('<h3>Application Run Request and Obtaining Results</h3>');
+  apin.append('Once an application has been approved by xDD administrators, a user can request that it be deployed at scale on the actual ');
+  apin.append('xDD corpus by clicking on the application name in the Application Manager table and filling out the generated form.');
+
   var naBtn = $('<a id="naBtn" class="res-tag" type="submit" onclick="newApplication();" >New</a>')
         .css('font-size','12px')
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
         .css('width','80px');
 
-  var eaBtn = $('<a id="naBtn" class="res-tag" type="submit" onclick="editApplication();" >Edit</a>')
-        .css('font-size','12px')
-        .css('background-color','rgb(33,145,194)')
-        .css('margin','5px')
-        .css('width','80px');
-
-  var raBtn = $('<a id="naBtn" class="res-tag" type="submit" onclick="regApplication();" >Register</a>')
-        .css('font-size','12px')
-        .css('background-color','rgb(33,145,194)')
-        .css('margin','5px')
-        .css('width','80px');
-
-  var gaBtn = $('<a id="gaBtn" class="res-tag" type="submit" onclick="addAppToGroup();" >Add to Group</a>')
-        .css('display','none')
-        .css('font-size','12px')
-        .css('background-color','rgb(33,145,194)')
-        .css('margin','5px')
-        .css('width','80px');
-
-  var sQ = $('<select id="selGrp"></select>')
-        .css("font-family","calibri")
-        .css("font-weight","bold")
-        .css("border-style","solid 1px")
-        .css('display', 'none')
-        .css("margin","4px 4px");
 
   aphdr.append(apTx);
+  aphdr.append(aphb);
+  aphdr.append('</br>');
+  aphdr.append(ahdiv);
+  aphdr.append('</br>');
   aphdr.append(naBtn);
-  aphdr.append(eaBtn);
-  aphdr.append(raBtn);
-  aphdr.append(gaBtn);
-  aphdr.append(sQ);
 
 
   $("#rud-results").append(aphdr);
@@ -2957,6 +3356,10 @@ var appMan = function(o) {
 
 }
 
+var helpToggle = function(o) {
+  
+  $("#app-help-div").toggle();
+}
 
 var getApps = function(o) {
 
@@ -3002,6 +3405,7 @@ var selectApp = function(o) {
     $("#e-"+k).css("background-color","white");
     $("#f-"+k).css("background-color","white");
     $("#m-"+k).css("background-color","white");
+    $("#z-"+k).css("background-color","white");
 
   }
 
@@ -3016,6 +3420,7 @@ var selectApp = function(o) {
     $("#e-"+aid).css("background-color","yellow");
     $("#f-"+aid).css("background-color","yellow");
     $("#m-"+aid).css("background-color","yellow");
+    $("#z-"+aid).css("background-color","yellow");
     $("#gaBtn").show();
   
     showAppDetails();
@@ -3026,7 +3431,33 @@ var selectApp = function(o) {
       $("#ar-"+k).show();
     }
     $("#app-tab-detail").remove();
+    $("#app-div-history").remove();
   }
+}
+
+var deleteApp = function(o) {
+  var apx = o.id.split('-')[1];
+  var appid = gApps[apx].ua_id;
+  var pUrl ='/adept/delUserApp?t='+ kmu(gKey) +'&a='+appid;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success dict terms'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+
+          getApps();
+         
+        }
+
+  });
+
 }
 
 var addAppToGroup = function(o) {
@@ -3057,212 +3488,246 @@ var addAppToGroup = function(o) {
     
   });
 }
+var addDataSet = function(o) {
+
+  var testSetId = $("#selTestSet option:selected").val();
+  var testSetName = $("#selTestSet option:selected").text();
+
+  gSelApp.test_set_list.push(testSetId);
+  $("#selResources").append("Testset: "+testSetName+ ",");
+
+}
+
+var addDict = function(o) {
+
+  var dictId = $("#selDict option:selected").val();
+  var dictName = $("#selDict option:selected").text();
+
+  gSelApp.dict_list.push(dictId);
+  $("#selResources").append("Dictionary : "+dictName+ ",");
+
+}
 
 var showAppDetails = function() {
+  $("#app-div-history").remove();
+  var ns = $('<div id="app-div-detail"></div>');
 
-  var sad = $('<div id="app-div-detail"></div>');
+  var shBtn = $('<a id="hBtn" class="res-tag" type="submit" onclick="getAppHistory();" >Show History</a>')
+    .css('font-size','12px')
+    .css('background-color','rgb(33,145,194)')
+    .css('margin','5px')
+    .css('width','100px');
+  ns.append(shBtn);
+  var sad = $('<div id="app-div-form"></div>');
+  ns.append(sad);
+  $("#app-man-div").append(ns);
 
-  $("#app-man-div").append(sad);
-  sad.append('</br>Test Sets & Dictionaries');
-  var nrBtn = $('<a id="nrBtn" class="res-tag" type="submit" onclick="addDataset();" >Add</a>')
+
+  sad.append('</br><b>Send Application to Process Queue</b></br>');
+  sad.append('</br>Notes  ');
+  var an = $('<input class="form-control" placeholder="Execution Notes" id="eNotes">');
+  sad.append(an);
+
+  sad.append('</br>Cores  ');
+  var ac = $('<input class="form-control" placeholder="CPU Cores" id="eCores">');
+  sad.append(ac);
+  
+  sad.append('</br>Memory  ');
+  var am = $('<input class="form-control" placeholder="Ram GB" id="eMem">');
+  sad.append(am);
+  
+  sad.append('</br>Test Sets  ');
+
+  var sTs = $('<select id="selTestSet"></select>')
+          .css("font-family","calibri")
+          .css("border-style","solid 1px")
+          .css("border-color","rgb(132, 155, 165)")
+          .css("margin","4px 4px");
+
+  appTestSetSelect(sTs);
+  sad.append(sTs);
+
+  var nrBtn = $('<a id="nrBtn" class="res-tag" type="submit" onclick="addDataSet();" >Add</a>')
               .css('font-size','12px')
               .css('background-color','rgb(33,145,194)')
               .css('margin','5px')
               .css('width','80px');
   sad.append(nrBtn);
+  sad.append('</br>Resources: <span id="selResources" ></span>'); 
+  sad.append('</br>');
 
-  var pt = $('<table id="app-tab-detail"></table>');
- 
-  for (k in gSelApp.test_set ) {
-    var i =  gSelApp.test_set[k].res_id;
-    var n =  gSelApp.test_set[k].ts_name;
-    var t =  gSelApp.test_set[k].ts_url;
-    var d = new Date(gSelApp.test_set[k].created);
-    var tr = $('<tr id="as-'+k+'"></tr>');
-
-    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
-        + "-" + ('0' + d.getDate()).slice(-2);
-
-    var appX = $('<a class="tsx-dm" id="at-'+k+'" onclick="selectRes(this);" ><i class="fa fa-trash"></i></a>')
-      .css("font-size", "10px")
-      .css("color", "#196fa6")
-      .css("cursor", "pointer")
-      .css("font-weight", "bold");
-
-    var ta = $('<td id="sax-'+k+'"></td>');
-    ta.append(appX);
-
-    var tb = $('<td id="sb-'+k+'">'+n+'</td>');
-    var tc = $('<td id="sc-'+k+'">test set</td>');
-    var td = $('<td id="sd-'+k+'">'+d+'</td>');
-    var te = $('<td id="se-'+k+'">'+t+'</td>');
-   
-    tr.append(ta);
-    tr.append(tb);
-    tr.append(tc);
-    tr.append(td);
-    tr.append(te);
-    pt.append(tr);
-
-  }
-
-  for (k in gSelApp.dict ) {
-    var i =  gSelApp.dict[k].res_id;
-    var n =  gSelApp.dict[k].dict_name;
-    var t =  gSelApp.dict[k].dict_source;
-    var d = new Date(gSelApp.dict[k].last_updated);
-    var tr = $('<tr id="ad-'+k+'"></tr>');
-
-    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
-        + "-" + ('0' + d.getDate()).slice(-2);
-
-    var appz = $('<a class="tsx-dm" id="bx-'+k+'" onclick="selectRes(this);" ><i class="fa fa-trash"></i></a>')
-      .css("font-size", "10px")
-      .css("color", "#196fa6")
-      .css("cursor", "pointer")
-      .css("font-weight", "bold");
-
-    var tf = $('<td id="sf-'+k+'"></td>');
-    
-    tf.append(appz);
-
-    var tb = $('<td id="sg-'+k+'">'+n+'</td>');
-    var tc = $('<td id="sh-'+k+'">dictionary</td>');
-    var td = $('<td id="si-'+k+'">'+d+'</td>');
-    var te = $('<td id="sj-'+k+'">'+t+'</td>');
-   
-    tr.append(tf);
-    tr.append(tb);
-    tr.append(tc);
-    tr.append(td);
-    tr.append(te);
-    pt.append(tr);
-  }
-  
-  sad.append(pt);
-  sad.append('</br>');  
-  
-  // process history
-  sad.append('</br>Process History</br>');
   var nxBtn = $('<a id="nxBtn" class="res-tag" type="submit" onclick="runApplication();" >Execute</a>')
-          .css('font-size','12px')
-          .css('background-color','rgb(33,145,194)')
-          .css('margin','5px')
-          .css('width','80px');
-  var xn = $('<input class="form-control" size="40" placeholder="Exec Notes" id="xni">');
-  var nxcBtn = $('<a id="nxcBtn" class="res-tag" type="submit" onclick="haltApplication();" >Halt</a>')
-          .css('font-size','12px')
-          .css('background-color','rgb(33,145,194)')
-          .css('margin','5px')
-          .css('width','80px');
-  
+  .css('font-size','12px')
+  .css('background-color','rgb(33,145,194)')
+  .css('margin','5px')
+  .css('width','80px');
   sad.append(nxBtn);
-  sad.append(xn);
-  sad.append('</br>'); 
-  //sad.append(nxcBtn);
-  //sad.append('</br>');  
+
+  var cxBtn = $('<a id="cxBtn" class="res-tag" type="submit" onclick="clearApplication();" >Clear</a>')
+  .css('font-size','12px')
+  .css('background-color','rgb(33,145,194)')
+  .css('margin','5px')
+  .css('width','80px');
+  sad.append(cxBtn);
+  sad.append('</br>');
+
+
+  gSelApp.test_set_list = [];
+  gSelApp.dict_list = [];
+
+
+}
+
+var runApplication = function() {
+
+  var n = $("#eNotes").val();
+  var i = gSelApp.ua_id;
+  var c = $("#eCores").val();
+  var m  = $("#eMem").val();
+  var t = gSelApp.test_set_list.join();
+  var d = gSelApp.dict_list.join();
+
+  var pUrl ='/adept/runAppInstance?t='+ kmu(gKey) + '&u='+gUser.id+'&i='+i+'&n='+n+'&c='+c+'&m='+m+'&s='+(t)+'&d='+(d);
+
+  var jqxhr = $.get(pUrl, function() {
+      var ssu = 'email Ian '; 
+    })
+    .done(function(data) { 
+      if (typeof(data) == "object" ) {
+        var dres = data;
+      } else {
+        console.log(data);
+      }
+      getAppHistory();
+  });
+}
+
+var clearApplication = function(o) {
+
+  $("#eNotes").val("");
+  $("#eCores").val("");
+  $("#eMem").val("");
+  $("#selResources").empty();
+  gSelApp.test_set_list = [];
+  gSelApp.dict_list = [];
+}
+
+
+var getAppHistory = function(o) {
+  
+  if ( $("#app-tab-process").length  ) {
+    $("#app-div-history").remove();
+    $("#app-div-form").show();
+    $("#hBtn").text("Show History");
+    return;
+  } 
+  var pUrl ='/adept/getAppHistory?t='+ kmu(gKey) + '&a='+gSelApp.ua_id;
+  var jqxhr = $.get(pUrl, function() {
+      var ssu = 'email Ian '; 
+    })
+    .done(function(data) { 
+      if (typeof(data) == "object" ) {
+        var dres = data;
+      } else {
+        var dres = JSON.parse(data);
+      }
+        gSelApp.history = dres.success.data;
+        $("#hBtn").text("Hide History");
+        $("#app-div-form").hide();
+        showAppHistory();
+        
+      
+  });
+
+}
+var showAppHistory = function(o) {
+   
+  $("#app-div-history").remove();
+  
+  var sad = $('<div id="app-div-history"></div>');
+  
+  $("#app-div-detail").append(sad);
 
   var px = $('<table id="app-tab-process"></table>');
   var tr = $('<tr></tr>')
-  var ta = $('<th></th>');
-  var tb = $('<th width="80px">Created</th>');
+  var tb = $('<th width="30px">Instance</th>');
   var tc = $('<th width="80px">Last Run Date</th>');
   var td = $('<th width="140px">Notes</th>');
-  var te = $('<th width="80px">Status</th>');
- 
-  tr.append(ta);
+  var te = $('<th width="30px">Status</th>');
+  var tf = $('<th width="80px">Test Sets</th>');
+  var tl = $('<th width="120px">Link to Result</th>');
+
+  sad.append(px);
+  px.append(tr);
   tr.append(tb);
   tr.append(tc);
   tr.append(td);
   tr.append(te);
-  px.append(tr);
+  tr.append(tf);
+  tr.append(tl);
 
-  for (k in gSelApp.proc ) {
-    var i =  gSelApp.proc[k].ax_id;
-    var n =  gSelApp.proc[k].proc_notes;
-    var t =  gSelApp.proc[k].state;
-    var c =  new Date(gSelApp.proc[k].created);
-    var d =  new Date(gSelApp.proc[k].run_date);
-    var tr = $('<tr id="as-'+k+'"></tr>');
-
-    c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
-    + "-" + ('0' + c.getDate()).slice(-2);
-
-    d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
+  for (k in gSelApp.history ) {
+    var tr = $('<tr></tr>');
+    var tb = $('<td>'+k+'</td>');
+    var d = new Date(gSelApp.history[k].created);
+      d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) 
         + "-" + ('0' + d.getDate()).slice(-2);
-
-    var procHalt = $('<a class="tsx-dm" id="ps-'+k+'" onclick="stopProc(this);" ><i class="fa fa-hand-paper"></i></a>')
-                  .css("font-size", "11px")
-                  .css("color", "#196fa6")
-                  .css("cursor", "pointer")
-                  .css("margin", "4px 4px")
-                  .css("font-weight", "bold");
-
-    var procGo = $('<a class="tsx-dm" id="pg-'+k+'" onclick="rerunProc(this);" ><i class="fa fa-sync-alt"></i></a>')
-                  .css("font-size", "11px")
-                  .css("color", "#196fa6")
-                  .css("cursor", "pointer")
-                  .css("margin", "4px 4px")
-                  .css("font-weight", "bold");
-
-    var ta = $('<td id="sap-'+k+'"></td>');
-    ta.append(procGo);
-    ta.append(procHalt);
-
-    //ta.append(appx);
-
-    var tb = $('<td id="sb-'+k+'">'+c+'</td>');
-    var tc = $('<td id="sb-'+k+'">'+d+'</td>');
-    var td = $('<td id="sc-'+k+'">'+n+'</td>');
-    var te = $('<td id="sd-'+k+'">'+t+'</td>');
-    
-    tr.append(ta);
+    var tc = $('<td>'+d+'</td>');
+    var td = $('<td>'+gSelApp.history[k].proc_notes+'</td>');
+    var te = $('<td>'+gSelApp.history[k].state+'</td>');
+    var tf = $('<td>'+gSelApp.history[k].test_sets+'</td>');
+    var urlx = '<a href="'+gSelApp.history[k].output_link+'" target="blank_" >'+gSelApp.history[k].output_link+'</a>'
+    var tl = $('<td>'+urlx+'</td>');
     tr.append(tb);
     tr.append(tc);
     tr.append(td);
     tr.append(te);
+    tr.append(tf);
+    tr.append(tl);
     px.append(tr);
   }
-  sad.append(px);
 
 }
 
-var newApplication = function(o) {
 
+var newApplication = function(o) {
+  if ( $("#aName").length ) {
+  	return;
+  }
   var am = $("#app-man-div");
+  $("#app-div-detail").remove();
   $("#apptab").hide();
   var ad = $('<div id="new-app-div"></div>');
   am.append(ad);
 
-  var an = $('<input class="form-control" placeholder="Application Name" id="aName">');
-  var adl = $('<input class="form-control" placeholder="Date Limit" id="aDateLim">');
-  var ado = $('<input class="form-control" placeholder="Docker Id" id="aDID">');
-  var sApT = $('<select id="selAppType"></select>')
-              .css("font-family","calibri")
-              .css("border-style","solid 1px")
-              .css("border-color","rgb(132, 155, 165)")
-              .css("margin","4px 4px");
-  var oad = $('<option value="docker" selected>docker</option>');
-  var oap = $('<option value="python" >python</option>');        
-  sApT.append(oad);
-  sApT.append(oap);
-
-  var aco = $('<input class="form-control" placeholder="Cores" id="aCores">');
-  var ame = $('<input class="form-control" placeholder="Memory" id="aMemory">');
+  var an = $('<input class="form-control" placeholder="Application Name" id="aName" style="background-color: #EEE8B7">');
+  var adid = $('<input class="form-control" placeholder="Docker Id" id="aDID" style="background-color: #EEE8B7">');
+  var csum = $('<input class="form-control" placeholder="Checksum" id="aChecksum" style="background-color: #EEE8B7">');
+  var sApT = $('<textarea rows="5" cols="50" id="AppDesc" placeholder="Application Description" style="background-color: #EEE8B7">');
+  var aco = $('<input class="form-control" placeholder="Cores" id="aCores" style="background-color: #EEE8B7">');
+  var ame = $('<input class="form-control" placeholder="Memory" id="aMemory" style="background-color: #EEE8B7">');
+  var gitre = $('<input class="form-control" placeholder="Github" id="aGithub">');
+  var runti = $('<input class="form-control" placeholder="Runtime" id="aRuntime">');
   
   ad.append('</br>');
   ad.append(an);
   ad.append('</br>');
-  ad.append(adl);
-  ad.append('</br>Application Type</br>');
   ad.append(sApT);
   ad.append('</br>Application Identifier and Version</br>');
-  ad.append(ado);
+  ad.append(adid);
+  ad.append('</br>');
+  ad.append(csum);
   ad.append('</br>Resources Required to Execute</br>');
   ad.append(aco);
   ad.append('</br>');
   ad.append(ame);
-  ad.append('</br>Add Test Sets');
+  ad.append('</br>');
+  ad.append(gitre);
+  ad.append('</br>');
+  ad.append(runti);
+  ad.append('</br>');
+  ad.append('<span>Default Test Set </span>');
+
 
   var sQ = $('<select id="selTestSets"></select>')
             .css("font-family","calibri")
@@ -3271,36 +3736,13 @@ var newApplication = function(o) {
             .css("margin","4px 4px");
 
   appTestSetSelect(sQ);
-
-  //var oa = $('<option value="lithologies" selected>lithologies</option>');
-  //var os = $('<option value="strat names" >strat names</option>');
-
-  //sQ.append(oa);
-  //sQ.append(os);
   ad.append(sQ);
 
-  ad.append('</br>Add Dictionaries');
-
-  var sD = $('<select id="selDict"></select>')
-            .css("font-family","calibri")
-            .css("border-style","solid 1px")
-            .css("border-color","rgb(132, 155, 165)")
-            .css("margin","4px 4px");
-  
-  appDictSelect(sD);
-
-  //var doa = $('<option value="lithologies" selected>lithologies</option>');
-  //var dob = $('<option value="strat names" >strat names</option>');
-
-  //sD.append(doa);
-  //sD.append(dob);
-  ad.append(sD);
-
-  var saveBtn = $('<a id="saveAppBtn" class="res-tag" type="submit" onclick="SaveNewApp();" >Save</a>')
+  var saveBtn = $('<a id="saveAppBtn" class="res-tag" type="submit" onclick="SaveNewApp();" >Save & Register</a>')
         .css('font-size','12px')
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
-        .css('width','80px');
+        .css('width','120px');
 
   var cancelBtn = $('<a id="cancelAppBtn" class="res-tag" type="submit" onclick="cancelNewApp();" >Cancel</a>')
         .css('font-size','12px')
@@ -3371,18 +3813,18 @@ var appDictSelect = function(sb) {
 var SaveNewApp = function() {
 
   var an = $("#aName").val();
-  var adl =  $("#aDateLim").val();
+  var csum =  $("#aChecksum").val();
   var adid =  $("#aDID").val();
+  var sApT =  $("#AppDesc").val();
   var aco =  $("#aCores").val();
   var ame =  $("#aMemory").val();
+  var gitre =  $("#aGithub").val();
+  var runti =  $("#aRuntime").val();
 
-  //var sts =  $("selTestSets").val();
-  //var sts = $('select[name=selTestSets] option').filter(':selected').val()
+
   var sts =  $("#selTestSets option:selected").val();
-  //var sd =  $("selDict").val();
-  var sd = $("#selDict option:selected").val();
 
-  pUrl = '/adept/newUserApp?t='+ kmu(gKey)+'&u='+gUser.id+'&n='+an+'&d='+adid+'&c='+aco+'&m='+ame+'&s='+sts+'&i='+sd;
+  pUrl = '/adept/newUserApp?t='+ kmu(gKey)+'&u='+gUser.id+'&n='+an+'&d='+sApT+'&i='+adid+'&c='+aco+'&m='+ame+'&s='+csum+'&g='+gitre+'&r='+runti+'&z='+sts;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success dict records'; 
@@ -3418,16 +3860,15 @@ var showAppTemplate = function() {
   
     var pt = $('<table id="apptab"></table>')
     var tr = $('<tr></tr>')
-    //var tab = $('<th width="10px"></th>');
     var tm = $('<th></th>');
     var ta = $('<th width="160px">Application</th>');
-    var tb = $('<th width="70px">Type</th>');
-    var tc = $('<th width="110px">Source</th>');
+    var tb = $('<th width="110px">Description</th>');
+    var tc = $('<th width="110px">Docker Image</th>');
     var td = $('<th width="80px">Cores/Memory</th>');
     var te = $('<th width="80px">Timestamp</th>');
     var tf = $('<th width="70px">Status</th>');
+    var tz = $('<th width="70px">Test Set</th>');
 
-    //tr.append(tab);
     tr.append(tm);
     tr.append(ta);
     tr.append(tb);
@@ -3435,14 +3876,17 @@ var showAppTemplate = function() {
     tr.append(td);
     tr.append(te);
     tr.append(tf);
+    tr.append(tz);
     pt.append(tr);
   
     for (k in gApps) {
       var i =  gApps[k].ua_id;
       var n =  gApps[k].app_name;
-      var t =  gApps[k].app_type;
-      var l =  gApps[k].source_url;
+      var t =  gApps[k].app_desc;
+      var l =  gApps[k].docker_image;
       var r =  gApps[k].resources;
+      var z =  gApps[k].default_ts_id;
+      var y =  gApps[k].default_testset;
 
       var c =  new Date(gApps[k].created);
 
@@ -3456,7 +3900,7 @@ var showAppTemplate = function() {
       var tr = $('<tr id="ar-'+k+'"></tr>');
 
       var appD = $('<a class="tsx-dm" id="appdel-'+k+'" onclick="deleteApp(this);" ><i class="fa fa-trash"></i></a>')
-            .css("font-size", "12px")
+            .css("font-size", "14px")
             .css("color", "#196fa6")
             .css("cursor", "pointer")
             .css("margin", "4px 4px")
@@ -3465,12 +3909,11 @@ var showAppTemplate = function() {
       tm.append(appD);
 
       var appx = $('<a class="tsx-dm" id="'+k+'" onclick="selectApp(this);" >' + n + '</a>')
-            .css("font-size", "12px")
+            .css("font-size", "14px")
             .css("color", "#222222")
             .css("cursor", "pointer")
             .css("font-weight", "bold");
 
-      //var tab = $('<td id="ab-'+k+'"></td>');
       var ta = $('<td id="a-'+k+'"></td>');
       ta.append(appx);
 
@@ -3479,7 +3922,8 @@ var showAppTemplate = function() {
       var td = $('<td id="d-'+k+'">'+r+'</td>');
       var te = $('<td id="e-'+k+'">'+c+'</td>');
       var tf = $('<td id="f-'+k+'">'+s+'</td>');
-      //tr.append(tab);
+      var tz = $('<td id="z-'+k+'">'+y+'</td>');
+
       tr.append(tm);
       tr.append(ta);
       tr.append(tb);
@@ -3487,6 +3931,7 @@ var showAppTemplate = function() {
       tr.append(td);
       tr.append(te);
       tr.append(tf);
+      tr.append(tz);
       pt.append(tr);
   
     }
@@ -3549,7 +3994,6 @@ var grpMan = function(o) {
 
   gphdr.append(apTx);
   gphdr.append(naBtn);
-  //gphdr.append(egBtn);
   gphdr.append(rgBtn);
   gphdr.append(amBtn);
   gphdr.append(amBox);
@@ -3563,7 +4007,7 @@ var grpMan = function(o) {
 }
 
 var getGroups = function(o) {
-
+  var gType = o;
   var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+gUser.id;
 
   var jqxhr = $.get(pUrl, function() {
@@ -3579,7 +4023,20 @@ var getGroups = function(o) {
         if ( dres.success.data ) {
           gGroups = dres.success.data;
           if ( gGroups.length ) {
-            showGroupTemplate();
+            if ( gType == 'colset' ) {
+              if ( gGroups.length ) {
+                for (k in gGroups ) {
+                  var ot = gGroups[k].group_name + ' - '+ gGroups[k].owner_name;
+                  var opt = $('<option value="'+ gGroups[k].group_id +'" >'+ot+'</option>'); 
+                  $("#selxGrp").append(opt);
+                }
+              } else {
+                $("#selxGrp").empty();
+              }
+            } else {
+              showGroupTemplate();
+            }
+            
           } else {
             // empty it out
           }
@@ -3719,8 +4176,6 @@ var showGroupTemplate = function() {
       }
     
       var tr = $('<tr id="gr-'+k+'"></tr>')
-      //var tab = $('<td id="ab-'+k+'"><input type="checkbox" id="cb='+i+'"></td>');
-      //var tab = $('<td id="ab-'+k+'"></td>');
       
       var ta = $('<td id="a-'+k+'"></td>');
       var appg = $('<a class="tsx-dm" id="grpsel-'+k+'" onclick="selectGrp(this);" >' + n + '</a>')
@@ -3782,7 +4237,6 @@ var showGroupTemplate = function() {
         var tg = $('<td id="g-'+k+'">'+m+'</td>');
       }
      
-      //tr.append(tab);
       tr.append(ta);
       tr.append(tb);
       tr.append(tc);
@@ -3847,6 +4301,9 @@ var selectGrp = function(o) {
 
     }
 
+    $("#grpDetailTab").remove();
+    $("#doga").remove();
+
     for (k in gGroups) {
       $("#gr-"+k).hide();
       $("#a-"+k).css("background-color","white");
@@ -3874,7 +4331,8 @@ var selectGrp = function(o) {
         $("#amBtn").show();
         $("#amBox").show();
       }
-      //showGroupDetails();
+
+      showGroupDetails();
 
     } else {
 
@@ -3886,8 +4344,76 @@ var selectGrp = function(o) {
       for (k in gGroups) {
         $("#gr-"+k).show();
       }
-     // $("#app-tab-detail").remove();
     }
+
+}
+
+var showGroupDetails = function(o) {
+
+  var pUrl ='/adept/getGroupObjects?t='+ kmu(gKey) +'&g='+gSelGrp.group_id;
+   
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success leave group'; 
+  })
+  .done(function(data) { 
+      if (typeof(data) == "object" ) {
+        var dres = data;
+      } else {
+        var dres = JSON.parse(data);
+      }
+      gSelGrp.objects = dres.success.data;
+      
+      selGrpTemplate();
+
+
+  });
+}
+
+var selGrpTemplate = function() {
+
+
+  var pt = $('<table id="grpDetailTab"></table>')
+  var tr = $('<tr></tr>')
+  
+  var ta = $('<th width="80px">Type</th>');
+  var tb = $('<th width="160px">Name</th>');
+  var tc = $('<th width="80px">Created</th>');
+  var td = $('<th width="50px">Status</th>');
+
+  tr.append(ta);
+  tr.append(tb);
+  tr.append(tc);
+  tr.append(td);
+
+  pt.append(tr);
+
+  for (k in gSelGrp.objects) {
+    var i =  gSelGrp.objects[k].group_id;
+    var o =  gSelGrp.objects[k].object_id;
+    var t =  gSelGrp.objects[k].object_type;
+    var n = gSelGrp.objects[k].name;
+   
+    var c = new Date(gSelGrp.objects[k].created);
+    var s = gSelGrp.objects[k].state;
+
+    c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+          + "-" + ('0' + c.getDate()).slice(-2);
+     
+    var tr = $('<tr id="gr-'+k+'"></tr>');
+    var ta = $('<td id="a-'+k+'">'+t+'</td>');
+    var tb = $('<td id="b-'+k+'">'+n+'</td>');
+    var tc = $('<td id="c-'+k+'">'+c+'</td>');
+    var td = $('<td id="d-'+k+'">'+s+'</td>');
+
+    tr.append(ta);
+    tr.append(tb);
+    tr.append(tc);
+    tr.append(td);
+    pt.append(tr);
+
+  }
+  $("#grp-man-div").append('</br><span id="doga" >Data Objects Assigned to Group</span>');
+  $("#grp-man-div").append(pt);
 
 }
 
@@ -4055,9 +4581,36 @@ var collectionMan = function(o) {
   $("#rud-results").empty();
   $("#rud-help").hide();
 
-  var codiv = $('<div id="coldiv"></div>');
-  var coTx = $('<h3>Data Set Management</h3>');
+  
+  var codiv = $('<div id="coldiv"></div>')
+  .css('width','600px')
+  .css('float','left')
+  .css('display','block');
+  var coTx = $('<span>Data Set Management</span>').css('font-size','20px');
+  var aphb = $('<a id="naBtn" class="res-tag" type="submit" onclick="helpToggle();" >?</a>')
+  .css('font-size','12px')
+  .css('background-color','rgb(33,145,194)')
+  .css('margin','5px')
+  .css('width','15px');
+
+  var ahdiv = $('<div id="app-help-div"></div>')
+    .css('display','none');
+  var apin = $('<span></span>')
+    .css('font-size','12px');
+  ahdiv.append(apin);
+
+  apin.append('<h3>About</h3>');
+  apin.append('A <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Set</b> is a group of search criteria that can be used to define a set of documents.');
+  apin.append(' Users build the search criteria from the main ADEPT Search page.');
+  apin.append(' Please view the following tutorial video for more instructions.');
+  apin.append('<br></br>');
+  
+
+
   codiv.append(coTx);
+  codiv.append(aphb);
+  codiv.append('</br>');
+  codiv.append(ahdiv);
   $("#rud-results").append(codiv);
   colTemplate();
 }
@@ -4072,6 +4625,7 @@ var colTemplate = function(o) {
 
   var dcBtn = $('<a id="dcBtn" class="res-tag" type="submit" onclick="deleteCollection(this);">Delete</a>')
     .css('font-size','12px')
+    .css('display', 'none')
     .css('background-color','rgb(33,145,194)')
     .css('margin','5px')
     .css('width','80px');
@@ -4083,57 +4637,30 @@ var colTemplate = function(o) {
     .css('margin','5px')
     .css('width','120px');
 
-  var gaBtn = $('<a id="gaBtn" class="res-tag" type="submit" onclick="addColToGroup(this);">Add to Group</a>')
-    .css('font-size','12px')
-    .css('display', 'none')
-    .css('background-color','rgb(33,145,194)')
-    .css('margin','5px')
-    .css('width','80px');
-
-  var sQ = $('<select id="selGrp"></select>')
-    .css("font-family","calibri")
-    .css("font-weight","bold")
-    .css("border-style","solid 1px")
-    .css('display', 'none')
-    .css("margin","4px 4px");
+  var cni = $('<input class="form-control" placeholder="Set Name" size=25 id="colname">')
+    .css("margin", "2px 0px")
+    .css('display', 'none');
 
   var clldiv = $('<div id="colist-div"></div>')
-           // .css('width','180px')
-          //  .css('height','420px')
-          //  .css("overflow-x","hidden")
-          //  .css("overflow-y", "scroll")
-          //  .css('float','left')
             .css('display','block');
-  /*
-  var clsdiv = $('<div id="col-search-div"></div>')
-            .css('width','520px')
-            .css('height','400px')
-            //.css('background-color','rgb(238, 238, 238)')
-            .css('border','solid 1px')
-            .css("overflow-x","hidden")
-            .css("overflow-y", "scroll")
-            .css('float','left')
-            .css('display','block');
-  */
+  
   $("#coldiv").append(cnBtn);
   $("#coldiv").append(dcBtn);
   $("#coldiv").append(rtBtn);
-  $("#coldiv").append(gaBtn);
-  $("#coldiv").append(sQ);
+  $("#coldiv").append('</br>');
+  $("#coldiv").append(cni);
   $("#coldiv").append('</br>');
   $("#coldiv").append(clldiv);
- 
-  $("#coldiv").append(clsdiv);
 
   getCollections('template');
-
+ 
 }
 
 var colrequestTS = function(o) {
   // send to Geo Deep Dive
   var cn = gSelCollection.col_id;
 
-  var pUrl = '/adept/collectionRegisterTs?t='+kmu(gKey)+'&u='+gUser.id+'&c='+cn;
+  var pUrl = '/adept/registerCollection?t='+kmu(gKey)+'&u='+gUser.id+'&c='+cn;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success add collection'; 
@@ -4146,12 +4673,10 @@ var colrequestTS = function(o) {
         }
 
         if ( dres.success ) {
-          //gCollections = dres.success;
-          //if ( gCollections.length ) {
           getCollections('template');
         } else {
             // empty it out
-          
+            alert('Most requests will be available within a few seconds, please go to Test Sets ');
         }
 
   });
@@ -4160,19 +4685,11 @@ var colrequestTS = function(o) {
 
 var colNew = function() {
   // create new collection
-  $("#col-search-div").empty();
-  var cni = $('<input class="form-control" placeholder="Set Name" size=25 id="colname">')
-              .css("margin", "2px 0px");
-
-  var csBtn = $('<a id="csBtn" class="res-tag" type="submit" onclick="createNewCollection(this);">Save</a>')
-              .css('font-size','12px')
-              .css('background-color','rgb(33,145,194)')
-              .css('margin','5px')
-              .css('width','80px');
-  
-  $("#col-search-div").append(cni);
-  $("#col-search-div").append('</br>');
-  $("#col-search-div").append(csBtn);
+  $("#colname").empty();
+  $("#colname").show()
+  $("#cnBtn").text('Save');
+  $("#dcBtn").text('Cancel');
+  $("#cnBtn").attr("onclick","createNewCollection(this)");
 
 }
 
@@ -4190,13 +4707,17 @@ var createNewCollection = function(o) {
           var dres = JSON.parse(data);
         }
 
+        $("#colname").hide()
+        $("#cnBtn").text('New');
+        $("#dcBtn").text('Delete');
+        $("#cnBtn").attr("onclick","colNew(this)");
+        
         if ( dres.success ) {
-          //gCollections = dres.success;
-          //if ( gCollections.length ) {
+
           getCollections('template');
         } else {
             // empty it out
-          
+          alert('New Collection Error') ;
         }
 
   });
@@ -4221,7 +4742,6 @@ var getCollections = function(o) {
           gCollections = dres.success.data;
           if ( gCollections.length ) {
             if ( o == 'template') {
-              //showCollectionList();
               showDatasets();
               loginSelCol();
             } else if ( o == 'login' ) {
@@ -4244,16 +4764,18 @@ var showDatasets = function() {
   var tr = $('<tr></tr>')
   
   var ta = $('<th width="100px">Dataset</th>');
-  var tb = $('<th width="80px">Owner</th>');
+  var tb = $('<th width="120px">Owner</th>');
   var tc = $('<th width="60px">Created</th>');
-  var td = $('<th width="60px">Searches/Count/Saved</th>');
-  var te = $('<th width="120px">Groups</th>');
+  var td = $('<th width="60px">Searches</th>');
+  var te = $('<th width="60px">Count</th>');
+  var tf = $('<th width="60px">Saved</th>');
   
   tr.append(ta);
   tr.append(tb);
   tr.append(tc);
   tr.append(td);
   tr.append(te);
+  tr.append(tf);
 
   pt.append(tr);
 
@@ -4261,7 +4783,7 @@ var showDatasets = function() {
       var i =  gCollections[k].col_id;
       var n =  gCollections[k].col_name;
       var u =  gCollections[k].user_id;
-      var o =  gCollections[k].owner_name;
+      var o =  gCollections[k].email;
       var s1 = gCollections[k].scnt;
       var s2 = gCollections[k].srecs;
       var s3 = gCollections[k].mdcnt;
@@ -4277,46 +4799,111 @@ var showDatasets = function() {
         } else {
           var grp = JSON.parse(g);
         }
+      } else {
+        var grp = null;
       }
     
       var tr = $('<tr id="co-'+k+'"></tr>')
       
       var ta = $('<td id="a-'+k+'"></td>');
       var cola = $('<a class="tsx-dm" id="colsel-'+k+'" onclick="selectCol(this);" >' + n + '</a>')
-            .css("font-size", "12px")
+            .css("font-size", "14px")
             .css("cursor", "pointer")
             .css("font-weight", "bold");
       ta.append(cola);
 
       var tb = $('<td id="b-'+k+'">'+o+'</td>');
       var tc = $('<td id="c-'+k+'">'+c+'</td>');
-      var td = $('<td id="d-'+k+'">'+s1+'/'+s2+' '+s3+'</td>');
-      var te = $('<td id="e-'+k+'"></td>');
+      var td = $('<td id="d-'+k+'">'+s1+'</td>');
+      var te = $('<td id="e-'+k+'">'+s2+'</td>');
+      var tf = $('<td id="f-'+k+'">'+s3+'</td>');
       
-      if ( grp ) {
-        for (z in grp) {
-          if ( u == gUser.id ) {
-            var gmx = $('<i class="fa fa-trash-alt" id="ct-'+z+'-'+grp[z].group_id+'" onclick="delGrpCol(this)"></i>')
-              .css("margin","3px;")
-              .css("font-size", "10px;")
-              .css('color','rgb(33,145,194)');
-            te.append(gmx);
-          }
-          te.append(grp[z].group_name);
-          te.append('</br>');
-        }
-      }
+  
      
       tr.append(ta);
       tr.append(tb);
       tr.append(tc);
       tr.append(td);
       tr.append(te);
+      tr.append(tf);
       pt.append(tr);
   
   }
-
+  
   $("#colist-div").append(pt);
+  getMemberDatasets(pt,'template');
+
+}
+
+var getMemberDatasets = function(o,gType) {
+
+   // Get collections that I are in groups I am a member of
+   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&u='+gUser.id;
+
+   var jqxhr = $.get(pUrl, function() {
+     var ssu = 'success member collections'; 
+   })
+   .done(function(data) { 
+         if (typeof(data) == "object" ) {
+           var dres = data;
+         } else {
+           var dres = JSON.parse(data);
+         }
+ 
+         if ( dres.success.data ) {
+           gMemberCollections = dres.success.data;
+           if ( gType == 'template') {
+            showMemberDatasets(o);
+           } else {
+
+           }
+           
+         }
+    });
+  
+}
+
+var showMemberDatasets = function(pt) {
+  // Get collections that I are in groups I am a member of
+
+    if ( gMemberSelCollection.length ) {
+        for (k in gMemberCollections) {
+          var i =  gMemberCollections[k].object_id;
+          var n =  gMemberCollections[k].col_name;
+          var u =  gMemberCollections[k].user_id;
+          var o =  gMemberCollections[k].owner_name;
+
+          var c = new Date(gMemberCollections[k].col_created);
+          var g = gMemberCollections[k].group_name;
+      
+          c = c.getFullYear() + "-" + ('0' + (c.getMonth() + 1)).slice(-2) 
+                + "-" + ('0' + c.getDate()).slice(-2);
+          
+          var tr = $('<tr id="cm-'+k+'"></tr>');
+          var ta = $('<td id="am-'+k+'" style=""></td>').css("background-color", "#bedebe");
+          var cola = $('<a class="tsx-dm" id="colsel-'+k+'" onclick="selectMemCol(this);" >' + n + '</a>')
+                .css("font-size", "16px")
+                .css("cursor", "pointer")
+                .css("font-weight", "bold");
+          ta.append(cola);
+          var tb = $('<td id="bm-'+k+'">'+o+'</td>').css("background-color", "#bedebe");
+          var tc = $('<td id="cm-'+k+'">'+c+'</td>').css("background-color", "#bedebe");
+          var td = $('<td id="dm-'+k+'">-</td>').css("background-color", "#bedebe");
+          var te = $('<td id="em-'+k+'">-</td>').css("background-color", "#bedebe");
+          var tf = $('<td id="fm-'+k+'">-</td>').css("background-color", "#bedebe");
+
+          tr.append(ta);
+          tr.append(tb);
+          tr.append(tc);
+          tr.append(td);
+          tr.append(te);
+          tr.append(tf);
+          pt.append(tr);
+        }
+
+    }
+
+
 
 }
 
@@ -4326,7 +4913,6 @@ var showCollectionList = function() {
     $( this ).remove();
   })
 
-  //$("#colist-div").text('Sets');
   $("#col-search-div").empty();
 
   for (k in gCollections) {
@@ -4350,26 +4936,274 @@ var showCollectionList = function() {
 
 }
 
-var deleteCollection = function(o) {
+var selectMemCol = function(o) {
 
-  if ( gSelCollection.col_id ) {
-    var pUrl ='/adept/deleteCollection?t='+ kmu(gKey) +'&u='+gUser.id+'&c='+gSelCollection.col_id;
-    var jqxhr = $.get(pUrl, function() {
-      var ssu = 'success collections'; 
-    })
-    .done(function(data) { 
-      if (typeof(data) == "object" ) {
-        var dres = data;
-      } else {
-        var dres = JSON.parse(data);
-      }
-      getCollections('template');
-    });
-
+  if ( typeof(gMemberSelCollection) !== 'undefined' && typeof(gMemberSelCollection.object_id) !== 'undefined' ) {
+    var old_id = gMemberSelCollection.object_id;
   } else {
-    alert('You must select a Data Set to delete ');
+    var old_id = -1;
+  }
+  
+  var cid = o.id.split('-')[1];
+  gMemberSelCollection = gMemberCollections[cid];
+
+  for (k in gCollections) {
+    $("#co-"+k).hide();
+    $("#a-"+k).css("background-color","white");
+    $("#b-"+k).css("background-color","white");
+    $("#c-"+k).css("background-color","white");
+    $("#d-"+k).css("background-color","white");
+    $("#e-"+k).css("background-color","white");
+    $("#f-"+k).css("background-color","white");
   }
 
+  for (k in gMemberCollections) {
+    $("#cm-"+k).hide();
+    $("#am-"+k).css("background-color","white");
+    $("#bm-"+k).css("background-color","white");
+    $("#cm-"+k).css("background-color","white");
+    $("#dm-"+k).css("background-color","white");
+    $("#me-"+k).css("background-color","white");
+  }
+
+  if ( gMemberSelCollection.object_id !== old_id ) {
+    $("#cnBtn").hide();
+    $("#rtBtn").show();
+
+    $("#cm-"+cid).show();
+    $("#am-"+cid).css("background-color","yellow");
+    $("#bm-"+cid).css("background-color","yellow");
+    $("#cm-"+cid).css("background-color","yellow");
+    $("#dm-"+cid).css("background-color","yellow");
+    $("#em-"+cid).css("background-color","yellow");
+    $("#fm-"+cid).css("background-color","yellow");
+    showColDetail(gMemberSelCollection.object_id, 'member');
+
+  } else {
+    $("#cnBtn").show();
+    $("#dcBtn").hide();
+    $("#rtBtn").hide();
+    $("#gaBtn").hide();
+    $("#selxGrp").hide();
+    $("#col-search-div").remove();
+    gMemberSelCollection = {};
+    for (k in gCollections) {
+      $("#co-"+k).show();
+    }
+
+    for (k in gMemberCollections) {
+      $("#cm-"+k).show();
+    }
+  }
+}
+
+var selectCol = function(o) {
+
+  if ( typeof(gSelCollection) !== 'undefined' && typeof(gSelCollection.col_id) !== 'undefined' ) {
+    var old_id = gSelCollection.col_id;
+  } else {
+    var old_id = -1;
+  }
+  
+  var cid = o.id.split('-')[1];
+  gSelCollection = gCollections[cid];
+
+  for (k in gCollections) {
+    $("#co-"+k).hide();
+    $("#a-"+k).css("background-color","white");
+    $("#b-"+k).css("background-color","white");
+    $("#c-"+k).css("background-color","white");
+    $("#d-"+k).css("background-color","white");
+    $("#e-"+k).css("background-color","white");
+    $("#f-"+k).css("background-color","white");
+  }
+
+  for (k in gMemberCollections) {
+    $("#cm-"+k).hide();
+    $("#am-"+k).css("background-color","white");
+    $("#bm-"+k).css("background-color","white");
+    $("#cm-"+k).css("background-color","white");
+    $("#dm-"+k).css("background-color","white");
+    $("#me-"+k).css("background-color","white");
+  }
+
+  if ( gSelCollection.col_id !== old_id ) {
+    $("#cnBtn").hide();
+    $("#dcBtn").show();
+    $("#rtBtn").show();
+    $("#gaBtn").show();
+    $("#selxGrp").show();
+
+    $("#co-"+cid).show();
+    $("#a-"+cid).css("background-color","yellow");
+    $("#b-"+cid).css("background-color","yellow");
+    $("#c-"+cid).css("background-color","yellow");
+    $("#d-"+cid).css("background-color","yellow");
+    $("#e-"+cid).css("background-color","yellow");
+    $("#f-"+cid).css("background-color","yellow");
+    showColDetail(gSelCollection.col_id, 'owner');
+
+  } else {
+    $("#cnBtn").show();
+    $("#dcBtn").hide();
+    $("#rtBtn").hide();
+    $("#gaBtn").hide();
+    $("#selxGrp").hide();
+    $("#col-search-div").remove();
+    gSelCollection = {};
+    for (k in gCollections) {
+      $("#co-"+k).show();
+    }
+    for (k in gMemberCollections) {
+      $("#cm-"+k).show();
+    }
+  }
+  
+}
+
+var showColDetail = function(selColId, colType) {
+
+  $("#col-search-div").remove();
+
+  var clsdiv = $('<div id="col-search-div"></div>')
+            .css('width','610px')
+            .css('height','300px')
+            .css('border','solid 1px')
+            .css("overflow-x","hidden")
+            .css("overflow-y", "scroll")
+            .css('float','left')
+            .css('display','block');
+  
+  $("#coldiv").append(clsdiv);
+
+  var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&u='+gUser.id+'&c='+selColId;
+
+  if ( colType == 'owner') {
+    var gSel = gSelCollection;
+  } else {
+    var gSel = gMemberSelCollection;
+  }
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+
+        if ( dres.success.data ) {
+          var s = dres.success.data[0];
+          if ( s.search_set) {
+            gSel.search_set = s.search_set;
+            if ( gSel.search_set.length ) {
+              clsdiv.append('<b>Searches</b></br>');
+              for (z in  gSel.search_set ) {
+                var i = gSel.search_set[z].cs_id;
+                var n = gSel.search_set[z].col_desc;
+                var u = gSel.search_set[z].search_url;
+             
+                if (typeof(u) == "object" ) {
+                  var jst = u;
+                } else {
+                  var jst = JSON.parse(u);
+                }
+            
+                var pstr = '';
+                Object.keys(jst).forEach(key => {
+                  pstr = pstr + ' <b>' + key + '</b> ' + jst[key];
+                });
+  
+                var csx = $('<i class="fa fa-trash-alt" id="ds-'+i+'" onclick="delSearchSet(this)"></i>')
+                  .css("margin","3px;")
+                  .css("font-size", "12px;")
+                  .css('color','rgb(33,145,194)');
+                var csn = $('<span  id="sid-'+i+'">'+pstr+'</span>');
+                if ( colType = 'owner') {
+                  clsdiv.append(csx);
+                }
+                
+                clsdiv.append(csn);
+                clsdiv.append('</br>');
+              }
+            }
+          }
+         
+          if ( s.record_set ) {
+            gSel.record_set = s.record_set; 
+
+            if ( gSel.record_set ) {
+              clsdiv.append('<b>Records</b></br>');
+
+              for (z in gSel.record_set ) {
+                var n = gSel.record_set[z];
+                var csx = $('<i class="fa fa-trash-alt" id="ds-'+z+'" onclick="deleteRecFromCollection(this)"></i>')
+                                  .css("margin","3px;")
+                                  .css("font-size", "12px;")
+                                  .css('color','rgb(33,145,194)');
+                var rsn = $('<span id="rid-'+z+'"><b>DOI:</b> '+n+'</span></br>');
+                clsdiv.append(csx);
+                clsdiv.append(rsn);
+              }
+            }
+
+          }
+        }
+  });
+
+}
+
+var deleteCollection = function(o) {
+
+  if ( $("#dcBtn").text() == 'Cancel') {
+    $("#dcBtn").text('Delete');
+    $("#cnBtn").text('New');
+    $("#colname").hide();
+  } else {
+    if ( gSelCollection.col_id ) {
+      var pUrl ='/adept/deleteCollection?t='+ kmu(gKey) +'&u='+gUser.id+'&c='+gSelCollection.col_id;
+      var jqxhr = $.get(pUrl, function() {
+        var ssu = 'success collections'; 
+      })
+      .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        getCollections('template');
+      });
+    } else {
+      alert('You must select a Data Set to delete ');
+    }
+  }
+
+
+}
+
+
+// Delete search in savedsets
+
+var delSearchSet = function(o) {
+  var csid = o.id.split('-')[1];
+
+  var durl = '/adept/deleteCollectionSearch?t='+ kmu(gKey) +'&u='+gUser.id+'&s='+csid;
+
+
+  var jqxhr = $.get(durl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    showColDetail(gSelCollection.col_id, 'owner');
+
+  });
 
 }
 
@@ -4411,17 +5245,12 @@ var selectCollection = function(o) {
         } else {
           var jst = JSON.parse(u);
         }
-        //var jst = JSON.parse(u);
         var pstr = '';
         var mStr = '';
         Object.keys(jst).forEach(key => {
-          //if ( key != 'term' ) {
-          //  mStr = + 'Search <b>' + jst[key] + '</b> ( ' + c + ' )';
-         // }
           pstr = pstr + ' <b>' + key + '</b> ' + jst[key];
         });
 
-        //var csx = $('<a onclick="delSetSearch(this)" id="ds-'+i+'">x</a>');
         var csx = $('<i class="fa fa-trash-alt" id="ds-'+i+'" onclick="delSetSearch(this)"></i>')
           .css("margin","3px;")
           .css("font-size", "12px;")
@@ -4436,9 +5265,12 @@ var selectCollection = function(o) {
     if ( gCollections[k].record_set ) {
       $("#col-search-div").append('<b>Records</b></br>');
       for (z in gCollections[k].record_set ) {
-        //var i = gCollections[k].record_set[z].cr_id;
         var n = gCollections[k].record_set[z];
-        var rsn = $('<span id="rid-'+z+'">DOI: '+n+'</span>');
+        var csx = $('<i class="fa fa-trash-alt" id="ds-'+z+'" onclick="delRecordSearch(this)"></i>')
+                .css("margin","3px 7px;")
+                .css("font-size", "12px;")
+                .css('color','rgb(33,145,194)');
+        var rsn = $('<span id="rid-'+z+'">DOI: '+n+'</span>').css("margin","3px 7px;");
         $("#col-search-div").append(rsn);
         $("#col-search-div").append('</br>');
       }
@@ -4447,7 +5279,6 @@ var selectCollection = function(o) {
 }
 
 var saveSearchToCollection = function(u) {
-
 
   var z = {};
   Object.keys(gSE).forEach(key => {
@@ -4485,6 +5316,7 @@ var saveSearchToCollection = function(u) {
           var dres = JSON.parse(data);
         }
         alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
+        getCollections('login');
       });
 
 }
@@ -4504,15 +5336,38 @@ var saveRecordToCollection = function(d) {
         } else {
           var dres = JSON.parse(data);
         }
-        //alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
+        alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
+        getCollections('login');
       });
 
 }
+var deleteRecFromCollection = function(d) {
+ 
+  var i = gSelCollection.col_id;
+  var oid = d.id.split('-')[1];
+  var pUrl ='/adept/delRecordFromCollection?t='+ kmu(gKey) +'&i='+i+'&d='+oid;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+        if (typeof(data) == "object" ) {
+          var dres = data;
+        } else {
+          var dres = JSON.parse(data);
+        }
+        showColDetail(gSelCollection.col_id, 'owner');
+  });  
+}
+
 
 var addColToGroup = function(o) {
 
   var u =  gUser.id;
-  var pUrl ='/adept/getUserGroups?t='+ kmu(gKey) +'&u='+u+'&type=owner';
+  var g = $("#selxGrp").val();
+  var o = gSelCollection.col_id;
+
+  var pUrl ='/adept/addObjectToGroup?t='+ kmu(gKey) +'&u='+u+'&g='+g+'&type=dataset&o='+o;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success collections'; 
@@ -4524,25 +5379,44 @@ var addColToGroup = function(o) {
       var dres = JSON.parse(data);
     }
 
-    $("#selGrp").html('');
-
-    for (k in dres.success.data ) {
-      var o = $('<option value="'+ dres.success.data[k].group_id +'" >'+dres.success.data[k].group_name+'</option>'); 
-      $("#selGrp").append(o);
+    if ( dres.success.data) {
+      getCollections('template');
+      $("#selxGrp").hide();
+      $("#gaBtn").hide();
     }
-    $("#selGrp").show();
-    //dx.append(sQ);
-    //$("#coldiv").append(dx);
-    $("#gaBtn").text("Save");
-    $("#gaBtn").attr("onclick","saveObjToGroup('dataset')");
+
     
+  });
+
+}
+
+var delGrpCol = function(o) {
+  var gcid = o.id.split('-');
+  var c = gcid[1];
+  var g = gcid[2];
+
+  var pUrl ='/adept/delObjectFromGroup?t='+ kmu(gKey) +'&u='+gUser.id+'&g='+g+'&type=dataset&o='+c;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success collections'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+
+    if ( dres.success.data) {
+      getCollections('template');
+    }
   });
 
 }
 
 var saveObjToGroup = function(type) {
 
-  var g = $("#selGrp").val();
+  var g = $("#selxGrp").val();
   if ( type == 'dataset') {
     var i = gSelCollection.col_id;
   } else if (  type == 'application') {
@@ -4552,7 +5426,6 @@ var saveObjToGroup = function(type) {
   } else if (  type == 'dictionary') {
     var i = gSelDict.dict_id;
   } 
-  
   
   var pUrl ='/adept/addObjectToGroup?t='+ kmu(gKey) +'&u='+gUser.user_id+'&g='+g+'&type='+type+'&o='+i;
 
@@ -4568,8 +5441,7 @@ var saveObjToGroup = function(type) {
 
         $("#gaBtn").text("Add To Group");
         $("#gaBtn").attr("onclick","addColToGroup()");
-        $("#selGrp").hide();
-        //alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
+        $("#selxGrp").hide();
   });
 
 }
