@@ -1995,6 +1995,8 @@ function logmeinx(o, cb) {
 
   var xUrl = '/action/getToken?q='+un+'&p='+pw;
 
+	
+	
   var jqxhr = $.get(xUrl, function() {
     var ssu = 'success gt'; 
   })
@@ -2281,6 +2283,7 @@ var submitReg = function(o) {
 
       $("#regForm").empty();
       $("#regDiv").hide();
+      alert('An email will be sent to the address you supplied confirming your approval');
     });
   }
 
