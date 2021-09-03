@@ -368,8 +368,8 @@ async function newUserApps(u,ao) {
                 "Cores " + ao.cores + "Memory: " + ao.memory;
 
         let info = await transporter.sendMail({
-            from: '', // sender address
-            to: "", // list of receivers
+            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
@@ -545,8 +545,8 @@ async function execAppInstance(u,i,n,c,m,t,d) {
                 "Cores " + c + "Memory: " + m + "Test Sets : " + t ;
 
         let info = await transporter.sendMail({
-            from: '', // sender address
-            to: "", // list of receivers
+            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Run Request", // Subject line
             text: "", 
             html: es
