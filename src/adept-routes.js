@@ -150,6 +150,7 @@ async function dbCall(q) {
 
 async function fetchAuth(u,p,s ) {
 
+    console.log("looking up user with email " + u + " and password " + p );
 	var sqlStr = 'select user_id, first_name, last_name, user_name, apikey, role_id, password '
 				+ ' from adept.users where email = \'' 
 				+ u + '\' and password = \'' + p + '\' and state = \'active\' order by 1'; 
@@ -356,8 +357,8 @@ async function newUserApps(u,ao) {
             port: 587,
             secure: false,
             auth: {
-            user: "", 
-            pass: "", 
+            user: process.env.ADEPT_EMAIL_USERNAME, 
+            pass: process.env.ADEPT_EMAIL_PASSWORD, 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -533,8 +534,8 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             port: 587,
             secure: false,
             auth: {
-            user: "", 
-            pass: "", 
+            user: process.env.ADEPT_EMAIL_USERNAME, 
+            pass: process.env.ADEPT_EMAIL_PASSWORD, 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -1329,7 +1330,7 @@ router.get('/', async function(req, res) {
 });
 
 router.get('/getToken', async function(req, res) {
-	var lp = '/adept/getToken';
+	var lp = 'adept/getToken';
 	routelog(req, lp);
 	var quark = req.query.q;
 	var lib = req.query.p;
@@ -1341,6 +1342,7 @@ router.get('/getToken', async function(req, res) {
   if ( typeof(px) !== "object" ) {
 	px = JSON.parse(px);
   }
+    console.log(px)
 
   if ( px ) { 
 
@@ -1391,7 +1393,7 @@ router.get('/getUsers', async function(req, res ) {
 });
 
 router.get('/updateUser', async function(req, res ) {
-	var lp = '/updateUser';
+    var lp = '/adept/updateUser';
 	routelog(req, lp);
 
 	var utoken = req.query.t;
