@@ -102,50 +102,117 @@ function rd() {
 
 async function createUser(uo) {
   
-	var tdate = Date.now();
-	var pwh = sha512(uo.pw,gNACL);
+	async function userCheck(uo) {
+	
+		var s = 'select * from adept.users where email = \''+uo.em+ '\''; 
+		console.log('user check '+s);
+		try {
+			var z = await dbCall(s);
+			if (typeof(z) == "object" ) {
+				var b = z;
+			} else {
+				var b = JSON.parse(z);
+			}
+            console.log('User check '+ b.rowCount + ' ' + JSON.stringify(b));
+			var userCount = b.rowCount;
+			if ( userCount == 0 ) {
+                console.log('process ...');
+				var z = insertUser(uo);
+				return z;
+			} else {
+				
+				uo.status = 'User Email Already in Database';
+				var z = uo;
+				return z;
+			}
+			
+		} catch(e) {
+			return e;
+		}
+	}
 
-	var sqlStr = 'insert into adept.users (user_id, first_name, last_name, email,'
-				+ 'org_name, purpose, apikey, role_id,'
-				+ 'auth_app, created, password, user_name, state) values '
-				+ ' (nextval(\'adept.adept_user_id\')'
-				+ ',\'' + uo.fname + '\''
-				+ ',\'' + uo.lname + '\''
-				+ ',\'' + uo.em + '\''
-				+ ',\'' + uo.org + '\''
-				+ ',\'' + uo.purp + '\''
-				+ ',\'' + gNACL + '\''
-				+ ',2'
-				+ ',\'adept\''
-				+ ',current_timestamp'
-				+ ',\'' + pwh.passwordHash + '\''
-				+ ',\'' + uo.uname + '\''
-				+ ',\'inactive\')';
+    async function insertUser(uo) {
+		var tdate = Date.now();
+		var pwh = sha512(uo.pw,gNACL);
 
-	var z = await dbCall(sqlStr);
-	return z;
+		var sqlStr = 'insert into adept.users (user_id, first_name, last_name, email,'
+					+ 'org_name, purpose, apikey, role_id,'
+					+ 'auth_app, created, password, user_name, state) values '
+					+ ' (nextval(\'adept.adept_user_id\')'
+					+ ',\'' + uo.fname + '\''
+					+ ',\'' + uo.lname + '\''
+					+ ',\'' + uo.em + '\''
+					+ ',\'' + uo.org + '\''
+					+ ',\'' + uo.purp + '\''
+					+ ',\'' + gNACL + '\''
+					+ ',2'
+					+ ',\'adept\''
+					+ ',current_timestamp'
+					+ ',\'' + pwh.passwordHash + '\''
+					+ ',\'' + uo.uname + '\''
+					+ ',\'inactive\') returning user_id'; 
 
+		var z = await dbCall(sqlStr);
+		var usr_id = z.rows[0].user_id;
+		var nx = sendregEmail(usr_id,uo);
+
+		return nx;
+	}
+
+	async function sendregEmail(u, uo ) {
+
+        let transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+            user: "xxxxxx", 
+            pass: "xxxxxx", 
+            },
+        });
+        // On gmail, this works if the Account option - Less Secure apps - is turned on 
+        var es = "<b>New User Registration Request</b></br>" + 
+                "User: " + uo.em + " User Id " + u +"</br>" +
+                "Name: " + uo.fname + " Last Name " + uo.fname + "</br>";
+
+        let info = await transporter.sendMail({
+            from: '"uwxdd contact" <xxxxx>', // sender address
+            to: "xxxxx", // list of receivers
+            subject: "New User Registration Request", // Subject line
+            text: "", 
+            html: es
+        });
+
+        if ( info ) {
+			console.log('New User email notification' + JSON.stringify(info));
+        }
+
+        return info;
+    }
+	
+	return userCheck(uo);
   }
+  
+  
 
 async function dbCall(q) {
-   	return new Promise(function(resolve, reject) {
-		pool.connect()
-			.then(client => {
-				return client
-				.query(q)
-				.then(res => {
-					client.release();
-					resolve(res);
-				})
-				.catch(err => {
-					client.release()
-					console.log(err.stack)
-					reject(err);
-				})
-			});
-		});
+	return new Promise(function(resolve, reject) {
+	 pool.connect()
+		 .then(client => {
+			 return client
+			 .query(q)
+			 .then(res => {
+				 client.release();
+				 resolve(res);
+			 })
+			 .catch(err => {
+				 client.release()
+				 console.log(err.stack)
+				 reject(err);
+			 })
+		 });
+	 });
 }
-
 
 async function fetchAuth(u,p,s ) {
 
