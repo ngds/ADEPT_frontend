@@ -2283,7 +2283,11 @@ var submitReg = function(o) {
 
       $("#regForm").empty();
       $("#regDiv").hide();
-      alert('An email will be sent to the address you supplied confirming your approval');
+      if ( data.status ) {
+        alert(data.status);
+     } else {
+       alert('An email will be sent to the address you supplied confirming your approval');
+     }
     });
   }
 
