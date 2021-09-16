@@ -1,4 +1,4 @@
-/* Adept routes */
+/* Adept */
 
 var express = require('express');
 var router = express.Router();
@@ -6,18 +6,20 @@ var crypto = require('crypto');
 const https = require('https');
 const nodemailer = require("nodemailer");
 const { getMaxListeners } = require("process");
-// This is the docker path
-var  Path = '/app';
+
+var  Path = process.env.NODE_PATH;
 const  {Pool} = require('pg');
+
+
 
 // The ADEPT Database is a postgres database containing user, stored datasets, & applications control
 // used to run Machine Learning apps. 
   
 const pool = new Pool({
-	user: 'dbname',
-	host: '',
-	database: 'geothermal',
-	password: '',
+	user: 'xxxxx',
+	host: 'xxxxx',
+	database: 'xxxxx',
+	password: 'xxxxx',
 	port: 5432,
 	max: 25
   });
@@ -36,6 +38,7 @@ var gdUrl = 'https://xdddev.chtc.io/api/v1';
 
 var gAdeptKey = [];
 var gNACL = '5d097fe1065645c8';
+var gResetKey = [];
 
 var genRandomString = function(length){
     return crypto.randomBytes(Math.ceil(length/2))
@@ -122,6 +125,7 @@ async function createUser(uo) {
 			} else {
 				
 				uo.status = 'User Email Already in Database';
+				console.log('error ' + JSON.stringify(uo));
 				var z = uo;
 				return z;
 			}
@@ -153,6 +157,7 @@ async function createUser(uo) {
 					+ ',\'inactive\') returning user_id'; 
 
 		var z = await dbCall(sqlStr);
+		console.log('insert results '+JSON.stringify(z));
 		var usr_id = z.rows[0].user_id;
 		var nx = sendregEmail(usr_id,uo);
 
@@ -166,8 +171,8 @@ async function createUser(uo) {
             port: 587,
             secure: false,
             auth: {
-            user: "xxxxxx", 
-            pass: "xxxxxx", 
+            user: "xxxxx", 
+            pass: "xxxxx", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -176,9 +181,9 @@ async function createUser(uo) {
                 "Name: " + uo.fname + " Last Name " + uo.fname + "</br>";
 
         let info = await transporter.sendMail({
-            from: '"uwxdd contact" <xxxxx>', // sender address
-            to: "xxxxx", // list of receivers
-            subject: "New User Registration Request", // Subject line
+            from: '"contact" <xxxxx@email.com>', // sender address
+            to: "xxxxxx", // list of receivers
+            subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
         });
@@ -193,7 +198,111 @@ async function createUser(uo) {
 	return userCheck(uo);
   }
   
-  
+async function userCheckPW(em) {
+	
+	var s = 'select * from adept.users where email = \''+em+ '\''; 
+	//console.log('user check '+s);
+	try {
+		var z = await dbCall(s);
+		if (typeof(z) == "object" ) {
+			var b = z;
+		} else {
+			var b = JSON.parse(z);
+		}
+	    //console.log(b);
+		var userCount = b.rowCount;
+		if ( userCount == 0 ) {
+			z = { 'userExists' : 'false' };
+			return z;
+		} else {
+			z = { 'userExists' : 'true' };
+			pwResetSendEmail(em);
+			return z;
+		}
+	} catch(e) {
+		return e;
+	}
+}  
+
+async function resetPassword(em, pw, rc) {
+
+	console.log('function - ' + pw);
+
+	if ( gResetKey.includes(rc) ) {
+		var pwh = sha512(pw,gNACL);
+	
+		var s = 'update adept.users set password = \''+ pwh.passwordHash + '\', reset = \'' + rd() + '\' where email = \''+em+ '\' returning user_id'; 
+		console.log('user check '+s);
+		try {
+			var z = await dbCall(s);
+			if (typeof(z) == "object" ) {
+				var b = z;
+			} else {
+				var b = JSON.parse(z);
+			}
+			if ( gResetKey.includes(rc) ) {
+				var ix = gResetKey.indexOf(rc);
+				gResetKey.splice(ix, 1);
+			}
+			console.log(b);
+			return b;
+		
+		} catch(e) {
+			if ( gResetKey.includes(rc) ) {
+				var ix = gResetKey.indexOf(rc);
+				gResetKey.splice(ix, 1);
+			}
+			return e;
+		}
+	} else {
+		if ( gResetKey.includes(rc) ) {
+			var ix = gResetKey.indexOf(rc);
+			gResetKey.splice(ix, 1);
+		}
+		var r = {'Status' : 'Validation Code Error'};
+		return r;
+	}
+	
+}  
+
+async function pwResetSendEmail(em) {
+
+	let transporter = nodemailer.createTransport({
+		host: "smtp.gmail.com",
+		port: 587,
+		secure: false,
+		auth: {
+		user: "xxxxx", 
+		pass: "xxxxx", 
+		},
+	});
+
+	var grs = genRandomString(16);
+	var pwToken = sha512(em,grs);
+	var cz = pwToken.passwordHash.substring(0,16);
+    gResetKey.push(cz);
+
+	var es = "<b>Adept User Password Reset Security Code</b></br>" + 
+			"User: " + em +"</br>" +
+			"Security Code: " + cz + "</br></br>" +
+			"This security code will be active for 60 minutes</br>" + 
+			"If you did not request a password reset, please notify us at contact@geodeepdive.org";
+
+	let info = await transporter.sendMail({
+		from: '"xxxxx contact" <xxxxx@gmail.com>', // sender address
+		to:  em,
+		subject: "ADEPT - User Password Reset Request NOTIFICATION", // Subject line
+		text: "", 
+		html: es
+	});
+
+	if ( info ) {
+		console.log('New User email notification' + JSON.stringify(info));
+	}
+
+	return info;
+
+}
 
 async function dbCall(q) {
 	return new Promise(function(resolve, reject) {
@@ -213,6 +322,7 @@ async function dbCall(q) {
 		 });
 	 });
 }
+
 
 async function fetchAuth(u,p,s ) {
 
@@ -407,12 +517,11 @@ async function newUserApps(u,ao) {
 				var b = JSON.parse(z);
 			}
 			var user_email = b.rows[0].email;
-			var estatus = sendAppEmail(u, user_email, ua_id, ao);
+			var estatus = sendAppEmail(u, user_email, ua_id, ao);         
 			return estatus;
 		} catch(e) {
 			return e;
-		}
-		
+		}	
     }
 
 	async function sendAppEmail(u,umail, ua_id, ao ) {
@@ -422,8 +531,8 @@ async function newUserApps(u,ao) {
             port: 587,
             secure: false,
             auth: {
-            user: "", 
-            pass: "", 
+            user: "xxxxx", 
+            pass: "xxxxx", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -433,17 +542,22 @@ async function newUserApps(u,ao) {
                 "Cores " + ao.cores + "Memory: " + ao.memory;
 
         let info = await transporter.sendMail({
-            from: '', // sender address
-            to: "", // list of receivers
+            from: '"xxxxx contact" <xxxx@gmail.com>', // sender address
+            to: "xxxxx", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
         });
         if ( info ) {
-			
-            updateAppStatus(u, ao, ua_id)
-        }
-        return info;
+            var uas = updateAppStatus(u, ao, ua_id);  // error handling
+			return uas;                               // error handling
+
+        } else {
+			var state = {"Status" : "Email Error"};   // error handling
+			return state;                             // error handling
+		}
+		
+        // return info;
     }
 
 	async function updateAppStatus(u, ao, ua_id  ) {
@@ -562,7 +676,7 @@ async function execAppInstance(u,i,n,c,m,t,d) {
         tz = tz+']';
         
         var s = 'select * from adept.addNewInstance('+u+','+i+',\''+n+'\',\''+c+'\',\''+m+'\','+tz+')';
-       
+        //console.log(s);
 
 		try {
 			var z = await dbCall(s);
@@ -571,14 +685,14 @@ async function execAppInstance(u,i,n,c,m,t,d) {
 			} else {
 				var b = JSON.parse(z);
 			}
-			
+			//console.log('addnewInstance '+b)	
 			var dx = {};
 			dx.success = {};
 			if ( b.rows ) {
-				
+			
 				var ax_id = b.rows[0].addnewinstance;   
 				var axa = ax_id.split('-')[1];
-				
+			
 				var z = await sendAppInstanceEmail(u,i,n,c,m,t, axa);
 				dx.success.data =  b.rows;
 				return dx;
@@ -599,8 +713,8 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             port: 587,
             secure: false,
             auth: {
-            user: "", 
-            pass: "", 
+            user: "xxxxx", 
+            pass: "xxxxx", 
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -610,24 +724,24 @@ async function execAppInstance(u,i,n,c,m,t,d) {
                 "Cores " + c + "Memory: " + m + "Test Sets : " + t ;
 
         let info = await transporter.sendMail({
-            from: '', // sender address
-            to: "", // list of receivers
+            from: '"xxxxx contact" <xxxxx@gmail.com>', // sender address
+            to: "xxxxx", // list of receivers
             subject: "New Application Run Request", // Subject line
             text: "", 
             html: es
         });
         if ( info ) {
-           
+            //console.log('Email Info '+ ax_id + ' ' + JSON.stringify(info));
             updateAppInstanceStatus(u,i,n,c,m,t, ax_id)
         }
-       
+        //console.log(info);
         return info;
     }
 
     async function updateAppInstanceStatus(u,i,n,c,m,t,ax_id  ) {
         
         var s = 'update adept.user_app_instance set state = \'active\' where ax_id = '+ax_id;
-		
+		//console.log('update '+s);
 		try {
 			var z = await dbCall(s);
 			if (typeof(z) == "object" ) {
@@ -654,7 +768,6 @@ async function execAppInstance(u,i,n,c,m,t,d) {
     insertAppInstance(u,i,n,c,m,t);
 }
 
-
 async function fetchAppHistory (a) {
 
 	var s = 'select * from adept.app_instance_history where app_id = '+a;
@@ -680,7 +793,6 @@ async function fetchAppHistory (a) {
 		return e;
 	}
 }
-
 
 async function fetchUsers(t, u) {
 
@@ -960,7 +1072,7 @@ async function  deleteLocalDict(u, dt) {
 }
 
 async function addSearchToCollection(i, t, u, c) {
-    // col_id, terms, url, count
+    
 	var s = 'insert into adept.collection_search (col_id, col_desc, search_url, state, rec_count) '
 			+ ' values ('+i+',\''+t+'\',\''+u+'\',\'active\','+c+')';
 
@@ -1041,7 +1153,7 @@ async function delCollectionSearch(c) {
 }
 
 async function deleteRecordFromCollection(i, d) {
-    // col_id, doi
+    
     var s = 'delete from adept.collection_records where col_id = '+i+' and cr_id = '+d;
  
     try {
@@ -1068,7 +1180,7 @@ async function deleteRecordFromCollection(i, d) {
 
 
 async function addRecordToCollection(i, d) {
-    // col_id, doi
+    
 	var s = 'insert into adept.collection_records (col_id, ident, itype, state) '
 			+ ' values ('+i+',\''+d+'\',\'doi\',\'active\')';
 
@@ -1155,26 +1267,8 @@ async function loadDict() {
 
 async function registerTestSet(u,c) {
 
-	var xddResponse = function(err, httpResponse, body) {
-      
-      if (err) {
-			errObj = {"result": "Save error : " + err};
-			console.log(' register Test Set error ' + err);
-			return errObj;
-             
-        } else {
-            jbody = {"result": "Upload response: " + body};
-            return jbody;
-        }
-        
-    }
-
 	var registerPost = async function(jb,r) {
-	
-	
-    	var hurl = 'https://xdddev.chtc.io/api/adept_request_testset?api_key=123-ABC';
-		var hburl = 'https://xdddev.chtc.io';
-				
+					
 		var postlen = JSON.stringify(jb).length;
 		var options = {
 			hostname: 'xdddev.chtc.io',			
@@ -1205,7 +1299,7 @@ async function registerTestSet(u,c) {
 		req.end()
 	}
 
-	var saveTestSet = async function(rds) {
+	async function saveTestSet(rds) {
 
 		var d = JSON.parse(rds);
 
@@ -1215,8 +1309,9 @@ async function registerTestSet(u,c) {
 		var col_id = testset.col_id;
 		
 		var s = 'select * from adept.insert_testset('+user_id+','+col_id+',\''+apikey+'\')';
-       
+        console.log('save testset ' + s);
 		var z = await dbCall(s);
+		console.log('test set save' + JSON.stringify(z) );
     	return z;
 
 	}
@@ -1234,8 +1329,10 @@ async function registerTestSet(u,c) {
 		jb.data.push(cur.success.data[0]);
 		
 		try {
+			console.log('b4 regPost');
 			var pr = await registerPost(jb);
-		
+			console.log('regts' + JSON.stringify(pr));
+		    return pr;
 		} catch(e) {
 			console.log('register catch error '+e);
 		}
@@ -1243,21 +1340,6 @@ async function registerTestSet(u,c) {
 }
 
 async function registerDict(u,d) {
-
-	var xddResponse = function(err, httpResponse, body) {
-  
-      if (err) {
-			errObj = {"result": "Save error : " + err};
-			console.log(' err response ' + err);
-			return errObj;
-           
-        } else {
-            jbody = {"result": "Upload response: " + body};
-            return jbody;
-
-        }
-        
-    }
 
 	var registerPost = async function(jb,r) {
 	
@@ -1272,16 +1354,14 @@ async function registerDict(u,d) {
 			  'sendImmediately': true,
 			  'content-type': "application/json",
         	  'content-length': postlen
-
 			}
 		};
-     
+        
 		const req = https.request(options, res => {
 			console.log(`statusCode: ${res.statusCode}`)
 			res.on('data', d => {
 				process.stdout.write(d);
                 saveTestSet(d);
-				process.stdout.write('AFTER SAVE');
 			})
 		})
 		req.on('error', error => {
@@ -1291,33 +1371,33 @@ async function registerDict(u,d) {
 		req.write(JSON.stringify(jb));
 		req.end()
 		
-
 	}
+
 
 	var saveTestSet = async function(rds) {
 
 		var d = JSON.parse(rds);
-	
-
 		var testset = d.success.data;
 		var apikey = testset.api_key;
 		var user_id = testset.user_id;
 		var col_id = testset.col_id;
 		var s = 'select * from adept.insert_dictionary_testset('+user_id+','+col_id+',\''+apikey+'\')';
-    
+      
 		var z = await dbCall(s);
     	return z;
 
 	}
 
+	
 	var cur = await getLocalDicTerms(u,d);
 
 	if ( cur == null ) {
+		
 		res.sent('Error - collection not found');
 	} else {
-
+       
 		var SearchSets = [];
-
+       
 		for (k in cur.success.data ) {
 			var dname =  cur.success.data[k].name;
 			var ss = {
@@ -1342,7 +1422,7 @@ async function registerDict(u,d) {
 						}]
 					};
 		jb.data[0].search_set = SearchSets;
-
+       
 		try {
 			var pr = await registerPost(jb);
 		} catch(e) {
@@ -1432,7 +1512,6 @@ router.get('/getToken', async function(req, res) {
   } else {
 	  res.send('{"authtoken": "Not authorized"}');	
   } 
-
   
 });
 
@@ -1483,6 +1562,38 @@ router.get('/updateUser', async function(req, res ) {
   
 });
 
+router.get('/sendResetCode', async function(req, res ) {
+	var lp = '/sendResetCode';
+	routelog(req, lp);
+
+	var em = req.query.em;
+    var cur = await userCheckPW(em);
+	if ( cur == null) {
+		res.send('No response');	
+	} else {
+		res.send(cur);	
+	}
+	
+});
+
+router.get('/sendPWReset', async function(req, res ) {
+	var lp = '/sendPWReset';
+	routelog(req, lp);
+
+	var em = req.query.em;
+	var pw = req.query.p;
+	var rc = req.query.r;
+
+    console.log('reset ' + em + ' ' + pw + rc);
+    var cur = await resetPassword(em, pw, rc);
+	if ( cur == null) {
+		res.send('No response');	
+	} else {
+		res.send(cur);	
+	}
+	
+});
+
 router.get('/createUser', async function( req, res ) {
 	// registration
 	var lp = '/adept/createUser';
@@ -1501,6 +1612,7 @@ router.get('/createUser', async function( req, res ) {
   
 	try {
 		var cur = await createUser(u);
+		console.log('response ' + JSON.stringify(cur));
 		res.send(cur);
 	} catch(err) {
 		res.send('User Created - not so much '+err);	
@@ -1678,7 +1790,6 @@ router.get('/getAppHistory', async function( req, res) {
     }   
 });
 
-
 router.get('/getLocalDicTerms', async function( req, res) {
 	var lp = '/adept/getLocalDicTerms';
 	routelog(req, lp);
@@ -1730,11 +1841,9 @@ router.get('/getCollections', async function( req, res) {
     var memid = req.query.m;
 
 	if ( gAdeptKey.includes(token) ) {
-		//if ( typeof(memid) !== "undefined" ) {
-		//	var cur = await fetchMemberCollections(memid);
-		//} else {
-			var cur = await fetchCollections(user_id, colid);
-		//}
+	
+		var cur = await fetchCollections(user_id, colid);
+	
 		
 		if ( cur == null) {
 			res.send('No response');	
@@ -2010,7 +2119,6 @@ router.get('/registerCollection', async function( req, res) {
 	var lp = '/adept/registerCollection';
 	routelog(req, lp);
 
-
 	var token = req.query.t;
 	var u = req.query.u;
 	var colid = req.query.c;
@@ -2043,9 +2151,10 @@ router.get('/registerDictionary', async function( req, res) {
 
 	var token = req.query.t;
 	var u = req.query.u;
+    var d = req.query.d;
 
 	if ( gAdeptKey.includes(token) ) {
-
+     
     	var cur = await registerDict(u, d);
 		if ( cur == null) {
 			res.send('{"Data" : "No response"}');	
