@@ -34,7 +34,6 @@
   var gSetInit = true;
   var gSelDict = {k : "", dict_id : "", count: 0 };
   var gdUrl='https://xdd.wisc.edu/api/v1';
-
   // find records header info
   var gFRHdr = {};
 
@@ -159,27 +158,22 @@
 		$("#Cex").show();
 		if ( gMenuSel == 's' ) {
 			$("#Cex").show();
-		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
-			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
 			console.log('logged in whlie viewing map');
-	
 			
 		}
 		
 	} else if ( kmu(gKey) && gKey.agentRole == "4"  ) {
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
 			$("#leftMDRecord").show();
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		
 			console.log('logged in while viewing map');
 			
 		}
@@ -187,13 +181,10 @@
 		// logging out
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-		
 		} else if ( gMenuSel == 'r' ) {
 			 $("#widget-view").empty();
-			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		
 			console.log('logged in whie viewing map');	
 		}
 	}
@@ -437,7 +428,9 @@ function saveSearchSetup(o) {
 
     if ( kmu(gKey) ) {
       if ( gSelCollection.col_id ) {
-        
+        //var srch=searchSettings();
+       // var srch=JSON.stringify(gSE);
+
        var srch = '?';
         var inx = 0;
 
@@ -776,6 +769,8 @@ function findRecords(page,g) {
       var ssu = 'success findrecords'; 
     })
     .done(function(data) { 
+        //spinner.stop();
+        //$("#rec-results").css("background-color", "white");
         console.log('-->> '+dx.getTime());
         if (typeof(data) == "object" ) {
           var dres = data;
@@ -868,6 +863,7 @@ function findTemplate(page) {
         var linkz =  xtm.link;
       }
 
+     // var savd = localStorage.getItem('sr-'+gs);
       var bt = 'Save';
       var bc =  "#2191c2";
       
@@ -961,6 +957,8 @@ function findTemplate(page) {
 
       var gCard = $('<div id ="gCard-' + i + '" class="g-item-card" />')
           .css("margin", "5px" )
+          .css("padding","2px 2px")
+          //.css("border","solid")
           .css("background-color", "white" )
           .hover(function() { 
               $(this).css("background-color", "powderblue"); 
@@ -1209,6 +1207,7 @@ var getSnippets = function(doi) {
                   .css("background", "slate" );
 
           snipDiv.append('<h2 style="font-size:14px; margin-bottom: 10px" >Text Highlights</h2>');
+          //snipDiv.append('</br>');
 
           for (k in hla) {
             var hls = $('<span>[ '+ hla[k] +' ]</span>').css("margin-top", "10px");
@@ -1255,6 +1254,7 @@ var getDictTerms = function(doi) {
 
             for (k in kta) {
               var kts = $('<a id="'+ kta[k]+'" onclick="ktFind(this)" class="tag">' +  kta[k] + '</a>');
+            //var kts = $('<span>[ '+ kta[k] +' ]</span>').css("margin-top", "10px");
               ktDiv.append(kts);
   
             }
@@ -1449,8 +1449,16 @@ var searchJrn = function() {
   gJSearch = $("#jstext").val();
   gjPage = 0;
   journalTemplate();
-}
+  /*
+  if ( jsx ) {
+    gJSearch = jsx;
+    gjPage = 0;
+    journalTemplate();
+  } else {
+    gJSearch = "";
+  }*/
 
+}
 // Journal functions that build that right panel catalog
 var journalView = function(o) {
 
@@ -1580,6 +1588,8 @@ var journalTemplate = function() {
     })
   }
   
+  //var jpstart = gjPage*50;
+  //var jpd = 0;
   var jpStart = gjPage*25;
   var jpEnd = jpStart+25;
   var jpd = 0;
@@ -1610,7 +1620,7 @@ var journalTemplate = function() {
       
     }
 
-   
+    //if ( df == true && jpd < 50 && k > jpstart ) {
     if ( df ) {
       jpd++;
       tc++;
@@ -1632,6 +1642,7 @@ var journalTemplate = function() {
           
           var e = gJrn[k].eissn;
 
+          //var i = $('<td id="ji-'+k+'" class="jtd">'+gJrn[k].issn+'</td>').css("width","80px");
           var y = gJrn[k].years_covered;
           var ys = y[0] + '-'+ y[y.length-1] + ' '+ y.length;
           var yx = $('<td id="jy-'+k+'" class="jtd">'+ys+'</td>').css("width","80px");
@@ -1640,6 +1651,7 @@ var journalTemplate = function() {
           tr.append(p);
           tr.append(a);
           tr.append(yx);
+         // tr.append(i);
           jT.append(tr);
         }
     }
@@ -1679,6 +1691,7 @@ var facetSet = function(o) {
   })
   .done(function(data) { 
 
+        //$("#rec-results").css("background-color", "white");
         if (typeof(data) == "object" ) {
           var dres = data;
         } else {
@@ -1696,6 +1709,22 @@ var facetSetView = function() {
   $(".nsv-category").each(function() {
     $( this ).remove();
   })
+/*
+  if ( gSetInit ) {
+    var pl = $('<a class="nsv" id="geothermal" style="cursor: pointer;" onclick="selectSet(this);" >geothermal</a>')
+        .css("font-size", "12px")
+        .css("color", "#222222")
+        .css("background-color", "yellow")
+        .css("font-weight", "bold");
+    var cax = $('<div class="nsv-category" />')
+        .css("margin-left", "11px")
+        .css("display", "block")
+        .css("height", "14px");
+        cax.append(pl);
+        $("#SetList").append(cax);
+    gSetInit = false;
+  }
+  */
 
   for (k in gSet) {
     var n = gSet[k].name;
@@ -1833,6 +1862,7 @@ function getDicTerms(o, cb) {
         }
         if ( dres.success.data[0].term_hits) {
           gDict = dres.success.data[0].term_hits
+          //gDict = Object.keys(gDict).sort();
           gSelDict.count = Object.keys(gDict).length;
           if ( cb ) {
             cb();
@@ -1880,6 +1910,7 @@ function logmein(o, cb) {
         $("#laname").text(un).css("font-size","12px")
             .css("font-family","Arial, Lucida Grande, sans-serif");
         $("#loginBtn").text("Logout");
+        //$("#Cex").css("display","block");
         $("#loginDiv").hide();
         $("#myDataTab").show();
         $("#saveSetGrp").show();
@@ -1950,6 +1981,7 @@ function loginSelCol(o) {
 
      
       init=1;
+      //getGroupColSearches();
 
     }
   } else {
@@ -1958,7 +1990,50 @@ function loginSelCol(o) {
   }
 }
 
+/*function getGroupColSearches() {
 
+  var xUrl = '/adept/getGroupCollections?t='+kmu(gKey)+'&u='+gUser.id;
+  var jqxhr = $.get(xUrl, function() {
+    var ssu = 'success gt'; 
+  })
+  .done(function(data) { 
+
+       if (typeof(data) == "object" ) {
+          var dres = data;
+       } else {
+          var dres = JSON.parse(data);
+       }
+       gGrpSelColSearch = dres.success.data;
+       if ( gGrpSelColSearch ) {
+        showGrpColSearch();
+       }
+      
+  });
+}
+
+function showGrpColSearch(o) {
+
+  if ( gGrpSelColSearch ) {
+
+    for (k in gGrpSelColSearch ) {
+      var g =  gGrpSelColSearch[k].group_id;
+      var gn =  gGrpSelColSearch[k].group_name;
+      var i =  gGrpSelColSearch[k].col_id;
+      var n =  gGrpSelColSearch[k].col_name;
+      var s =  gGrpSelColSearch[k].search_set;
+
+      for (x in s) {
+        var si = s[x].cs_id;
+        var cd = s[x].col_desc;
+        var so = $('<option value="'+k+'-'+i+'-'+x+'-G">'+gn+'/'+n+'/'+cd+'</option>')
+                  .css("font-family", "calibri")
+                  .css("background","#7bb853");
+        $("#selSavedSets").append(so);
+      }
+    }
+  }
+
+} */
 
 function getSavedSetOpt(o) {
   var ov = o.value.split('-');
@@ -1995,8 +2070,6 @@ function logmeinx(o, cb) {
 
   var xUrl = '/action/getToken?q='+un+'&p='+pw;
 
-	
-	
   var jqxhr = $.get(xUrl, function() {
     var ssu = 'success gt'; 
   })
@@ -2008,7 +2081,7 @@ function logmeinx(o, cb) {
           var dres = JSON.parse(data);
        }
       
-        
+        //for (var k in dres) {
         if ( dres.authtoken == dres.kv ) {
             gKey = {};
             gKey[dres.authtoken] = dres.kv;
@@ -2016,6 +2089,7 @@ function logmeinx(o, cb) {
             $("#laname").text(un).css("font-size","12px")
 				.css("font-family","Arial, Lucida Grande, sans-serif");
             $("#loginBtn").text("Logout");
+            //$("#Cex").css("display","block");
             $("#loginDiv").hide();
             cb();
             return;
@@ -2032,9 +2106,13 @@ var resetPw = function(o) {
     $("#regDiv").hide();
   } else {
     $("#regDiv").show();
+
     $("#loginDiv").hide();
 
     var rf = $("#regForm");
+    rf.css("height","380px");
+
+    var div1 = $('<div id="sendEm"></div>');
 
     var h = $('<h5>Have you forgotten your password ?</h5>')
                     .css("margin-top", "12px")
@@ -2044,58 +2122,31 @@ var resetPw = function(o) {
                     .css("margin-bottom", "12px")
                     .css("text-align", "center");
 
-    var labn = $('<span>Enter your email address below and press send to receive a password reset security code</span></br>')
-        .css("font-family","calibri")
-        .css("font-size", "16px");                
-   var rfn = $('<input class="form-control" placeholder="First Name" id="rFname">').css("display","none");
-   var rln = $('<input class="form-control" placeholder="Last Name" size="30" id="rLname">').css("display","none");
-
-    var labc = $('<span >Contact Info </span></br>')
-        .css("display","none")
-        .css("font-family","calibri")
-        .css("font-size", "12px");  
     var em = $('<input class="form-control" placeholder="Email" size="30" id="rEmail">');
-    var org = $('<input class="form-control" placeholder="Institution" size="40" id="rOrg">')
-        .css("display","none");
-    var rdesc = $('<input class="form-control" placeholder="Purpose" size="40" id="rDesc">')
-        .css("display","none");
 
-    var labl = $('<span id="lofi">Enter the reset code</span></br>')
-        .css("display","none")
-        .css("font-family","calibri")
-        .css("font-size", "14px");  
-    var unx = $('<input class="form-control" placeholder="Enter reset code" id="resetCode">')
-        .css("display","none");
-    var pw = $('<input id="upass" class="form-control" placeholder="Create new password" type="password">')
-        .css("display","none");
-    var cpw = $('<input  id="cupass" class="form-control" placeholder="Confirm password" type="password">')
-        .css("display","none");
-    
-    var pwi = $('<span id="pwcl">Password must contain minimum of 8 characters with a number & special character</span>')
-              .css("display","none")
-              .css("font-family","calibri")
-              .css("font-size","12px");
-              
-    var dbtn = $('<input id="disCB" type="checkbox" value="true">')
-          .css("display","none");
-    var dsclm = $('<span>I have read and understand the Terms and Conditions of Use</span></br>')
-          .css("display","none")
-          .css("font-family","calibri")
-          .css("font-size","11px");
+    var fpBtn = $('<a id="regBtn" class="tag" type="submit" onclick="sendResetPwEmail();" style="margin:4px;">Send</a>');  
+    var labn = $('<span>Enter your email address and press send to receive a password reset security code</span></br>')
+            .css("font-family","calibri")
+            .css("font-size", "12px");
 
-    var regBtn = $('<a id="regBtn" class="tag" type="submit" onclick="forgotPW();" style="margin:4px;">Send</a>');
+    div1.append(h);  
+    div1.append(em);
+    div1.append(fpBtn);
+  
+    div1.append('</br>');  
+    div1.append(labn);
+
+    rf.append(div1);
+
+    var div2 = $('<div id="getCode"></div>');
+    rf.append(div2);
+
+    var div3 = $('<div id="finalSend"></div>');
     var cancelBtn = $('<a id="cancelBtn" class="tag" type="submit" onclick="cancelReg();" style="margin:4px;">Cancel</a>');
 
-    var bsp = $('<h5></h5>')
-                    .css("margin-top", "8px")
-                    .css("color", "#21b229")
-                    .css("font-size", "16px")
-                    .css("font-family","calibri")
-                    .css("margin-bottom", "8px")
-                    .css("text-align", "center");
-    bsp.append(regBtn)
-    bsp.append(cancelBtn);
-
+    div3.append(cancelBtn);
+    rf.append(div3);
+    /*
     rf.append(h);
     rf.append(labn);
     rf.append(rfn);
@@ -2126,12 +2177,114 @@ var resetPw = function(o) {
     rf.append(dsclm);
     rf.append('</br>');
     rf.append(bsp);
+    */
+    //rf.append(cancelBtn);
     
   }
 
+}
 
+var sendResetPwEmail = function(o) {
+    
+  var emx = $("#rEmail").val();
+  var pUrl = '/adept/sendResetCode?em='+emx;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success cu'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    console.log(data);
+
+    if ( data ) {
+      //alert(data);
+      ResetPwEmailForm(emx);
+   } else {
+      alert('An email will be sent to the address you supplied confirming your approval');
+   }
+  });
 
 }
+
+var ResetPwEmailForm = function(o) {
+
+  var cbn = $("#sendEm");
+  $("#regBtn").hide();
+  var labl = $('<span id="lofi">Enter the reset code</span></br>')
+    .css("display","none")
+    .css("font-family","calibri")
+    .css("font-size", "14px");  
+
+  var unx = $('<input class="form-control" placeholder="Enter reset code" id="resetCode">');
+  
+  var verifyBtn = $('<a id="verifyBtn" class="tag" type="submit" onclick="resetPWform(this);" style="margin:4px;">Validate</a>');
+  cbn.append(labl);     
+  cbn.append(unx);
+  cbn.append(verifyBtn);
+  
+}
+
+
+var resetPWform = function(o) {
+
+  if ( $("#upass").length ) {
+    console.log('Done already');
+  } else {
+  //$("#sendEm").empty();
+    var emx = $("#rEmail").val();
+    var pwf = $("#getCode");
+    var pw = $('<input id="upass" class="form-control" placeholder="Reset password" type="password">');
+    var cpw = $('<input  id="cupass" class="form-control" placeholder="Confirm password" type="password">');
+
+    var pwi = $('<span id="pwcl">Password must contain minimum of 8 characters with a number & special character</span>')
+            .css("font-family","calibri")
+            .css("font-size","12px");
+
+    var pwBtn = $('<a id="verifyBtn" class="tag" type="submit" onclick="sendPW(this);" style="margin:4px;">Reset</a>');
+
+    pwf.append(pw);
+    pwf.append('</br>');
+    pwf.append(cpw);
+    pwf.append(pwBtn);
+    pwf.append('</br>');
+    pwf.append(pwi);
+    pwf.append('</br>');
+   
+  } 
+
+}
+
+var sendPW = function(o) {
+  var emx = $("#rEmail").val();
+  var rsc = $("#resetCode").val();
+  var pwx = $("#upass").val();
+  var pUrl = '/adept/sendPWReset?em='+emx+'&p='+pwx+'&r='+rsc;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success cu'; 
+  })
+  .done(function(data) { 
+    console.log(data);
+
+    $("#getCode").empty();
+
+
+    if ( data.Status ) {
+      alert ('ERROR ' + data.Status);
+    } else {
+      alert('Password has been reset, try logging in ');
+      $("#regForm").empty();
+      $("#regDiv").hide();
+
+    }
+  });
+
+}
+
 var register = function(o) {
 
   if ( $("#regDiv").is(":visible") ) {
@@ -2222,6 +2375,7 @@ var register = function(o) {
     rf.append(dsclm);
     rf.append('</br>');
     rf.append(bsp);
+    //rf.append(cancelBtn);
     
   }
 
@@ -2266,10 +2420,15 @@ var submitReg = function(o) {
   }
 
   if ( valid && !e ) {
+   // $("#rEmail").css("color","red");
     $("#emsp").text("Valid email is required").css("color","red");
     valid = false;
   }
 
+  //if ( valid && !e && !u ) {
+  //  $("#rUname").css("color","red");
+  //  valid = false;
+  //}
 
   var rUrl = '/adept/createUser?em='+e+'&u='+u+'&p='+p+'&f='+f+'&l='+l+'&o='+o+'&d='+d;
   console.log(rUrl);
@@ -2311,6 +2470,7 @@ var showLogin = function() {
   } else {
     $("#Cex").css("display","block");
     //TEMP FOR DEV - use toggle !!
+    //toggleLogin();
   } 
 }
 
@@ -2347,6 +2507,7 @@ var toggleLogin = function(o, cb) {
 }
 
 var viewTos = function(o) {
+  //$("#loginDiv").hide();
   $("#tosDiv").toggle();
 }
 
@@ -2482,7 +2643,14 @@ var dictManTemplate = function(o) {
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
         .css('width','80px');
-  
+  /*
+  var udBtn = $('<a id="edBtn" class="res-tag" type="submit" onclick="uploadDict();" >Upload</a>')
+        .css('font-size','12px')
+        .css('display','none')
+        .css('background-color','rgb(33,145,194)')
+        .css('margin','5px')
+        .css('width','80px');
+  */
   var rtBtn = $('<a id="rtsBtn" class="res-tag" type="submit" onclick="dicRequestTS();" >Request Test Set</a>')
         .css('font-size','12px')
         .css('display','none')
@@ -2503,10 +2671,12 @@ var dictManTemplate = function(o) {
   $("#dmdiv").append(sdBtn);
   $("#dmdiv").append(ndBtn);
   $("#dmdiv").append(ddBtn)
+  //$("#dmdiv").append(udBtn);
   $("#dmdiv").append(rtBtn);
   $("#dmdiv").append('</br>');
 
   var dldiv = $('<div id="dm-dl-div">'+gDLType+'</br></div>')
+  //$("#dmdiv").append('<div id="dm-dl-div">'+gDLType+'</br></div>')
         .css('width','180px')
         .css('height','420px')
         .css("overflow-x","hidden")
@@ -2519,12 +2689,15 @@ var dictManTemplate = function(o) {
         .css('width','400px')
         .css('height','20px')
         .css('background-color','rgb(230, 230, 230)')
+        //.css("overflow-x","hidden")
+        //.css("overflow-y", "scroll")
         .css('float','right')
         .css('display','block');
 
   var dtdiv = $('<div id="dm-term-div"></div>')
         .css('width','400px')
         .css('height','400px')
+        //.css('background-color','rgb(238, 238, 238)')
         .css('border','solid 1px')
         .css("overflow-x","hidden")
         .css("overflow-y", "scroll")
@@ -2537,6 +2710,8 @@ var dictManTemplate = function(o) {
   if ( gDictList.length ) {
     showDictList();
   }
+
+  //$("#rud-results").append(dmdiv);
 
 }
 
@@ -2553,6 +2728,7 @@ function showDictList() {
     var i =  gDictList[k].dict_id;
     var n =  gDictList[k].name;
     var s =  gDictList[k].source;
+    //var a = gSet[k].details;
     
     var pl = $('<a class="ndx-dm" id="'+k+'-'+i+'" onclick="selectDmDict(this);" >' + n + '</a>')
         .css("font-size", "14px")
@@ -2569,11 +2745,13 @@ function showDictList() {
 }
 
 function selectDmDict(o) {
+  // key, dict_id
   var da = o.id.split('-');
  
   $(".ndx-dm").css("background-color","#ffffff");
   $("#dm-term-div").empty();
   $("#dm-th-div").empty();
+  //$("#dm-term-div").append('<h5>Terms</h5>');
 
   if ( da[0] == gSelDict.k ) {
     gSelDict.k = "";
@@ -2661,6 +2839,7 @@ var dmTermView = function() {
           .css("color", "#222222")
           .css("font-weight", "bold");
   $("#dm-th-div").append(dmhdr);
+//  $("#dm-th-div").append(nb);
 
   var kt = $('<table id="kdt" style="border: none; background-color: white;"></table>');
 
@@ -2684,12 +2863,17 @@ var dmTermView = function() {
       var tn = $('<td style="border: none; background-color: white;"><span style="font-size:12px; font-family: calibri">'+ gDict[key] +'</span></td>');
 
       if ( px < 500 ) {
+        //kr.append(tx);
+        //kr.append(tkt);
         kr.append(tc);
         kr.append(tn);
         kt.append(kr);
       } else {
         return
-      } 
+      }
+      //if ( px < 500 ) { 
+      //  $("#dm-term-div").append(st);
+     // }    
       px++;
     });
     $("#dm-term-div").append(kt);
@@ -2711,6 +2895,7 @@ var dlTermView = function(o) {
   
   for (k in gDict ) {
     var kr = $('<tr></tr>');
+    //var dxt = '<a id="kdel-'+k+'" class="sh-item" style="font-size:12px; font-family: calibri; margin: 2px 2px;" onclick="dlDel(this);" > x </a>';
     var dxt = '<i id="kdel-'+gDict[k].dt_id+'" class="fa fa-trash-alt" id="ds-225" onclick="deleteLocalDictTerm(this)" style="color: rgb(33, 145, 194);"></i>'
     var tx = $('<td></td>');
     tx.append(dxt);
@@ -2767,6 +2952,7 @@ var createNewDict = function(o) {
   var dt = $("#dictTerms").val();
 
   var pUrl = '/adept/newLocalDictionary?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+dn+'&dt='+dt;
+  //var pUrl = '/adept/newLocalDictionary?t='+ kmu(gKey)+'&u='+gUser.id+'&d='+dn;
 
   var jqxhr = $.get(pUrl, function() {
     var ssu = 'success dict terms'; 
@@ -2781,6 +2967,33 @@ var createNewDict = function(o) {
         var o = {};
         o.id = 'sdBtn';
         getDictList(o);
+
+        /*
+        var k = gDictList.length;
+        var i = 0;
+        var pl = $('<a class="ndx-dm" id="'+k+'-'+i+'" onclick="selectDmDict(this);" >' + dn + '</a>')
+              .css("font-size", "14px")
+              .css("color", "#222222")
+              .css("cursor", "pointer")
+              .css("font-weight", "bold");
+        var cax = $('<div class="ndx-dm" />')
+              .css("margin-left", "14px")
+              .css("display", "block")
+              .css("height", "14px");
+        cax.append(pl);
+        $("#dm-dl-div").append(cax);
+
+        $("#dictname").remove();
+        $("#csBtn").remove();
+        if ( dres.success.data ) {
+          gTestSets = dres.success.data;
+          if ( gTestSets.length ) {
+            showTestSetList();
+          } else {
+            // empty it out
+          }
+        }
+        */
   });
 }
 
@@ -3048,6 +3261,15 @@ var selectUser = function(o) {
     gSelUser = {};
   }
 
+
+  //for (k in gUsers) {
+  //   if ( gUsers[k].user_id == sid) {
+  //    gSelUser = gUsers[k];
+  //   }
+  //}
+
+  //console.log(JSON.stringify(gSelUser));
+
 }
 
 var uChgStatus = function(o) {
@@ -3189,6 +3411,7 @@ var testSetMan = function(o) {
 
 var tsTemplate = function() {
 
+
   var tldiv = $('<div id="tslist-div">Test Sets</br></div>')
             .css('width','180px')
             .css('height','420px')
@@ -3211,7 +3434,7 @@ var tsTemplate = function() {
             .css('float','right')
             .css('display','block');
 
- 
+  
   $("#tsdiv").append(tldiv);
   $("#tsdiv").append(tsdv);
 
@@ -3258,7 +3481,6 @@ var showTestSetList = function() {
     var t =  gTestSets[k].ts_id;
     var c =  gTestSets[k].col_id;
     var n =  gTestSets[k].ts_name;
-
     
     var pl = $('<a class="tsx-dm" id="'+k+'-'+t+'" onclick="selectTestSet(this);" >' + n + '</a>')
         .css("font-size", "14px")
@@ -3560,6 +3782,7 @@ var showAppDetails = function() {
               .css('margin','5px')
               .css('width','80px');
   sad.append(nrBtn);
+
   sad.append('</br>Resources: <span id="selResources" ></span>'); 
   sad.append('</br>');
 
@@ -3697,6 +3920,7 @@ var showAppHistory = function(o) {
 }
 
 
+
 var newApplication = function(o) {
   if ( $("#aName").length ) {
   	return;
@@ -3708,9 +3932,11 @@ var newApplication = function(o) {
   am.append(ad);
 
   var an = $('<input class="form-control" placeholder="Application Name" id="aName" style="background-color: #EEE8B7">');
+  //var adl = $('<input class="form-control" placeholder="Date Limit" id="aDateLim">');
   var adid = $('<input class="form-control" placeholder="Docker Id" id="aDID" style="background-color: #EEE8B7">');
   var csum = $('<input class="form-control" placeholder="Checksum" id="aChecksum" style="background-color: #EEE8B7">');
   var sApT = $('<textarea rows="5" cols="50" id="AppDesc" placeholder="Application Description" style="background-color: #EEE8B7">');
+  //var sApT = $('<input class="form-control" placeholder="Application Description" id="AppDesc">');
   var aco = $('<input class="form-control" placeholder="Cores" id="aCores" style="background-color: #EEE8B7">');
   var ame = $('<input class="form-control" placeholder="Memory" id="aMemory" style="background-color: #EEE8B7">');
   var gitre = $('<input class="form-control" placeholder="Github" id="aGithub">');
@@ -3921,6 +4147,7 @@ var showAppTemplate = function() {
             .css("cursor", "pointer")
             .css("font-weight", "bold");
 
+  
       var ta = $('<td id="a-'+k+'"></td>');
       ta.append(appx);
 
@@ -3930,7 +4157,7 @@ var showAppTemplate = function() {
       var te = $('<td id="e-'+k+'">'+c+'</td>');
       var tf = $('<td id="f-'+k+'">'+s+'</td>');
       var tz = $('<td id="z-'+k+'">'+y+'</td>');
-
+      
       tr.append(tm);
       tr.append(ta);
       tr.append(tb);
@@ -4244,6 +4471,7 @@ var showGroupTemplate = function() {
         var tg = $('<td id="g-'+k+'">'+m+'</td>');
       }
      
+  
       tr.append(ta);
       tr.append(tb);
       tr.append(tc);
@@ -4783,7 +5011,6 @@ var showDatasets = function() {
   tr.append(td);
   tr.append(te);
   tr.append(tf);
-
   pt.append(tr);
 
   for (k in gCollections) {
@@ -4824,6 +5051,7 @@ var showDatasets = function() {
       var td = $('<td id="d-'+k+'">'+s1+'</td>');
       var te = $('<td id="e-'+k+'">'+s2+'</td>');
       var tf = $('<td id="f-'+k+'">'+s3+'</td>');
+      //var te = $('<td id="e-'+k+'"></td>');
       
   
      
@@ -4833,19 +5061,20 @@ var showDatasets = function() {
       tr.append(td);
       tr.append(te);
       tr.append(tf);
+      //tr.append(te);
       pt.append(tr);
   
   }
   
   $("#colist-div").append(pt);
-  getMemberDatasets(pt,'template');
+  //getMemberDatasets(pt,'template');
 
 }
 
 var getMemberDatasets = function(o,gType) {
 
    // Get collections that I are in groups I am a member of
-   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&u='+gUser.id;
+   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&m='+gUser.id;
 
    var jqxhr = $.get(pUrl, function() {
      var ssu = 'success member collections'; 
@@ -4898,7 +5127,7 @@ var showMemberDatasets = function(pt) {
           var td = $('<td id="dm-'+k+'">-</td>').css("background-color", "#bedebe");
           var te = $('<td id="em-'+k+'">-</td>').css("background-color", "#bedebe");
           var tf = $('<td id="fm-'+k+'">-</td>').css("background-color", "#bedebe");
-
+          
           tr.append(ta);
           tr.append(tb);
           tr.append(tc);
@@ -4976,6 +5205,7 @@ var selectMemCol = function(o) {
   if ( gMemberSelCollection.object_id !== old_id ) {
     $("#cnBtn").hide();
     $("#rtBtn").show();
+  
 
     $("#cm-"+cid).show();
     $("#am-"+cid).css("background-color","yellow");
@@ -5258,6 +5488,7 @@ var selectCollection = function(o) {
           pstr = pstr + ' <b>' + key + '</b> ' + jst[key];
         });
 
+    
         var csx = $('<i class="fa fa-trash-alt" id="ds-'+i+'" onclick="delSetSearch(this)"></i>')
           .css("margin","3px;")
           .css("font-size", "12px;")
@@ -5272,6 +5503,7 @@ var selectCollection = function(o) {
     if ( gCollections[k].record_set ) {
       $("#col-search-div").append('<b>Records</b></br>');
       for (z in gCollections[k].record_set ) {
+
         var n = gCollections[k].record_set[z];
         var csx = $('<i class="fa fa-trash-alt" id="ds-'+z+'" onclick="delRecordSearch(this)"></i>')
                 .css("margin","3px 7px;")
@@ -5449,6 +5681,7 @@ var saveObjToGroup = function(type) {
         $("#gaBtn").text("Add To Group");
         $("#gaBtn").attr("onclick","addColToGroup()");
         $("#selxGrp").hide();
+        //alert('Saved Search ' + d + ' in ' +gSelCollection.col_name);
   });
 
 }
