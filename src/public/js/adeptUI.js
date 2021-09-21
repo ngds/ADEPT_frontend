@@ -34,7 +34,6 @@
   var gSetInit = true;
   var gSelDict = {k : "", dict_id : "", count: 0 };
   var gdUrl='https://xdd.wisc.edu/api/v1';
-
   // find records header info
   var gFRHdr = {};
 
@@ -159,27 +158,22 @@
 		$("#Cex").show();
 		if ( gMenuSel == 's' ) {
 			$("#Cex").show();
-		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
-			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
 			console.log('logged in whlie viewing map');
-	
 			
 		}
 		
 	} else if ( kmu(gKey) && gKey.agentRole == "4"  ) {
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-		
 		} else if ( gMenuSel == 'r' ) {
 			$("#widget-view").empty();
 			$("#leftMDRecord").show();
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		
 			console.log('logged in while viewing map');
 			
 		}
@@ -187,13 +181,10 @@
 		// logging out
 		if ( gMenuSel == 's' ) {
 			$("#Cex").hide();
-		
 		} else if ( gMenuSel == 'r' ) {
 			 $("#widget-view").empty();
-			
 			recordTemplate(gT, gKey);
 		} else if ( gMenuSel == 'm' ) {
-		
 			console.log('logged in whie viewing map');	
 		}
 	}
@@ -437,7 +428,7 @@ function saveSearchSetup(o) {
 
     if ( kmu(gKey) ) {
       if ( gSelCollection.col_id ) {
-        
+
        var srch = '?';
         var inx = 0;
 
@@ -751,9 +742,6 @@ var dtm =function(o) {
 
 function findRecords(page,g) {
 
-  /*if (  init == true) {
-    gSE.dict = gDefaultDict;
-  }*/
   if ( !page ) { page = 0 }
   if ( page == 0 ) {
     var srch=searchSettings();
@@ -867,7 +855,6 @@ function findTemplate(page) {
       if ( xtm.link ) {
         var linkz =  xtm.link;
       }
-
       var bt = 'Save';
       var bc =  "#2191c2";
       
@@ -961,6 +948,7 @@ function findTemplate(page) {
 
       var gCard = $('<div id ="gCard-' + i + '" class="g-item-card" />')
           .css("margin", "5px" )
+          .css("padding","2px 2px")
           .css("background-color", "white" )
           .hover(function() { 
               $(this).css("background-color", "powderblue"); 
@@ -1449,8 +1437,8 @@ var searchJrn = function() {
   gJSearch = $("#jstext").val();
   gjPage = 0;
   journalTemplate();
-}
 
+}
 // Journal functions that build that right panel catalog
 var journalView = function(o) {
 
@@ -1580,6 +1568,7 @@ var journalTemplate = function() {
     })
   }
   
+
   var jpStart = gjPage*25;
   var jpEnd = jpStart+25;
   var jpd = 0;
@@ -1610,7 +1599,6 @@ var journalTemplate = function() {
       
     }
 
-   
     if ( df ) {
       jpd++;
       tc++;
@@ -1765,7 +1753,6 @@ function facetDictView() {
     var i =  gDictList[k].dict_id;
     var n =  gDictList[k].name;
     var s =  gDictList[k].source;
-    //var a = gSet[k].details;
     
     var pl = $('<a class="ndv" id="'+k+'-'+i+'" style="cursor: pointer;" onclick="selectDict(this);" >' + n + '</a>')
         .css("font-size", "14px")
@@ -1793,7 +1780,6 @@ function facetDictView() {
 }
 
 function selectDict(o) {
-  // key, dict_id
   var da = o.id.split('-');
  
   $(".ndx-dm").css("background-color","#ffffff");
@@ -1950,6 +1936,7 @@ function loginSelCol(o) {
 
      
       init=1;
+      //getGroupColSearches();
 
     }
   } else {
@@ -1957,8 +1944,6 @@ function loginSelCol(o) {
     $("#selSavedSets").append(so);
   }
 }
-
-
 
 function getSavedSetOpt(o) {
   var ov = o.value.split('-');
@@ -1991,12 +1976,9 @@ function getSavedSetOpt(o) {
 function logmeinx(o, cb) {
   var un = $("#luser").val();
   var pw =  $("#lpass").val();
-  //var fcp = o.id;
 
   var xUrl = '/action/getToken?q='+un+'&p='+pw;
 
-	
-	
   var jqxhr = $.get(xUrl, function() {
     var ssu = 'success gt'; 
   })
@@ -2008,7 +1990,6 @@ function logmeinx(o, cb) {
           var dres = JSON.parse(data);
        }
       
-        
         if ( dres.authtoken == dres.kv ) {
             gKey = {};
             gKey[dres.authtoken] = dres.kv;
@@ -2032,9 +2013,13 @@ var resetPw = function(o) {
     $("#regDiv").hide();
   } else {
     $("#regDiv").show();
+
     $("#loginDiv").hide();
 
     var rf = $("#regForm");
+    rf.css("height","380px");
+
+    var div1 = $('<div id="sendEm"></div>');
 
     var h = $('<h5>Have you forgotten your password ?</h5>')
                     .css("margin-top", "12px")
@@ -2044,94 +2029,134 @@ var resetPw = function(o) {
                     .css("margin-bottom", "12px")
                     .css("text-align", "center");
 
-    var labn = $('<span>Enter your email address below and press send to receive a password reset security code</span></br>')
-        .css("font-family","calibri")
-        .css("font-size", "16px");                
-   var rfn = $('<input class="form-control" placeholder="First Name" id="rFname">').css("display","none");
-   var rln = $('<input class="form-control" placeholder="Last Name" size="30" id="rLname">').css("display","none");
-
-    var labc = $('<span >Contact Info </span></br>')
-        .css("display","none")
-        .css("font-family","calibri")
-        .css("font-size", "12px");  
     var em = $('<input class="form-control" placeholder="Email" size="30" id="rEmail">');
-    var org = $('<input class="form-control" placeholder="Institution" size="40" id="rOrg">')
-        .css("display","none");
-    var rdesc = $('<input class="form-control" placeholder="Purpose" size="40" id="rDesc">')
-        .css("display","none");
 
-    var labl = $('<span id="lofi">Enter the reset code</span></br>')
-        .css("display","none")
-        .css("font-family","calibri")
-        .css("font-size", "14px");  
-    var unx = $('<input class="form-control" placeholder="Enter reset code" id="resetCode">')
-        .css("display","none");
-    var pw = $('<input id="upass" class="form-control" placeholder="Create new password" type="password">')
-        .css("display","none");
-    var cpw = $('<input  id="cupass" class="form-control" placeholder="Confirm password" type="password">')
-        .css("display","none");
-    
-    var pwi = $('<span id="pwcl">Password must contain minimum of 8 characters with a number & special character</span>')
-              .css("display","none")
-              .css("font-family","calibri")
-              .css("font-size","12px");
-              
-    var dbtn = $('<input id="disCB" type="checkbox" value="true">')
-          .css("display","none");
-    var dsclm = $('<span>I have read and understand the Terms and Conditions of Use</span></br>')
-          .css("display","none")
-          .css("font-family","calibri")
-          .css("font-size","11px");
+    var fpBtn = $('<a id="regBtn" class="tag" type="submit" onclick="sendResetPwEmail();" style="margin:4px;">Send</a>');  
+    var labn = $('<span>Enter your email address and press send to receive a password reset security code</span></br>')
+            .css("font-family","calibri")
+            .css("font-size", "12px");
 
-    var regBtn = $('<a id="regBtn" class="tag" type="submit" onclick="forgotPW();" style="margin:4px;">Send</a>');
+    div1.append(h);  
+    div1.append(em);
+    div1.append(fpBtn);
+  
+    div1.append('</br>');  
+    div1.append(labn);
+
+    rf.append(div1);
+
+    var div2 = $('<div id="getCode"></div>');
+    rf.append(div2);
+
+    var div3 = $('<div id="finalSend"></div>');
     var cancelBtn = $('<a id="cancelBtn" class="tag" type="submit" onclick="cancelReg();" style="margin:4px;">Cancel</a>');
 
-    var bsp = $('<h5></h5>')
-                    .css("margin-top", "8px")
-                    .css("color", "#21b229")
-                    .css("font-size", "16px")
-                    .css("font-family","calibri")
-                    .css("margin-bottom", "8px")
-                    .css("text-align", "center");
-    bsp.append(regBtn)
-    bsp.append(cancelBtn);
-
-    rf.append(h);
-    rf.append(labn);
-    rf.append(rfn);
-    rf.append('</br>');
-    rf.append(rln);
-    rf.append('</br>');
-    rf.append(labc);
-    rf.append(em);
-    rf.append('</br><span>You will receive an email with a security code valid for 60 minutes. </span></br>')
-          .css("font-family","calibri")
-          .css("font-size","14px");
-
-    rf.append(org);
-    rf.append('</br>');
-    rf.append(rdesc);
-    rf.append('</br>');
-    rf.append(labl);
-    rf.append(unx);
-    rf.append('</br><span></span></br>')
-          .css("font-family","calibri")
-          .css("font-size","11px");
-    rf.append(pw);
-    rf.append('</br>');
-    rf.append(cpw);
-
-    rf.append(pwi);
-    rf.append(dbtn);
-    rf.append(dsclm);
-    rf.append('</br>');
-    rf.append(bsp);
+    div3.append(cancelBtn);
+    rf.append(div3);
     
   }
 
+}
 
+var sendResetPwEmail = function(o) {
+    
+  var emx = $("#rEmail").val();
+  var pUrl = '/adept/sendResetCode?em='+emx;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success cu'; 
+  })
+  .done(function(data) { 
+    if (typeof(data) == "object" ) {
+      var dres = data;
+    } else {
+      var dres = JSON.parse(data);
+    }
+    console.log(data);
+
+    if ( data ) {
+      ResetPwEmailForm(emx);
+   } else {
+      alert('An email will be sent to the address you supplied confirming your approval');
+   }
+  });
 
 }
+
+var ResetPwEmailForm = function(o) {
+
+  var cbn = $("#sendEm");
+  $("#regBtn").hide();
+  var labl = $('<span id="lofi">Enter the reset code</span></br>')
+    .css("display","none")
+    .css("font-family","calibri")
+    .css("font-size", "14px");  
+
+  var unx = $('<input class="form-control" placeholder="Enter reset code" id="resetCode">');
+  
+  var verifyBtn = $('<a id="verifyBtn" class="tag" type="submit" onclick="resetPWform(this);" style="margin:4px;">Validate</a>');
+  cbn.append(labl);     
+  cbn.append(unx);
+  cbn.append(verifyBtn);
+  
+}
+
+
+var resetPWform = function(o) {
+
+  if ( $("#upass").length ) {
+    console.log('Done already');
+  } else {
+    var emx = $("#rEmail").val();
+    var pwf = $("#getCode");
+    var pw = $('<input id="upass" class="form-control" placeholder="Reset password" type="password">');
+    var cpw = $('<input  id="cupass" class="form-control" placeholder="Confirm password" type="password">');
+
+    var pwi = $('<span id="pwcl">Password must contain minimum of 8 characters with a number & special character</span>')
+            .css("font-family","calibri")
+            .css("font-size","12px");
+
+    var pwBtn = $('<a id="verifyBtn" class="tag" type="submit" onclick="sendPW(this);" style="margin:4px;">Reset</a>');
+
+    pwf.append(pw);
+    pwf.append('</br>');
+    pwf.append(cpw);
+    pwf.append(pwBtn);
+    pwf.append('</br>');
+    pwf.append(pwi);
+    pwf.append('</br>');
+   
+  } 
+
+}
+
+var sendPW = function(o) {
+  var emx = $("#rEmail").val();
+  var rsc = $("#resetCode").val();
+  var pwx = $("#upass").val();
+  var pUrl = '/adept/sendPWReset?em='+emx+'&p='+pwx+'&r='+rsc;
+
+  var jqxhr = $.get(pUrl, function() {
+    var ssu = 'success cu'; 
+  })
+  .done(function(data) { 
+    console.log(data);
+
+    $("#getCode").empty();
+
+
+    if ( data.Status ) {
+      alert ('ERROR ' + data.Status);
+    } else {
+      alert('Password has been reset, try logging in ');
+      $("#regForm").empty();
+      $("#regDiv").hide();
+
+    }
+  });
+
+}
+
 var register = function(o) {
 
   if ( $("#regDiv").is(":visible") ) {
@@ -2270,7 +2295,6 @@ var submitReg = function(o) {
     valid = false;
   }
 
-
   var rUrl = '/adept/createUser?em='+e+'&u='+u+'&p='+p+'&f='+f+'&l='+l+'&o='+o+'&d='+d;
   console.log(rUrl);
 
@@ -2283,7 +2307,11 @@ var submitReg = function(o) {
 
       $("#regForm").empty();
       $("#regDiv").hide();
-      alert('An email will be sent to the address you supplied confirming your approval');
+      if ( data.status ) {
+        alert(data.status);
+     } else {
+       alert('An email will be sent to the address you supplied confirming your approval');
+     }
     });
   }
 
@@ -2306,7 +2334,6 @@ var showLogin = function() {
        $("#Cex").css("display","none");
   } else {
     $("#Cex").css("display","block");
-    //TEMP FOR DEV - use toggle !!
   } 
 }
 
@@ -2478,7 +2505,7 @@ var dictManTemplate = function(o) {
         .css('background-color','rgb(33,145,194)')
         .css('margin','5px')
         .css('width','80px');
-  
+
   var rtBtn = $('<a id="rtsBtn" class="res-tag" type="submit" onclick="dicRequestTS();" >Request Test Set</a>')
         .css('font-size','12px')
         .css('display','none')
@@ -2685,7 +2712,7 @@ var dmTermView = function() {
         kt.append(kr);
       } else {
         return
-      } 
+      }
       px++;
     });
     $("#dm-term-div").append(kt);
@@ -2777,6 +2804,7 @@ var createNewDict = function(o) {
         var o = {};
         o.id = 'sdBtn';
         getDictList(o);
+
   });
 }
 
@@ -3044,6 +3072,7 @@ var selectUser = function(o) {
     gSelUser = {};
   }
 
+
 }
 
 var uChgStatus = function(o) {
@@ -3185,6 +3214,7 @@ var testSetMan = function(o) {
 
 var tsTemplate = function() {
 
+
   var tldiv = $('<div id="tslist-div">Test Sets</br></div>')
             .css('width','180px')
             .css('height','420px')
@@ -3207,7 +3237,7 @@ var tsTemplate = function() {
             .css('float','right')
             .css('display','block');
 
- 
+  
   $("#tsdiv").append(tldiv);
   $("#tsdiv").append(tsdv);
 
@@ -3254,7 +3284,6 @@ var showTestSetList = function() {
     var t =  gTestSets[k].ts_id;
     var c =  gTestSets[k].col_id;
     var n =  gTestSets[k].ts_name;
-
     
     var pl = $('<a class="tsx-dm" id="'+k+'-'+t+'" onclick="selectTestSet(this);" >' + n + '</a>')
         .css("font-size", "14px")
@@ -3556,6 +3585,7 @@ var showAppDetails = function() {
               .css('margin','5px')
               .css('width','80px');
   sad.append(nrBtn);
+
   sad.append('</br>Resources: <span id="selResources" ></span>'); 
   sad.append('</br>');
 
@@ -3691,6 +3721,7 @@ var showAppHistory = function(o) {
   }
 
 }
+
 
 
 var newApplication = function(o) {
@@ -3917,6 +3948,7 @@ var showAppTemplate = function() {
             .css("cursor", "pointer")
             .css("font-weight", "bold");
 
+  
       var ta = $('<td id="a-'+k+'"></td>');
       ta.append(appx);
 
@@ -3926,7 +3958,7 @@ var showAppTemplate = function() {
       var te = $('<td id="e-'+k+'">'+c+'</td>');
       var tf = $('<td id="f-'+k+'">'+s+'</td>');
       var tz = $('<td id="z-'+k+'">'+y+'</td>');
-
+      
       tr.append(tm);
       tr.append(ta);
       tr.append(tb);
@@ -4240,6 +4272,7 @@ var showGroupTemplate = function() {
         var tg = $('<td id="g-'+k+'">'+m+'</td>');
       }
      
+  
       tr.append(ta);
       tr.append(tb);
       tr.append(tc);
@@ -4779,7 +4812,6 @@ var showDatasets = function() {
   tr.append(td);
   tr.append(te);
   tr.append(tf);
-
   pt.append(tr);
 
   for (k in gCollections) {
@@ -4834,14 +4866,13 @@ var showDatasets = function() {
   }
   
   $("#colist-div").append(pt);
-  getMemberDatasets(pt,'template');
 
 }
 
 var getMemberDatasets = function(o,gType) {
 
    // Get collections that I are in groups I am a member of
-   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&u='+gUser.id;
+   var pUrl ='/adept/getCollections?t='+ kmu(gKey) +'&m='+gUser.id;
 
    var jqxhr = $.get(pUrl, function() {
      var ssu = 'success member collections'; 
@@ -4894,7 +4925,7 @@ var showMemberDatasets = function(pt) {
           var td = $('<td id="dm-'+k+'">-</td>').css("background-color", "#bedebe");
           var te = $('<td id="em-'+k+'">-</td>').css("background-color", "#bedebe");
           var tf = $('<td id="fm-'+k+'">-</td>').css("background-color", "#bedebe");
-
+          
           tr.append(ta);
           tr.append(tb);
           tr.append(tc);
@@ -4972,6 +5003,7 @@ var selectMemCol = function(o) {
   if ( gMemberSelCollection.object_id !== old_id ) {
     $("#cnBtn").hide();
     $("#rtBtn").show();
+  
 
     $("#cm-"+cid).show();
     $("#am-"+cid).css("background-color","yellow");
@@ -5254,6 +5286,7 @@ var selectCollection = function(o) {
           pstr = pstr + ' <b>' + key + '</b> ' + jst[key];
         });
 
+    
         var csx = $('<i class="fa fa-trash-alt" id="ds-'+i+'" onclick="delSetSearch(this)"></i>')
           .css("margin","3px;")
           .css("font-size", "12px;")
@@ -5268,6 +5301,7 @@ var selectCollection = function(o) {
     if ( gCollections[k].record_set ) {
       $("#col-search-div").append('<b>Records</b></br>');
       for (z in gCollections[k].record_set ) {
+
         var n = gCollections[k].record_set[z];
         var csx = $('<i class="fa fa-trash-alt" id="ds-'+z+'" onclick="delRecordSearch(this)"></i>')
                 .css("margin","3px 7px;")
@@ -5572,7 +5606,6 @@ var cosmosMan = function(o) {
     gSelDict.dict_id = 47;
     var o = {};
     var rc = getDicTerms(o, cosmosTemplate );
-    //comsosTemplate();
   }
  
 }
