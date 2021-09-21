@@ -357,8 +357,12 @@ async function newUserApps(u,ao) {
             port: 587,
             secure: false,
             auth: {
-            user: process.env.ADEPT_EMAIL_USERNAME, 
-            pass: process.env.ADEPT_EMAIL_PASSWORD, 
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -534,8 +538,12 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             port: 587,
             secure: false,
             auth: {
-            user: process.env.ADEPT_EMAIL_USERNAME, 
-            pass: process.env.ADEPT_EMAIL_PASSWORD, 
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
