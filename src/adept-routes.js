@@ -1286,7 +1286,7 @@ async function registerTestSet(u,c) {
 		var postlen = JSON.stringify(jb).length;
 		var options = {
 			hostname: 'xdddev.chtc.io',			
-			path: '/api/adept_request_testset?api_key=123-ABC',
+			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
 			body : jb,
@@ -1360,7 +1360,7 @@ async function registerDict(u,d) {
 		var postlen = JSON.stringify(jb).length;
 		var options = {
 			hostname: 'xdddev.chtc.io',
-			path: '/api/adept_request_testset?api_key=123-ABC',
+			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
 			body : jb,
