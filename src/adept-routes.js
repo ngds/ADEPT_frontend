@@ -33,7 +33,7 @@ pool.on('error', (err, client) => {
 var request = require('request');
 
 var qbUrl = 'http://127.0.0.1:8082/query?q=';
-var gdUrl = 'https://xdddev.chtc.io/api/v1';
+var gdUrl = `https://${process.env.XDD_URL}/api/v1`;
 
 // Authentication
 
@@ -1285,7 +1285,7 @@ async function registerTestSet(u,c) {
 					
 		var postlen = JSON.stringify(jb).length;
 		var options = {
-			hostname: 'xdddev.chtc.io',			
+			hostname: process.env.XDD_URL,			
 			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
@@ -1359,7 +1359,7 @@ async function registerDict(u,d) {
 	
 		var postlen = JSON.stringify(jb).length;
 		var options = {
-			hostname: 'xdddev.chtc.io',
+			hostname: process.env.XDD_URL,
 			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
