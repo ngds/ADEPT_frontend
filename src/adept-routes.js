@@ -187,7 +187,7 @@ async function createUser(uo) {
 
         let info = await transporter.sendMail({
             from: '"contact" <xxxxx@email.com>', // sender address
-            to: "xxxxxx", // list of receivers
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
