@@ -3193,13 +3193,13 @@ var testSetMan = function(o) {
 
   apin.append('<h3>About</h3>');
   apin.append('ADEPT defines a <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> as a random sample of 200 documents from its library that meet a particular set of search criteria. ');
-  apin.append(' Users can request the creation of a new test set from the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Dictionaries</b> tab or the  <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Sets</b> tab. '); 
-  apin.append(' Once requested, a URL to the test-set will be recorded below.  ');
-  apin.append(' Please note that there may be a 30-90 second delay between requesting a test set and its appearance below.');
-  apin.append('<br></br>');
+  apin.append(' Users can request the creation of a new test set from the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Dictionaries</b> tab or the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Sets</b> tab.'); 
+  apin.append(' Once requested, a URL to the test-set will be recorded below.');
   apin.append(' The principal purpose of a test set is to provide users with a realistic example of the data input that goes into a xDD application. ');
   apin.append(' More information about how a test-set can be used in an xDD application can be found <a href=" https://github.com/UW-xDD/xdd-docker-recipe#objective "style="color:#0000FF;">here</a>.');
-
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">WARNING: Please note that there may be a 30-90 second delay between requesting a test set and its appearance below.</blockquote>');
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">There may also be a 90-180 second delay between the link appearing in the table below and the table being populated with data.</blockquote>');
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">Please wait a few minutes and try again before reaching out to xDD support at <a href = "mailto: contact@geodeepdive.org">contact@geodeepdive.org</a></blockquote>');
 
   tsdiv.append(tsTx);
   tsdiv.append(aphb);
