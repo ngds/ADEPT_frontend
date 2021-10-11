@@ -4641,7 +4641,7 @@ var collectionMan = function(o) {
   apin.append('A `Saved Set` is a group of search criteria that can be used to define a set of documents. Saved Sets are a core component of the ADEPT system and can be used in many different ways.')
   
   apin.append('<h3>Constructing A Saved Set</h3>')
-  apin.append('Saved Sets are initialized from this tab. Users will click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">New</b> button below and give their saved set a new name - e.g., Geothermal. Once a new saved set is created and saved, users can click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Return to Search<b> button to return to the main metadata browser page of ADEPT.')
+  apin.append('Saved Sets are initialized from this tab. Users will click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">New</b> button below and give their saved set a new name - e.g., Geothermal. Once a new saved set is created and saved, users can click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Return to Search</b> button to return to the main metadata browser page of ADEPT.')
   
   apin.append('Users then use the metadata browser as normal and search for relevant items by keyword, publisher, author, journal, etc. If users are happy with the results of their search they can save those documents to a Saved Set.')
   
