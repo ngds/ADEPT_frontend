@@ -3366,6 +3366,8 @@ var appMan = function(o) {
   apin.append('<h3>Application Run Request and Obtaining Results</h3>');
   apin.append('Once an application has been approved by xDD administrators, a user can request that it be deployed at scale on the actual ');
   apin.append('xDD corpus by clicking on the application name in the Application Manager table and filling out the generated form.');
+  apin.append('<img src="img/136840799-27de92be-3b24-43b9-8f97-9dbb9eb94288.gif">')
+
 
   var naBtn = $('<a id="naBtn" class="res-tag" type="submit" onclick="newApplication();" >New</a>')
         .css('font-size','12px')
@@ -4649,7 +4651,7 @@ var collectionMan = function(o) {
   apin.append('<h3>Using a Saved Set</h3>')
   apin.append('Once users have populated their `<b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Set</b> with appropriate search criteria they can click on its name and then <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Request Test Set</b>. A Test Set is a random sample of 200 documents drawn from the entire Saved Set that users can download for development purposes. Visit the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Sets</b> tab for more information.')
   
-  apin.append('<img src="136842642-dee59b65-6d74-48ad-b93c-990442d9371e.gif">')
+  apin.append('<img src="img/136842642-dee59b65-6d74-48ad-b93c-990442d9371e.gif">')
   apin.append('<br></br>');
   
 
