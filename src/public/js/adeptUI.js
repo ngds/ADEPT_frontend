@@ -2409,7 +2409,7 @@ var dictionaryMan = function(o) {
   apin.append('<h3>Local Dictionaries</h3>');
   apin.append('Users can also create new, custom dictionaries through the ADEPT interface by clicking the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Local</b> button and filling out the resulting form.  ');
   apin.append('A dictionary made through this method is private and only visible to the user who created it from this pane. ');
-  apin.append('A user can <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">request a test set</b> (e.g., a random sample of 200 documents containing one or more of the keywords in the dictionary) for any local, user-created dictionary. ');
+  apin.append('A user can <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Request a Test Set</b> (e.g., a random sample of 200 documents containing one or more of the keywords in the dictionary) for any local, user-created dictionary. ');
   apin.append('A URL to the requested test-set will be accessible by navigating to the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> tab.');
 
   dmdiv.append(dmTx);
