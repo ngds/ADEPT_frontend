@@ -4645,8 +4645,7 @@ var collectionMan = function(o) {
   
   apin.append('Users then use the metadata browser as normal and search for relevant items by keyword, publisher, author, journal, etc. If users are happy with the results of their search they can save those documents to a Saved Set.')
   
-  apin.append('<img src="img/136839149-76f3a5a5-ed85-409b-9a04-94a2916271c3.gif">')
-  apin.append('Caption: A hypothetical user studying geothermal properties performed a search for documents containing the keyword <i>permeability</i>, resulting in 588,987 hits. The user can then refine the search further or, if satisfied, <b>Save the Results</b> to the <b>Geothermal</b> set created earlier by clicking save search.')
+    apin.append('<figure><img src="img/136839149-76f3a5a5-ed85-409b-9a04-94a2916271c3.gif"><figcaption>A hypothetical user studying geothermal properties performed a search for documents containing the keyword <i>permeability</i>, resulting in 588,987 hits. The user can then refine the search further or, if satisfied, <b>Save the Results</b> to the <b>Geothermal</b> set created earlier by clicking save search.</figcaption></figure>')
   
   apin.append('<h3>Using a Saved Set</h3>')
   apin.append('Once users have populated their `<b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Set</b> with appropriate search criteria they can click on its name and then <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Request Test Set</b>. A Test Set is a random sample of 200 documents drawn from the entire Saved Set that users can download for development purposes. Visit the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Sets</b> tab for more information.')
