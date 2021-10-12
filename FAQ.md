@@ -68,8 +68,8 @@ A user write a knowledge base construction application to create a database of t
 Users interested in developing an xDD application are encouraged to visit the following resources. Users are also encouraged to reach out directly to the xDD administrators with questions (contact@geodeepdive.org).
 
 1. Review the xDD [Terms of Service](https://github.com/ngds/ADEPT_frontend/blob/main/TOS.md#terms-of-service)
-2. Instructions on how to [construct an xDD Application](https://github.com/ngds/xdd-docker-recipe/blob/master/README.md#objective)
-3. The [tutorial video]() on how to use the ADEPT front-end for managing your xDD project.
+2. Register and account and login at https://xdd.wisc.edu/adept/#loginPanel
+3. Instructions on how to [construct an xDD Application](https://github.com/ngds/xdd-docker-recipe/blob/master/README.md#objective)
 4. Three examples of working applications created by xDD users.
     1. [An application for named entity recognition and disambiguation of toponyms in text.](https://github.com/ngds/geoparse-rerank/tree/add_cluter_disambig)
     2. [An application for identifying and extracting samples and geographic coordinates from text.](https://github.com/throughput-ec/UnacquiredSites)
