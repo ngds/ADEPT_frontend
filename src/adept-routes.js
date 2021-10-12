@@ -3,11 +3,12 @@
 var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
+var bodyParser = require('body-parser');
 const https = require('https');
 const nodemailer = require("nodemailer");
 const { getMaxListeners } = require("process");
-
-var  Path = process.env.NODE_PATH;
+// This is the docker path
+var  Path = '/app/src/';
 const  {Pool} = require('pg');
 
 
@@ -16,11 +17,11 @@ const  {Pool} = require('pg');
 // used to run Machine Learning apps. 
   
 const pool = new Pool({
-	user: 'xxxxx',
-	host: 'xxxxx',
-	database: 'xxxxx',
-	password: 'xxxxx',
-	port: 5432,
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: process.env.PG_PORT,
 	max: 25
   });
   
@@ -32,7 +33,7 @@ pool.on('error', (err, client) => {
 var request = require('request');
 
 var qbUrl = 'http://127.0.0.1:8082/query?q=';
-var gdUrl = 'https://xdddev.chtc.io/api/v1';
+var gdUrl = `https://${process.env.XDD_URL}/api/v1`;
 
 // Authentication
 
@@ -171,8 +172,12 @@ async function createUser(uo) {
             port: 587,
             secure: false,
             auth: {
-            user: "xxxxx", 
-            pass: "xxxxx", 
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -182,7 +187,7 @@ async function createUser(uo) {
 
         let info = await transporter.sendMail({
             from: '"contact" <xxxxx@email.com>', // sender address
-            to: "xxxxxx", // list of receivers
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
@@ -326,6 +331,7 @@ async function dbCall(q) {
 
 async function fetchAuth(u,p,s ) {
 
+    console.log("looking up user with email " + u + " and password " + p );
 	var sqlStr = 'select user_id, first_name, last_name, user_name, apikey, role_id, password '
 				+ ' from adept.users where email = \'' 
 				+ u + '\' and password = \'' + p + '\' and state = \'active\' order by 1'; 
@@ -531,8 +537,12 @@ async function newUserApps(u,ao) {
             port: 587,
             secure: false,
             auth: {
-            user: "xxxxx", 
-            pass: "xxxxx", 
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -542,8 +552,8 @@ async function newUserApps(u,ao) {
                 "Cores " + ao.cores + "Memory: " + ao.memory;
 
         let info = await transporter.sendMail({
-            from: '"xxxxx contact" <xxxx@gmail.com>', // sender address
-            to: "xxxxx", // list of receivers
+            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Registration request", // Subject line
             text: "", 
             html: es
@@ -713,8 +723,12 @@ async function execAppInstance(u,i,n,c,m,t,d) {
             port: 587,
             secure: false,
             auth: {
-            user: "xxxxx", 
-            pass: "xxxxx", 
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
             },
         });
         // On gmail, this works if the Account option - Less Secure apps - is turned on 
@@ -724,8 +738,8 @@ async function execAppInstance(u,i,n,c,m,t,d) {
                 "Cores " + c + "Memory: " + m + "Test Sets : " + t ;
 
         let info = await transporter.sendMail({
-            from: '"xxxxx contact" <xxxxx@gmail.com>', // sender address
-            to: "xxxxx", // list of receivers
+            from: '"uwxdd contact" <uwxdd.contact@gmail.com>', // sender address
+            to: "iross@cs.wisc.edu", // list of receivers
             subject: "New Application Run Request", // Subject line
             text: "", 
             html: es
@@ -1271,8 +1285,8 @@ async function registerTestSet(u,c) {
 					
 		var postlen = JSON.stringify(jb).length;
 		var options = {
-			hostname: 'xdddev.chtc.io',			
-			path: '/api/adept_request_testset?api_key=123-ABC',
+			hostname: process.env.XDD_URL,			
+			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
 			body : jb,
@@ -1345,8 +1359,8 @@ async function registerDict(u,d) {
 	
 		var postlen = JSON.stringify(jb).length;
 		var options = {
-			hostname: 'xdddev.chtc.io',
-			path: '/api/adept_request_testset?api_key=123-ABC',
+			hostname: process.env.XDD_URL,
+			path: `/api/adept_request_testset?api_key=${process.env.ADEPT_API_KEY}`,
       		port: 443, 
 			method: "POST",
 			body : jb,
@@ -1475,7 +1489,7 @@ router.get('/', async function(req, res) {
 });
 
 router.get('/getToken', async function(req, res) {
-	var lp = '/adept/getToken';
+	var lp = 'adept/getToken';
 	routelog(req, lp);
 	var quark = req.query.q;
 	var lib = req.query.p;
@@ -1487,6 +1501,7 @@ router.get('/getToken', async function(req, res) {
   if ( typeof(px) !== "object" ) {
 	px = JSON.parse(px);
   }
+    console.log(px)
 
   if ( px ) { 
 
@@ -1536,7 +1551,7 @@ router.get('/getUsers', async function(req, res ) {
 });
 
 router.get('/updateUser', async function(req, res ) {
-	var lp = '/updateUser';
+    var lp = '/adept/updateUser';
 	routelog(req, lp);
 
 	var utoken = req.query.t;

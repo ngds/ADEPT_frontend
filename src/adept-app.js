@@ -3,7 +3,7 @@
   
 */
 
-var  Path = '/<WORKING-DIR>/';
+var  Path = '/app/src/';
 var  fs = require("fs");
 console.log('Node Adept app startup at ' + Date.now());
 
@@ -21,9 +21,9 @@ app.use(function(req, res, next){
     next();
 });
  
-app.use('/img', express.static(__dirname + '/public/img'));
-app.use('/js', express.static(__dirname + '/public/js'));
-app.use('/css', express.static(__dirname + '/public/css'));
+app.use('/adept/img', express.static(__dirname + '/public/img'));
+app.use('/adept/js', express.static(__dirname + '/public/js'));
+app.use('/adept/css', express.static(__dirname + '/public/css'));
 app.use('/adept',adeptapi);
 
 app.get('/' , function(req,res) {

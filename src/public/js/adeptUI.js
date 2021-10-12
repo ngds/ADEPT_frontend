@@ -2409,7 +2409,7 @@ var dictionaryMan = function(o) {
   apin.append('<h3>Local Dictionaries</h3>');
   apin.append('Users can also create new, custom dictionaries through the ADEPT interface by clicking the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Local</b> button and filling out the resulting form.  ');
   apin.append('A dictionary made through this method is private and only visible to the user who created it from this pane. ');
-  apin.append('A user can <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">request a test set</b> (e.g., a random sample of 200 documents containing one or more of the keywords in the dictionary) for any local, user-created dictionary. ');
+  apin.append('A user can <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Request a Test Set</b> (e.g., a random sample of 200 documents containing one or more of the keywords in the dictionary) for any local, user-created dictionary. ');
   apin.append('A URL to the requested test-set will be accessible by navigating to the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> tab.');
 
   dmdiv.append(dmTx);
@@ -3193,13 +3193,13 @@ var testSetMan = function(o) {
 
   apin.append('<h3>About</h3>');
   apin.append('ADEPT defines a <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Set</b> as a random sample of 200 documents from its library that meet a particular set of search criteria. ');
-  apin.append(' Users can request the creation of a new test set from the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Dictionaries</b> tab or the  <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Sets</b> tab. '); 
-  apin.append(' Once requested, a URL to the test-set will be recorded below.  ');
-  apin.append(' Please note that there may be a 30-90 second delay between requesting a test set and its appearance below.');
-  apin.append('<br></br>');
+  apin.append(' Users can request the creation of a new test set from the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Dictionaries</b> tab or the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Sets</b> tab.'); 
+  apin.append(' Once requested, a URL to the test-set will be recorded below.');
   apin.append(' The principal purpose of a test set is to provide users with a realistic example of the data input that goes into a xDD application. ');
   apin.append(' More information about how a test-set can be used in an xDD application can be found <a href=" https://github.com/UW-xDD/xdd-docker-recipe#objective "style="color:#0000FF;">here</a>.');
-
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">WARNING: Please note that there may be a 30-90 second delay between requesting a test set and its appearance below.</blockquote>');
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">There may also be a 90-180 second delay between the link appearing in the table below and the table being populated with data.</blockquote>');
+  apin.append(' <blockquote style="border-width: 3px; border-style: solid;">Please wait a few minutes and try again before reaching out to xDD support at <a href = "mailto: contact@geodeepdive.org">contact@geodeepdive.org</a></blockquote>');
 
   tsdiv.append(tsTx);
   tsdiv.append(aphb);
@@ -3366,6 +3366,8 @@ var appMan = function(o) {
   apin.append('<h3>Application Run Request and Obtaining Results</h3>');
   apin.append('Once an application has been approved by xDD administrators, a user can request that it be deployed at scale on the actual ');
   apin.append('xDD corpus by clicking on the application name in the Application Manager table and filling out the generated form.');
+  apin.append('<img src="img/136840799-27de92be-3b24-43b9-8f97-9dbb9eb94288.gif">')
+
 
   var naBtn = $('<a id="naBtn" class="res-tag" type="submit" onclick="newApplication();" >New</a>')
         .css('font-size','12px')
@@ -4636,9 +4638,19 @@ var collectionMan = function(o) {
   ahdiv.append(apin);
 
   apin.append('<h3>About</h3>');
-  apin.append('A <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Set</b> is a group of search criteria that can be used to define a set of documents.');
-  apin.append(' Users build the search criteria from the main ADEPT Search page.');
-  apin.append(' Please view the following tutorial video for more instructions.');
+  apin.append('A `Saved Set` is a group of search criteria that can be used to define a set of documents. Saved Sets are a core component of the ADEPT system and can be used in many different ways.')
+  
+  apin.append('<h3>Constructing A Saved Set</h3>')
+  apin.append('Saved Sets are initialized from this tab. Users will click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">New</b> button below and give their saved set a new name - e.g., Geothermal. Once a new saved set is created and saved, users can click the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Return to Search</b> button to return to the main metadata browser page of ADEPT.')
+  
+  apin.append('Users then use the metadata browser as normal and search for relevant items by keyword, publisher, author, journal, etc. If users are happy with the results of their search they can save those documents to a Saved Set.')
+  
+    apin.append('<img src="img/136839149-76f3a5a5-ed85-409b-9a04-94a2916271c3.gif">')
+  
+  apin.append('<h3>Using a Saved Set</h3>')
+  apin.append('Once users have populated their `<b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Saved Set</b> with appropriate search criteria they can click on its name and then <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Request Test Set</b>. A Test Set is a random sample of 200 documents drawn from the entire Saved Set that users can download for development purposes. Visit the <b style="background-color:rgb(33,145,194);color:White;padding:.2%;">Test Sets</b> tab for more information.')
+  
+  apin.append('<img src="img/136842642-dee59b65-6d74-48ad-b93c-990442d9371e.gif">')
   apin.append('<br></br>');
   
 
