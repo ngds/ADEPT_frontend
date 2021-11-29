@@ -59,7 +59,9 @@ The following is a list of hypothetical scenarios where xDD would or would not b
 
 > **PROHIBITED** A user writes a knowledge base construction application to create a database of the locations of precious minerals and ores with the intention to ***sell*** this database to mining companies. (Violation of the non-commercial only rule). 
 
-> **ALLOWED** A user writes a knowledge base construction application to create a database of the locations of precious minerals and ores and publishes this data freely under an open-access license as part of an academic publication. A mining company, unaffiliated with the original KBC researcher, then uses that data for commercial purposes.
+> **ALLOWED** A user writes a knowledge base construction application to create a database of the locations of precious minerals and ores and publishes this data freely under an open-access license. 
+
+> **ALLOWED** A mining company uses an *open-access* dataset derived by an ADEPT project for commercial purposes.
 
 ### How to get started with xDD and ADEPT
 Users interested in developing an xDD application are encouraged to visit the following resources. Users are also encouraged to reach out directly to the xDD administrators with questions (contact@geodeepdive.org).
