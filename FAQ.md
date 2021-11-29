@@ -48,21 +48,18 @@ The trade-off of including these controlled-access agreements is that xDD and it
 
 1. KBC applications using xDD documents ***may only be deployed within UW-Madison computing resources***. xDD provides access to these computing resources to users for free.
 2. Users must use xDD for [non-commercial academic research](#what-kinds-of-research-can-be-done-with-xdd) and may not monetize the output of an xDD-[KBC application](#what-knowledge-base-construction).
-3. Application output must be a machine-readable, derived product..
+3. Application output must be a machine-readable, derived product.
 
 A full list of the Terms of Service for ADEPT and xDD can be viewed [here](https://github.com/ngds/ADEPT_frontend/blob/main/TOS.md#terms-of-service). As a general rule, however, projects that meet the above three criteria are likely permissable. Users with further questions about permissability are encouraged to reach out to xDD administrators directly (contact@geodeepdive.org).
 
 ### Hypothetical use-cases?
 The following is a list of hypothetical scenarios where xDD would or would not be an appropriate partner for a research project. This list is not exhaustive, and a full list of the Terms of Service for ADEPT and xDD can be viewed [here](https://github.com/ngds/ADEPT_frontend/blob/main/TOS.md#terms-of-service). Users with further questions about permissability are encouraged to reach out to xDD administrators directly (contact@geodeepdive.org).
 
-#### Prohibited Example 1
-A user wishes to read a particular article and submits an xDD application that returns a human-readable, full-text copy of that article without performing any data analysis. (Violation of the derived-products only rule).
+> **PROHIBITED** A user wishes to read a particular article and submits an xDD application that returns a human-readable, full-text copy of that article without performing any data analysis. (Violation of the derived-products only rule).
 
-#### Prohibited Example 2
-A user write a knowledge base construction application to create a database of the locations of precious minerals and ores with the intention to sell this database to mining companies. (Violation of the non-commercial only rule). 
+> **PROHIBITED** A user writes a knowledge base construction application to create a database of the locations of precious minerals and ores with the intention to ***sell*** this database to mining companies. (Violation of the non-commercial only rule). 
 
-#### Allowed Example 1
-A user write a knowledge base construction application to create a database of the locations of precious minerals and ores and publishes this data freely under an open-access license as part of an academic publication. A mining company, unaffiliated with the original KBC researcher, then uses that data for commercial purposes.
+> **ALLOWED** A user writes a knowledge base construction application to create a database of the locations of precious minerals and ores and publishes this data freely under an open-access license as part of an academic publication. A mining company, unaffiliated with the original KBC researcher, then uses that data for commercial purposes.
 
 ### How to get started with xDD and ADEPT
 Users interested in developing an xDD application are encouraged to visit the following resources. Users are also encouraged to reach out directly to the xDD administrators with questions (contact@geodeepdive.org).
