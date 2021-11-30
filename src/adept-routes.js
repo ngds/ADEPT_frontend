@@ -273,13 +273,17 @@ async function resetPassword(em, pw, rc) {
 async function pwResetSendEmail(em) {
 
 	let transporter = nodemailer.createTransport({
-		host: "smtp.gmail.com",
-		port: 587,
-		secure: false,
-		auth: {
-		user: "xxxxx", 
-		pass: "xxxxx", 
-		},
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                type: 'OAuth2',
+                user: process.env.ADEPT_EMAIL_USERNAME,
+                clientId: process.env.ADEPT_EMAIL_CLIENTID,
+                clientSecret: process.env.ADEPT_EMAIL_CLIENTSECRET,
+                refreshToken: process.env.ADEPT_EMAIL_REFRESHTOKEN,
+                accessToken: process.env.ADEPT_EMAIL_ACCESSTOKEN
+            },
 	});
 
 	var grs = genRandomString(16);
